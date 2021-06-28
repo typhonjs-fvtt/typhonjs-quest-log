@@ -674,7 +674,7 @@ export default class QuestPreview extends FormApplication
                   this.quest.addReward({
                      data: {
                         name: value,
-                        img: 'icons/svg/mystery-man.svg'
+                        img: 'FQL/defultAbstract.jpg'
                      },
                      hidden: true,
                      type: 'Abstract'

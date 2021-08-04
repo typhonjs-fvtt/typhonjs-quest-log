@@ -38,6 +38,33 @@ I think module is quite user-friendly with intuitive UI, however if you are conf
 * Personal Quests
 * Quest Branching in the form of Sub Quests
 
+## Macros & Syntax
+
+FQL provides macros for the convenience of GMs and players to make controlling FQL easier and providing an option besides opening module setting and copy/pasting commands from wiki. They can be added by dragging and dropping to the hotbar.
+
+Syntax Examples:
+
+Opens FQL
+```
+Hooks.call('ForienQuestLog.Open.QuestLog');
+```
+
+Resets the quest tracker position if hidden by window / size changes
+```
+game.settings.set('forien-quest-log', 'resetQuestTracker', true);
+```
+
+This macro opens a FilePicker for the GM to select the default image assigned to new abstract rewards created in quests
+```
+new FilePicker({
+   type: 'image',
+   callback: async (path) =>
+   {
+      await game.settings.set('forien-quest-log', 'defaultAbstractRewardImage', path);
+   },
+}).browse();
+```
+
 ## Future plans (current ideas)
 
 Plans for future include:

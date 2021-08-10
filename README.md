@@ -65,6 +65,12 @@ new FilePicker({
 }).browse();
 ```
 
+This macro runs all DB migration
+The integer parameter (0 default) can be set to run a specific migration level to max level migration
+```
+Hooks.call('ForienQuestLog.Run.DBMigration', 0);
+```
+
 ## Future plans (current ideas)
 
 Plans for future include:

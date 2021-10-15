@@ -1,7 +1,7 @@
 import Enrich     from '../../control/Enrich.js';
 import Socket     from '../../control/Socket.js';
 import Utils      from '../../control/Utils.js';
-import FQLDialog  from '../FQLDialog.js';
+import TQLDialog  from '../TQLDialog.js';
 
 import { constants, jquery, settings } from '../../model/constants.js';
 
@@ -61,7 +61,7 @@ export default class HandlerDetails
          {
             case 'name':
                quest.name = valueOut;
-               questPreview.options.title = game.i18n.format('ForienQuestLog.QuestPreview.Title', quest);
+               questPreview.options.title = game.i18n.format('TyphonJSQuestLog.QuestPreview.Title', quest);
                break;
          }
          await questPreview.saveQuest(saveOptions);
@@ -133,7 +133,7 @@ export default class HandlerDetails
             case 'giverName':
                quest.giverName = valueOut;
                if (typeof quest.giverData === 'object') { quest.giverData.name = valueOut; }
-               questPreview.options.title = game.i18n.format('ForienQuestLog.QuestPreview.Title', quest);
+               questPreview.options.title = game.i18n.format('TyphonJSQuestLog.QuestPreview.Title', quest);
                await questPreview.saveQuest(saveOptions);
                break;
          }
@@ -168,7 +168,7 @@ export default class HandlerDetails
          {
             quest.giver = 'abstract';
             quest.image = path;
-            quest.giverName = game.i18n.localize('ForienQuestLog.QuestPreview.CustomSource');
+            quest.giverName = game.i18n.localize('TyphonJSQuestLog.QuestPreview.CustomSource');
             quest.giverData = await Enrich.giverFromQuest(quest);
             delete quest.giverData.uuid;
 
@@ -218,7 +218,7 @@ export default class HandlerDetails
          }
          else
          {
-            ui.notifications.warn(game.i18n.format('ForienQuestLog.QuestPreview.Notifications.BadUUID', { uuid }));
+            ui.notifications.warn(game.i18n.format('TyphonJSQuestLog.QuestPreview.Notifications.BadUUID', { uuid }));
          }
       }
       else
@@ -227,7 +227,7 @@ export default class HandlerDetails
          // from world and compendium sources with a UUID.
          if (typeof data.data === 'object')
          {
-            ui.notifications.warn(game.i18n.localize('ForienQuestLog.QuestPreview.Notifications.WrongDocType'));
+            ui.notifications.warn(game.i18n.localize('TyphonJSQuestLog.QuestPreview.Notifications.WrongDocType'));
          }
       }
    }
@@ -364,7 +364,7 @@ export default class HandlerDetails
    /**
     * Creates a new abstract reward if the input entry is successful or contains data and a focus out event occurs.
     *
-    * The module setting: {@link FQLSettings.defaultAbstractRewardImage} stores the default abstract reward image.
+    * The module setting: {@link TQLSettings.defaultAbstractRewardImage} stores the default abstract reward image.
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
     *
@@ -428,7 +428,7 @@ export default class HandlerDetails
       const name = target.data('reward-name');
 
       // Await a semi-modal dialog.
-      const result = await FQLDialog.confirmDeleteReward({ name, result: uuidv4, questId: quest.id });
+      const result = await TQLDialog.confirmDeleteReward({ name, result: uuidv4, questId: quest.id });
       if (result)
       {
          quest.removeReward(result);
@@ -455,7 +455,7 @@ export default class HandlerDetails
           * @type {RewardDropData}
           */
          const dataTransfer = {
-            _fqlData: {
+            _tqlData: {
                type: 'reward',
                questId: quest.id,
                uuidv4: data.uuidv4,
@@ -526,7 +526,7 @@ export default class HandlerDetails
          Socket.refreshQuestPreview({ questId: quest.id });
       }
 
-      if (data.type === 'Item' && data._fqlData === void 0)
+      if (data.type === 'Item' && data._tqlData === void 0)
       {
          if (typeof data.id === 'string')
          {
@@ -540,7 +540,7 @@ export default class HandlerDetails
             }
             else
             {
-               ui.notifications.warn(game.i18n.format('ForienQuestLog.QuestPreview.Notifications.BadUUID', { uuid }));
+               ui.notifications.warn(game.i18n.format('TyphonJSQuestLog.QuestPreview.Notifications.BadUUID', { uuid }));
             }
          }
          else
@@ -549,7 +549,7 @@ export default class HandlerDetails
             // items that are backed by a document with a UUID.
             if (typeof data.data === 'object')
             {
-               ui.notifications.warn(game.i18n.localize('ForienQuestLog.QuestPreview.Notifications.WrongItemType'));
+               ui.notifications.warn(game.i18n.localize('TyphonJSQuestLog.QuestPreview.Notifications.WrongItemType'));
             }
          }
       }
@@ -827,7 +827,7 @@ export default class HandlerDetails
       const uuidv4 = target.data('uuidv4');
       const name = target.data('task-name');
 
-      const result = await FQLDialog.confirmDeleteTask({ name, result: uuidv4, questId: quest.id });
+      const result = await TQLDialog.confirmDeleteTask({ name, result: uuidv4, questId: quest.id });
       if (result)
       {
          quest.removeTask(result);
@@ -1000,10 +1000,10 @@ export default class HandlerDetails
 }
 
 /**
- * @typedef {object} FQLDropData An object attached to drop data transfer which describes the FQL reward item and who
+ * @typedef {object} TQLDropData An object attached to drop data transfer which describes the TQL reward item and who
  *                               is dropping it into an actor sheet.
  *
- * @property {string} type - The type of FQL drop data; one of: ['reward']
+ * @property {string} type - The type of TQL drop data; one of: ['reward']
  *
  * @property {string} questId - The Quest ID
  *
@@ -1017,7 +1017,7 @@ export default class HandlerDetails
 /**
  * @typedef {object} RewardDropData
  *
- * @property {FQLDropData} _fqlData - FQL drop data used to remove the reward from a quest.
+ * @property {TQLDropData} _tqlData - TQL drop data used to remove the reward from a quest.
  *
  * @property {string}      type - Type of document.
  *

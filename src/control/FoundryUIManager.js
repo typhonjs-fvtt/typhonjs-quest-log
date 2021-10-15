@@ -170,7 +170,7 @@ export default class FoundryUIManager
  * Defines a rectangle with essential contains check. Used to define the pinning rectangle next to the
  * upper left of the sidebar.
  */
-class FQLRect
+class TQLRect
 {
    /**
     * @param {number}   x - Left
@@ -205,7 +205,7 @@ class FQLRect
    }
 
    /**
-    * Tests if the point is contained by this FQLRect.
+    * Tests if the point is contained by this TQLRect.
     *
     * @param {number}   x - Point X
     *
@@ -243,7 +243,7 @@ const sidebar = {
       left: -1,
       width: -1,
       height: -1,
-      rectDock: new FQLRect(0, 0, 15, 30)
+      rectDock: new TQLRect(0, 0, 15, 30)
    },
 
    open: {
@@ -253,7 +253,7 @@ const sidebar = {
       left: -1,
       width: -1,
       height: -1,
-      rectDock: new FQLRect(0, 0, 15, 30)
+      rectDock: new TQLRect(0, 0, 15, 30)
    }
 };
 

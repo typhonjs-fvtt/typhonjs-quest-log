@@ -20,7 +20,7 @@ class QuestAPI
 
    /**
     * Opens the Quest sheet / QuestPreview for the given questID. A check for the module setting
-    * {@link FQLSettings.hideFQLFromPlayers} provides an early out if FQL is hidden from players causing the sheet to
+    * {@link TQLSettings.hideTQLFromPlayers} provides an early out if TQL is hidden from players causing the sheet to
     * not render. {@link ViewManager.questPreview} provides an object.
     *
     * @param {object}   options - Optional parameters.
@@ -31,7 +31,7 @@ class QuestAPI
     */
    static open({ questId, notify = true })
    {
-      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideFQLFromPlayers)) { return; }
+      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) { return; }
 
       try
       {
@@ -51,7 +51,7 @@ class QuestAPI
          {
             if (notify)
             {
-               ViewManager.notifications.warn(game.i18n.localize('ForienQuestLog.Notifications.CannotOpen'));
+               ViewManager.notifications.warn(game.i18n.localize('TyphonJSQuestLog.Notifications.CannotOpen'));
             }
             else
             {
@@ -69,7 +69,7 @@ class QuestAPI
       {
          if (notify)
          {
-            ViewManager.notifications.error(game.i18n.localize('ForienQuestLog.Notifications.CannotOpen'));
+            ViewManager.notifications.error(game.i18n.localize('TyphonJSQuestLog.Notifications.CannotOpen'));
          }
          else
          {

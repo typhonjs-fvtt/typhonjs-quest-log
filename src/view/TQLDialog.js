@@ -1,7 +1,7 @@
 /**
- * Stores any open FQLDialogImpl.
+ * Stores any open TQLDialogImpl.
  *
- * @type {FQLDialogImpl}
+ * @type {TQLDialogImpl}
  */
 let s_DELETE_DIALOG = void 0;
 
@@ -20,10 +20,10 @@ let s_DELETE_DIALOG = void 0;
  * operation and brings the dialog to front and renders again. This provides reasonable semi-modal behavior from just a
  * single dialog instance shared across confirmation to delete quests, tasks, and rewards.
  */
-export default class FQLDialog
+export default class TQLDialog
 {
    /**
-    * Closes any open FQLDialogImpl that is associated with the questId or quest log. FQLDialogImpl gets associated
+    * Closes any open TQLDialogImpl that is associated with the questId or quest log. TQLDialogImpl gets associated
     * with the last app that invoked the dialog.
     *
     * @param {object}   [options] - Optional parameters.
@@ -34,7 +34,7 @@ export default class FQLDialog
     */
    static closeDialogs({ questId, isQuestLog = false } = {})
    {
-      if (s_DELETE_DIALOG && (s_DELETE_DIALOG.fqlQuestId === questId || s_DELETE_DIALOG.fqlIsQuestLog === isQuestLog))
+      if (s_DELETE_DIALOG && (s_DELETE_DIALOG.tqlQuestId === questId || s_DELETE_DIALOG.tqlIsQuestLog === isQuestLog))
       {
          s_DELETE_DIALOG.close();
          s_DELETE_DIALOG = void 0;
@@ -58,13 +58,13 @@ export default class FQLDialog
    {
       if (s_DELETE_DIALOG && s_DELETE_DIALOG.rendered)
       {
-         return s_DELETE_DIALOG.updateFQLData({
+         return s_DELETE_DIALOG.updateTQLData({
             name,
             result,
             questId,
             isQuestLog,
-            title: game.i18n.localize('ForienQuestLog.Quest'),
-            body: 'ForienQuestLog.DeleteDialog.BodyQuest'
+            title: game.i18n.localize('TyphonJSQuestLog.Quest'),
+            body: 'TyphonJSQuestLog.DeleteDialog.BodyQuest'
          });
       }
 
@@ -72,14 +72,14 @@ export default class FQLDialog
 
       return new Promise((resolve) =>
       {
-         s_DELETE_DIALOG = new FQLDialogImpl({
+         s_DELETE_DIALOG = new TQLDialogImpl({
             resolve,
             name,
             result,
             questId,
             isQuestLog,
-            title: game.i18n.localize('ForienQuestLog.Quest'),
-            body: 'ForienQuestLog.DeleteDialog.BodyQuest'
+            title: game.i18n.localize('TyphonJSQuestLog.Quest'),
+            body: 'TyphonJSQuestLog.DeleteDialog.BodyQuest'
          });
 
          s_DELETE_DIALOG.render(true);
@@ -103,13 +103,13 @@ export default class FQLDialog
    {
       if (s_DELETE_DIALOG && s_DELETE_DIALOG.rendered)
       {
-         return s_DELETE_DIALOG.updateFQLData({
+         return s_DELETE_DIALOG.updateTQLData({
             name,
             result,
             questId,
             isQuestLog,
-            title: game.i18n.localize('ForienQuestLog.QuestPreview.Reward'),
-            body: 'ForienQuestLog.DeleteDialog.BodyReward'
+            title: game.i18n.localize('TyphonJSQuestLog.QuestPreview.Reward'),
+            body: 'TyphonJSQuestLog.DeleteDialog.BodyReward'
          });
       }
 
@@ -117,14 +117,14 @@ export default class FQLDialog
 
       return new Promise((resolve) =>
       {
-         s_DELETE_DIALOG = new FQLDialogImpl({
+         s_DELETE_DIALOG = new TQLDialogImpl({
             resolve,
             name,
             result,
             questId,
             isQuestLog,
-            title: game.i18n.localize('ForienQuestLog.QuestPreview.Reward'),
-            body: 'ForienQuestLog.DeleteDialog.BodyReward'
+            title: game.i18n.localize('TyphonJSQuestLog.QuestPreview.Reward'),
+            body: 'TyphonJSQuestLog.DeleteDialog.BodyReward'
          });
 
          s_DELETE_DIALOG.render(true);
@@ -148,13 +148,13 @@ export default class FQLDialog
    {
       if (s_DELETE_DIALOG && s_DELETE_DIALOG.rendered)
       {
-         return s_DELETE_DIALOG.updateFQLData({
+         return s_DELETE_DIALOG.updateTQLData({
             name,
             result,
             questId,
             isQuestLog,
-            title: game.i18n.localize('ForienQuestLog.QuestPreview.Objective'),
-            body: 'ForienQuestLog.DeleteDialog.BodyObjective'
+            title: game.i18n.localize('TyphonJSQuestLog.QuestPreview.Objective'),
+            body: 'TyphonJSQuestLog.DeleteDialog.BodyObjective'
          });
       }
 
@@ -162,14 +162,14 @@ export default class FQLDialog
 
       return new Promise((resolve) =>
       {
-         s_DELETE_DIALOG = new FQLDialogImpl({
+         s_DELETE_DIALOG = new TQLDialogImpl({
             resolve,
             name,
             result,
             questId,
             isQuestLog,
-            title: game.i18n.localize('ForienQuestLog.QuestPreview.Objective'),
-            body: 'ForienQuestLog.DeleteDialog.BodyObjective'
+            title: game.i18n.localize('TyphonJSQuestLog.QuestPreview.Objective'),
+            body: 'TyphonJSQuestLog.DeleteDialog.BodyObjective'
          });
 
          s_DELETE_DIALOG.render(true);
@@ -178,12 +178,12 @@ export default class FQLDialog
 }
 
 /**
- * Provides the FQL dialog implementation.
+ * Provides the TQL dialog implementation.
  */
-class FQLDialogImpl extends Dialog
+class TQLDialogImpl extends Dialog
 {
    /**
-    * @param {FQLDialogOptions} options FQLDialogImpl Options
+    * @param {TQLDialogOptions} options TQLDialogImpl Options
     */
    constructor(options)
    {
@@ -192,10 +192,10 @@ class FQLDialogImpl extends Dialog
       /**
        * Stores the options specific to the dialog
        *
-       * @type {FQLDialogOptions}
+       * @type {TQLDialogOptions}
        * @private
        */
-      this._fqlOptions = options;
+      this._tqlOptions = options;
 
       /**
        * The Dialog options to set.
@@ -204,19 +204,19 @@ class FQLDialogImpl extends Dialog
        * @see https://foundryvtt.com/api/Dialog.html
        */
       this.data = {
-         title: game.i18n.format('ForienQuestLog.DeleteDialog.TitleDel', this._fqlOptions),
-         content: `<h3>${game.i18n.format('ForienQuestLog.DeleteDialog.HeaderDel', this._fqlOptions)}</h3>` +
-          `<p>${game.i18n.localize(this._fqlOptions.body)}</p>`,
+         title: game.i18n.format('TyphonJSQuestLog.DeleteDialog.TitleDel', this._tqlOptions),
+         content: `<h3>${game.i18n.format('TyphonJSQuestLog.DeleteDialog.HeaderDel', this._tqlOptions)}</h3>` +
+          `<p>${game.i18n.localize(this._tqlOptions.body)}</p>`,
          buttons: {
             yes: {
                icon: '<i class="fas fa-trash"></i>',
-               label: game.i18n.localize('ForienQuestLog.DeleteDialog.Delete'),
-               callback: () => this._fqlOptions.resolve(this._fqlOptions.result)
+               label: game.i18n.localize('TyphonJSQuestLog.DeleteDialog.Delete'),
+               callback: () => this._tqlOptions.resolve(this._tqlOptions.result)
             },
             no: {
                icon: '<i class="fas fa-times"></i>',
-               label: game.i18n.localize('ForienQuestLog.DeleteDialog.Cancel'),
-               callback: () => this._fqlOptions.resolve(void 0)
+               label: game.i18n.localize('TyphonJSQuestLog.DeleteDialog.Cancel'),
+               callback: () => this._tqlOptions.resolve(void 0)
             }
          }
       };
@@ -229,44 +229,44 @@ class FQLDialogImpl extends Dialog
     */
    async close()
    {
-      this._fqlOptions.resolve(void 0);
+      this._tqlOptions.resolve(void 0);
       return super.close();
    }
 
    /**
-    * @returns {boolean} Returns {@link FQLDialogOptions.isQuestLog} from options.
+    * @returns {boolean} Returns {@link TQLDialogOptions.isQuestLog} from options.
     */
-   get fqlIsQuestLog() { return this._fqlOptions.isQuestLog; }
+   get tqlIsQuestLog() { return this._tqlOptions.isQuestLog; }
 
    /**
-    * @returns {string} Returns {@link FQLDialogOptions.questId} from options.
+    * @returns {string} Returns {@link TQLDialogOptions.questId} from options.
     */
-   get fqlQuestId() { return this._fqlOptions.questId; }
+   get tqlQuestId() { return this._tqlOptions.questId; }
 
    /**
-    * Updates the FQLDialogOptions when a dialog is already showing and a successive delete operation is initiated.
+    * Updates the TQLDialogOptions when a dialog is already showing and a successive delete operation is initiated.
     *
     * Resolves the currently cached Promise with undefined and cache a new Promise which is returned.
     *
-    * @param {FQLDialogOptions} options - The new options to set for Dialog rendering and success return value.
+    * @param {TQLDialogOptions} options - The new options to set for Dialog rendering and success return value.
     *
     * @returns {Promise<unknown>} The new Promise to await upon.
     */
-   updateFQLData(options)
+   updateTQLData(options)
    {
       // Resolve old promise with undefined
-      this._fqlOptions.resolve(void 0);
+      this._tqlOptions.resolve(void 0);
 
       // Set new options
-      this._fqlOptions = options;
+      this._tqlOptions = options;
 
-      // Create a new Promise that will store the resolve function in this FQLDialogImpl.
-      const promise = new Promise((resolve) => { this._fqlOptions.resolve = resolve; });
+      // Create a new Promise that will store the resolve function in this TQLDialogImpl.
+      const promise = new Promise((resolve) => { this._tqlOptions.resolve = resolve; });
 
       // Update title and content with new data.
-      this.data.title = game.i18n.format('ForienQuestLog.DeleteDialog.TitleDel', this._fqlOptions);
-      this.data.content = `<h3>${game.i18n.format('ForienQuestLog.DeleteDialog.HeaderDel', this._fqlOptions)}</h3>` +
-       `<p>${game.i18n.localize(this._fqlOptions.body)}</p>`;
+      this.data.title = game.i18n.format('TyphonJSQuestLog.DeleteDialog.TitleDel', this._tqlOptions);
+      this.data.content = `<h3>${game.i18n.format('TyphonJSQuestLog.DeleteDialog.HeaderDel', this._tqlOptions)}</h3>` +
+       `<p>${game.i18n.localize(this._tqlOptions.body)}</p>`;
 
       // Bring the dialog to top and render again.
       this.bringToTop();
@@ -279,7 +279,7 @@ class FQLDialogImpl extends Dialog
 }
 
 /**
- * @typedef FQLDialogOptions
+ * @typedef TQLDialogOptions
  *
  * @property {Function} [resolve] - The cached resolve function of the Dialog promise.
  *

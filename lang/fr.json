@@ -1,5 +1,5 @@
 {
-  "ForienQuestLog": {
+  "TyphonJSQuestLog": {
     "Api": {
       "__COMMENT__": "No need for translating lines starting with 'API ERROR', they show in console for developers only.",
       "create": {
@@ -185,7 +185,7 @@
         "Enable": "Marques pages dynamiques en arrière plan",
         "EnableHint": "Cochez pour que l'onglet marque page soit affichée de manière dynamique sur la fenêtre de contenu de l'arrière plan."
       },
-      "hideFQLFromPlayers": {
+      "hideTQLFromPlayers": {
         "Enable": "Cacher le journal de quête aux joueurs",
         "EnableHint": "Activer cette option cache le journal de quêts à tous les joueurs. Seul less joueurs ayant le nivveau MJ seront capables d'accéder au journal de quêtes."
       },

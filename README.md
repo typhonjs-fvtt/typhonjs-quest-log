@@ -1,16 +1,22 @@
-# FoundryVTT - Forien's Quest Log
+# FoundryVTT - TyphonJS Quest Log
 
-<img title="Forien's Quest Log version" src="https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/master/module.json&label=Forien%27s+Quest+Log+version&query=version&style=flat-square&color=success"> ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2FLeague-of-Foundry-Developers%2Ffoundryvtt-forien-quest-log%2Fmaster%2Fmodule.json&label=Foundry%20Version&query=$.compatibleCoreVersion&colorB=orange)
-![GitHub release](https://img.shields.io/github/release-date/League-of-Foundry-Developers/foundryvtt-forien-quest-log)
-[![GitHub commits](https://img.shields.io/github/commits-since/League-of-Foundry-Developers/foundryvtt-forien-quest-log/latest)](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/commits/)
-![the latest version zip](https://img.shields.io/github/downloads/League-of-Foundry-Developers/foundryvtt-forien-quest-log/latest/module.zip)
-![Forge installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fforien-quest-log)
+<img title="TyphonJS Quest Log version" src="https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/master/module.json&label=Forien%27s+Quest+Log+version&query=version&style=flat-square&color=success"> ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftyphonjs-fvtt%2Ftyphonjs-quest-log%2Fmaster%2Fmodule.json&label=Foundry%20Version&query=$.compatibleCoreVersion&colorB=orange)
+![GitHub release](https://img.shields.io/github/release-date/typhonjs-fvtt/typhonjs-quest-log)
+[![GitHub commits](https://img.shields.io/github/commits-since/typhonjs-fvtt/typhonjs-quest-log/latest)](https://github.com/typhonjs-fvtt/typhonjs-quest-log/commits/)
+![the latest version zip](https://img.shields.io/github/downloads/typhonjs-fvtt/typhonjs-quest-log/latest/module.zip)
+![Forge installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Ftyphonjs-quest-log)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fforien-quest-log%2Fshield%2Fendorsements)](https://www.foundryvtt-hub.com/package/forien-quest-log/)
+[![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Ftyphonjs-quest-log%2Fshield%2Fendorsements)](https://www.foundryvtt-hub.com/package/typhonjs-quest-log/)
 
-**NOTE** This is an unofficial forked version of the module maintained by the [League of Foundry Developers](https://discord.gg/gzemMfHURH) to provide module continuity while Forien is unavailable.
+**NOTE** This is a new quest log module which continues from Michael's / TyphonJS' work on the `0.7.x` series of 
+Forien's Quest Log. A whole new UI / tech stack (Svelte + GSAP) and utilization of the TyphonJS plugin manager / 
+eventbus is forthcoming. Many new features are planned for the TyphonJS Quest Log and provides a high performance 
+quest runtime for Foundry VTT.
 
-**[Compatibility]**: _FoundryVTT_ 0.8.6 (as of version 0.6.0)
+When officially launched there will be a migration path for users of Forien's Quest Log to update to the TyphonJS Quest
+Log.
+
+**[Compatibility]**: _FoundryVTT_ 0.8.x
 
 **[Systems]**: _any_
 
@@ -20,20 +26,19 @@ This module provides comprehensive Quest Log system for players and Game Masters
 
 ## Installation
 
-1. Install Forien's Quest Log from the Foundry Module browser directly, or manually using manifest URL: https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/releases/latest/download/module.json
-2. While loaded in World, enable **_Forien's Quest Log_** module.
+1. Install the TyphonJS Quest Log from the Foundry Module browser directly, or manually using manifest URL: https://github.com/typhonjs-fvtt/typhonjs-quest-log/releases/latest/download/module.json
+2. While loaded in World, enable the **_TyphonJS Quest Log_** module.
 
 ## Usage
 
 A button to access the Quest Log is situated on the bottom of Journal Directory or in the scene controls menu under notes / journal entries on the left-hand navigation bar where a scroll icon opens the Quest Log.
 
-FQL is quite user-friendly with an intuitive UI, however you might want to [check out the Wiki](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/wiki) for more detailed usage including macros and Quest API details for external developers integrations. 
+TQL is quite user-friendly with an intuitive UI, however you might want to [check out the Wiki](https://github.com/typhonjs-fvtt/typhonjs-quest-log/wiki) for more detailed usage including macros and Quest API details for external developers integrations. 
 
-There are also a series of useful in depth video tutorials on YouTube that cover each recent release:
+Being a new module that shares ancestry with Forien's Quest Log the following in-depth of useful in depth video tutorials on YouTube are applicable to the TyphonJS Quest Log:
 - [v0.7.7](https://youtu.be/lfSYJXVQAcE)
 - [v0.7.6](https://youtu.be/Dn2iprrcPpY)
 - [v0.7.5](https://youtu.be/cakE2a9MedM)
-
 
 ## Features
 
@@ -52,7 +57,7 @@ Plans for future include:
 - advanced sorting with additional data fields including user tagging.
 - experience / currency rewards with the option to split amongst the party.
 
-You can **always** check current and up-to-date [planned and requested features here](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
+You can **always** check current and up-to-date [planned and requested features here](https://github.com/typhonjs-fvtt/typhonjs-quest-log/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
 
 _If you have **any** suggestion or idea on new contents, hit me up on Discord!_
 
@@ -66,7 +71,7 @@ Please leave your preferred attribution name and optional email address in the A
 
 #### How to translate
 
-The League maintains the English translation of this module, so you check on that one to see how a translation file should look. It can be either expanded (nested) JSON like English, or flat JSON like Polish.
+The English translation of this module is maintained, so you check on that one to see how a translation file should look. It can be either expanded (nested) JSON like English, or flat JSON like Polish.
 
 Order of Localization Strings inside a `.json` file is indifferent.
 
@@ -80,34 +85,23 @@ The `lang/missing/` folder contains files for all languages showing all Localiza
 
 ## Contact
 
-Michael Leahy aka TyphonJS is currently maintaining and adding new features as the main developer for Forien's Quest Log.
+Michael Leahy aka TyphonJS is maintaining and adding new features as the main developer for the TyphonJS Quest Log.
 
-We request that you contact MLeahy#4299 for permission to use the name **Forien's Quest Log** in your fanworks, self-promotions, and advertisements. Do not use Forien's name or the names of other contributors without permission.
+We request that you contact MLeahy#4299 for permission to use the name **TyphonJS Quest Log** in your fan works, self-promotions, and advertisements. Do not use the TyphonJS name or the names of other contributors without permission.
 
 Please feel free to join the following Discord servers:
 - [TyphonJS Discord server / current main FQL developer](https://discord.gg/mnbgN8f) for any questions.
-- [League of Foundry Developers Discord server](https://discord.gg/gzemMfHURH)
 
 ## Acknowledgments
 
-- Thanks to TyphonJS for significant improvements from `v0.7.0+` onward. 
-- Great thanks to sdenec for his invaluable help with UI overhaul!
-- Thanks to Atropos for his relentless work on developing and improving the Foundry VTT
-- Thanks to necxelos, TomChristoffer and Kralug for their massive lists of suggestions
-- Thanks to Brother Sharp for providing Japanese translation
-- Thanks to Acd-Jake for providing German translation
-- Thanks to KLO for providing Korean translation
-- Thanks to rectulo and Naoki for providing French translation
-- Thanks to JJBocanegra for providing Spanish translation
-- Thanks to Ztt1996 for providing Chinese translation
-- Thanks to Innocenti for providing Brazilian Portuguese translation
+TBA
 
-## Support (Historical)
+## Support
 
-The original author, Forien, is no longer actively maintaining FQL, but for historical correctness please visit: [Foundry Workshop Patreon](https://www.patreon.com/foundryworkshop).
+TBA
 
 ## License
 
-Forien's Quest Log is a module for Foundry VTT by Forien and is licensed under a [MIT License](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/blob/master/LICENSE). List of contributors in [AUTHORS file](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/blob/master/AUTHORS).
+TyphonJS Quest Log is a module for Foundry VTT by Michael Leahy and is licensed under a [MIT License](https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/LICENSE). List of contributors in [AUTHORS file](https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/AUTHORS).
 
 This work is licensed under Foundry Virtual Tabletop [EULA - Limited License Agreement for module development from February 17, 2021](https://foundryvtt.com/article/license/).

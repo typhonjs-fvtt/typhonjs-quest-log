@@ -1,6 +1,6 @@
 import QuestDB                from '../../control/QuestDB.js';
 import ViewManager            from '../../control/ViewManager.js';
-import FQLPermissionControl   from '../FQLPermissionControl.js';
+import TQLPermissionControl   from '../TQLPermissionControl.js';
 
 /**
  * Provides all {@link JQuery} callbacks for the `management` tab.
@@ -43,7 +43,7 @@ export default class HandlerManage
       {
          if (!questPreview._permControl)
          {
-            questPreview._permControl = new FQLPermissionControl(quest.entry, {
+            questPreview._permControl = new TQLPermissionControl(quest.entry, {
                top: Math.min(questPreview.position.top, window.innerHeight - 350),
                left: questPreview.position.left + 125
             });

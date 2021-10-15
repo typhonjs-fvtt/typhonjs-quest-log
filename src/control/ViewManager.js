@@ -27,7 +27,7 @@ const Apps = {
 let s_ADD_QUEST_PREVIEW;
 
 /**
- * Stores and manages all the GUI apps / view for FQL.
+ * Stores and manages all the GUI apps / view for TQL.
  */
 export default class ViewManager
 {
@@ -69,9 +69,9 @@ export default class ViewManager
 
    /**
     * @returns {QuestLog} The main quest log app accessible from the left hand menu bar or
-    *                     `Hook.call('ForienQuestLog.Open.QuestLog')`.
+    *                     `Hook.call('TyphonJSQuestLog.Open.QuestLog')`.
     *
-    * @see {@link FQLHooks.openQuestLog}
+    * @see {@link TQLHooks.openQuestLog}
     */
    static get questLog() { return Apps.questLog; }
 
@@ -84,7 +84,7 @@ export default class ViewManager
 
    /**
     * @returns {QuestTracker} Returns the quest tracker overlap app. This app is accessible when module setting
-    *                         {@link FQLSettings.questTrackerEnable} is enabled.
+    *                         {@link TQLSettings.questTrackerEnable} is enabled.
     */
    static get questTracker() { return Apps.questTracker; }
 
@@ -118,7 +118,7 @@ export default class ViewManager
    static isQuestTrackerVisible()
    {
       return game.settings.get(constants.moduleName, settings.questTrackerEnable) &&
-       (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideFQLFromPlayers)) &&
+       (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) &&
         QuestDB.getCount({ status: questStatus.active }) > 0;
    }
 
@@ -213,7 +213,7 @@ export default class ViewManager
    {
       if (notify)
       {
-         ui.notifications.info(game.i18n.format('ForienQuestLog.Notifications.QuestAdded', {
+         ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestAdded', {
             name: quest.name,
             status: game.i18n.localize(questStatusI18n[quest.status])
          }));
@@ -252,7 +252,7 @@ export default class ViewManager
          if (s_ADD_QUEST_PREVIEW.rendered)
          {
             s_ADD_QUEST_PREVIEW.bringToTop();
-            ViewManager.notifications.warn(game.i18n.localize('ForienQuestLog.Notifications.FinishQuestAdded'));
+            ViewManager.notifications.warn(game.i18n.localize('TyphonJSQuestLog.Notifications.FinishQuestAdded'));
             return false;
          }
          else

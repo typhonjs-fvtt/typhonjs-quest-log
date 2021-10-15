@@ -211,7 +211,7 @@ export default class Quest
        * @private
        */
       this._name =
-       typeof value === 'string' && value.length > 0 ? value : game.i18n.localize('ForienQuestLog.NewQuest');
+       typeof value === 'string' && value.length > 0 ? value : game.i18n.localize('TyphonJSQuestLog.NewQuest');
    }
 
    /**
@@ -329,7 +329,7 @@ export default class Quest
     */
    initData(data)
    {
-      this.name = data.name || game.i18n.localize('ForienQuestLog.NewQuest');
+      this.name = data.name || game.i18n.localize('TyphonJSQuestLog.NewQuest');
 
       /**
        * @type {string}
@@ -522,7 +522,7 @@ export default class Quest
       // Save Quest JSON, but also potentially update the backing JournalEntry folder name.
       const update = {
          name: typeof this._name === 'string' && this._name.length > 0 ? this._name :
-          game.i18n.localize('ForienQuestLog.NewQuest'),
+          game.i18n.localize('TyphonJSQuestLog.NewQuest'),
          flags: {
             [constants.moduleName]: { json: this.toJSON() }
          }
@@ -982,7 +982,7 @@ export class Task
  *
  * @property {boolean}  locked - Reward locked.
  *
- * @property {string}   uuidv4 - The FQL UUIDv4 / unique ID.
+ * @property {string}   uuidv4 - The TQL UUIDv4 / unique ID.
  *
  */
 
@@ -1009,6 +1009,6 @@ export class Task
  *
  * @property {string}   state - Task state.
  *
- * @property {string}   uuidv4 - The FQL UUIDv4 / unique ID.
+ * @property {string}   uuidv4 - The TQL UUIDv4 / unique ID.
  */
 

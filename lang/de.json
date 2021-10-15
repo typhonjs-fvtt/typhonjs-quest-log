@@ -1,5 +1,5 @@
 {
-  "ForienQuestLog": {
+  "TyphonJSQuestLog": {
     "NewQuest": "Neue Quest",
     "QuestLogButton": "Questlog",
     "Quests": "{0} Quests",
@@ -183,7 +183,7 @@
         "NONE": "Nichts",
         "OWNER": "Besitzer"
       },
-      "hideFQLFromPlayers": {
+      "hideTQLFromPlayers": {
         "Enable": "Questlog für Spieler verbergen",
         "EnableHint": "Aktivieren, um das Questlog für alle Spieler zu verbergen. Nur GM-Benutzer können auf das Questlog zugreifen."
       },

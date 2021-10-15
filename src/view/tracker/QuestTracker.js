@@ -3,7 +3,7 @@ import FoundryUIManager from '../../control/FoundryUIManager.js';
 import QuestDB          from '../../control/QuestDB.js';
 import Socket           from '../../control/Socket.js';
 import Utils            from '../../control/Utils.js';
-import FQLContextMenu   from '../FQLContextMenu.js';
+import TQLContextMenu   from '../TQLContextMenu.js';
 import collect          from '../../../external/collect.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '../../model/constants.js';
@@ -94,13 +94,13 @@ export default class QuestTracker extends Application
    {
       return foundry.utils.mergeObject(super.defaultOptions, {
          id: 'quest-tracker',
-         template: 'modules/forien-quest-log/templates/quest-tracker.html',
+         template: 'modules/typhonjs-quest-log/templates/quest-tracker.html',
          minimizable: false,
          resizable: true,
          popOut: false,
          width: 300,
          height: 480,
-         title: game.i18n.localize('ForienQuestLog.QuestTracker.Title')
+         title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title')
       });
    }
 
@@ -114,7 +114,7 @@ export default class QuestTracker extends Application
    _contextMenu(html)
    {
       const menuItemCopyLink = {
-         name: 'ForienQuestLog.QuestLog.ContextMenu.CopyEntityLink',
+         name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyEntityLink',
          icon: '<i class="fas fa-link"></i>',
          callback: (menu) =>
          {
@@ -123,7 +123,7 @@ export default class QuestTracker extends Application
 
             if (quest && Utils.copyTextToClipboard(`@Quest[${quest.id}]{${quest.name}}`))
             {
-               ui.notifications.info(game.i18n.format('ForienQuestLog.Notifications.LinkCopied'));
+               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
             }
          }
       };
@@ -136,7 +136,7 @@ export default class QuestTracker extends Application
       if (game.user.isGM)
       {
          menuItems.push({
-            name: 'ForienQuestLog.QuestLog.ContextMenu.CopyQuestID',
+            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyQuestID',
             icon: '<i class="fas fa-key"></i>',
             callback: (menu) =>
             {
@@ -145,13 +145,13 @@ export default class QuestTracker extends Application
 
                if (quest && Utils.copyTextToClipboard(quest.id))
                {
-                  ui.notifications.info(game.i18n.format('ForienQuestLog.Notifications.QuestIDCopied'));
+                  ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
                }
             }
          });
 
          menuItems.push({
-            name: 'ForienQuestLog.QuestLog.ContextMenu.PrimaryQuest',
+            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.PrimaryQuest',
             icon: '<i class="fas fa-star"></i>',
             callback: (menu) =>
             {
@@ -162,7 +162,7 @@ export default class QuestTracker extends Application
          });
       }
 
-      new FQLContextMenu(html, '.quest-tracker-header', menuItems);
+      new TQLContextMenu(html, '.quest-tracker-header', menuItems);
    }
 
    /**
@@ -184,8 +184,8 @@ export default class QuestTracker extends Application
 
       const primaryState = sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true';
       const primaryIcon = primaryState ? 'fas fa-star' : 'far fa-star';
-      const primaryTitle = primaryState ? 'ForienQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow' :
-       'ForienQuestLog.QuestTracker.Tooltips.PrimaryQuestShow';
+      const primaryTitle = primaryState ? 'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow' :
+       'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestShow';
 
       buttons.unshift({
          title: primaryTitle,
@@ -285,7 +285,7 @@ export default class QuestTracker extends Application
       };
 
       /**
-       * Stores the state of {@link FQLSettings.questTrackerResizable}.
+       * Stores the state of {@link TQLSettings.questTrackerResizable}.
        *
        * @type {boolean}
        * @private
@@ -455,7 +455,7 @@ export default class QuestTracker extends Application
     */
    setPosition({ override, pinned = this._pinned, ...opts } = {})
    {
-      // Potentially force override any pinned state. This is done from FQLHooks.openQuestTracker.
+      // Potentially force override any pinned state. This is done from TQLHooks.openQuestTracker.
       if (typeof override === 'boolean')
       {
          if (pinned)
@@ -515,7 +515,7 @@ export default class QuestTracker extends Application
       // has changed.
       if (!this._pinned && this._dragHeader && currentInPinDropRect !== this._inPinDropRect)
       {
-         this.element.css('animation', this._inPinDropRect ? 'fql-jiggle 0.3s infinite' : '');
+         this.element.css('animation', this._inPinDropRect ? 'tql-jiggle 0.3s infinite' : '');
       }
 
       el.style.top = `${currentPosition.top}px`;

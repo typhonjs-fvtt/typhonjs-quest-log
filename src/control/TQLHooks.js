@@ -14,61 +14,65 @@ import DBMigration      from '../../database/DBMigration.js';
 import { constants, noteControls, sessionConstants, settings } from '../model/constants.js';
 
 /**
- * Provides implementations for all Foundry hooks that FQL responds to and registers under. Please view the
+ * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
  * {@link QuestDB} documentation for hooks that it fires in the QuestDB lifecycle.
  *
  * Foundry lifecycle:
- * - `init` - {@link FQLHooks.foundryInit}
- * - `ready` - {@link FQLHooks.foundryReady} - A hook `ForienQuestLog.Lifecycle.ready` is fired after FQL is ready.
- * - `setup` - {@link FQLHooks.foundrySetup}
+ * - `init` - {@link TQLHooks.foundryInit}
+ * - `ready` - {@link TQLHooks.foundryReady} - A hook `TyphonJSQuestLog.Lifecycle.ready` is fired after TQL is ready.
+ * - `setup` - {@link TQLHooks.foundrySetup}
  *
  * Foundry game hooks:
  * - `collapseSidebar` - {@link FoundryUIManager.collapseSidebar} - Handle tracking state of the sidebar.
- * - `dropActorSheetData` - {@link FQLHooks.dropActorSheetData} - Handle drop data for reward items in actor sheet.
- * - `dropCanvasData` - {@link FQLHooks.dropCanvasData} - Handle drop data for {@link Quest} on Foundry canvas.
- * - `getSceneControlButtons` - {@link FQLHooks.getSceneControlButtons} - Add FQL scene controls to 'note'.
- * - `hotbarDrop` - {@link FQLHooks.hotbarDrop} - Handle {@link Quest} drops to the macro hotbar.
- * - `renderJournalDirectory` - {@link FQLHooks.renderJournalDirectory} - Add 'open quest log' / show FQL folder.
- * - `renderJournalSheet` - {@link FQLHooks.renderJournalSheet} - Hide FQL directory from journal sheet option items.
+ * - `dropActorSheetData` - {@link TQLHooks.dropActorSheetData} - Handle drop data for reward items in actor sheet.
+ * - `dropCanvasData` - {@link TQLHooks.dropCanvasData} - Handle drop data for {@link Quest} on Foundry canvas.
+ * - `getSceneControlButtons` - {@link TQLHooks.getSceneControlButtons} - Add TQL scene controls to 'note'.
+ * - `hotbarDrop` - {@link TQLHooks.hotbarDrop} - Handle {@link Quest} drops to the macro hotbar.
+ * - `renderJournalDirectory` - {@link TQLHooks.renderJournalDirectory} - Add 'open quest log' / show TQL folder.
+ * - `renderJournalSheet` - {@link TQLHooks.renderJournalSheet} - Hide TQL directory from journal sheet option items.
  *
- * FQL hooks (response):
- * - `ForienQuestLog.Open.QuestLog` - {@link FQLHooks.openQuestLog} - Open the quest log.
- * - `ForienQuestLog.Open.QuestTracker` - {@link FQLHooks.openQuestTracker} - Open the quest tracker.
- * - `ForienQuestLog.Run.DBMigration` - {@link FQLHooks.runDBMigration} - Allow GMs to run the DBMigration manually.
+ * TQL hooks (response):
+ * - `TyphonJSQuestLog.Open.QuestLog` - {@link TQLHooks.openQuestLog} - Open the quest log.
+ * - `TyphonJSQuestLog.Open.QuestTracker` - {@link TQLHooks.openQuestTracker} - Open the quest tracker.
+ * - `TyphonJSQuestLog.Run.DBMigration` - {@link TQLHooks.runDBMigration} - Allow GMs to run the DBMigration manually.
  *
- * FQL hooks (called):
- * - `ForienQuestLog.Lifecycle.ready` - {@link FQLHooks.foundryReady} - Called at the end of the `ready` hook when FQL
+ * TQL hooks (called):
+ * - `TyphonJSQuestLog.Lifecycle.ready` - {@link TQLHooks.foundryReady} - Called at the end of the `ready` hook when TQL
  * is fully setup.
  */
-export default class FQLHooks
+export default class TQLHooks
 {
    /**
-    * Initializes all hooks that FQL responds to in the Foundry lifecycle and in game hooks.
+    * Initializes all hooks that TQL responds to in the Foundry lifecycle and in game hooks.
     */
    static init()
    {
       // Foundry startup hooks.
-      Hooks.once('init', FQLHooks.foundryInit);
-      Hooks.once('ready', FQLHooks.foundryReady);
-      Hooks.once('setup', FQLHooks.foundrySetup);
+      Hooks.once('init', TQLHooks.foundryInit);
+      Hooks.once('ready', TQLHooks.foundryReady);
+      Hooks.once('setup', TQLHooks.foundrySetup);
 
       // Respond to Foundry in game hooks.
-      Hooks.on('dropActorSheetData', FQLHooks.dropActorSheetData);
-      Hooks.on('dropCanvasData', FQLHooks.dropCanvasData);
-      Hooks.on('getSceneControlButtons', FQLHooks.getSceneControlButtons);
-      Hooks.on('hotbarDrop', FQLHooks.hotbarDrop);
-      Hooks.on('renderJournalDirectory', FQLHooks.renderJournalDirectory);
-      Hooks.on('renderJournalSheet', FQLHooks.renderJournalSheet);
+      Hooks.on('dropActorSheetData', TQLHooks.dropActorSheetData);
+      Hooks.on('dropCanvasData', TQLHooks.dropCanvasData);
+      Hooks.on('getSceneControlButtons', TQLHooks.getSceneControlButtons);
+      Hooks.on('hotbarDrop', TQLHooks.hotbarDrop);
+      Hooks.on('renderJournalDirectory', TQLHooks.renderJournalDirectory);
+      Hooks.on('renderJournalSheet', TQLHooks.renderJournalSheet);
 
-      // FQL specific hooks.
-      Hooks.on('ForienQuestLog.Open.QuestLog', FQLHooks.openQuestLog);
-      Hooks.on('ForienQuestLog.Open.QuestTracker', FQLHooks.openQuestTracker);
-      Hooks.on('ForienQuestLog.Run.DBMigration', FQLHooks.runDBMigration);
+      // FQL compatibility hooks
+      Hooks.on('ForienQuestLog.Open.QuestLog', TQLHooks.openQuestLog);
+      Hooks.on('ForienQuestLog.Open.QuestTracker', TQLHooks.openQuestTracker);
+
+      // TQL specific hooks.
+      Hooks.on('TyphonJSQuestLog.Open.QuestLog', TQLHooks.openQuestLog);
+      Hooks.on('TyphonJSQuestLog.Open.QuestTracker', TQLHooks.openQuestTracker);
+      Hooks.on('TyphonJSQuestLog.Run.DBMigration', TQLHooks.runDBMigration);
    }
 
    /**
-    * Responds to when a data drop occurs on an ActorSheet. If there is an {@link FQLDropData} instance attached by
-    * checking the `_fqlData.type` set to `reward` then process the reward item drop via {@link Socket.questRewardDrop}
+    * Responds to when a data drop occurs on an ActorSheet. If there is an {@link TQLDropData} instance attached by
+    * checking the `_tqlData.type` set to `reward` then process the reward item drop via {@link Socket.questRewardDrop}
     * to remove the item from the associated quest.
     *
     * @param {Actor}          actor - The Actor which received the data drop.
@@ -83,7 +87,7 @@ export default class FQLHooks
     */
    static async dropActorSheetData(actor, sheet, data)
    {
-      if (typeof data !== 'object' || data?._fqlData?.type !== 'reward') { return; }
+      if (typeof data !== 'object' || data?._tqlData?.type !== 'reward') { return; }
 
       await Socket.questRewardDrop({
          actor: { id: actor.id, name: actor.data.name },
@@ -108,14 +112,14 @@ export default class FQLHooks
    }
 
    /**
-    * Provides FQL initialization during the `init` Foundry lifecycle hook.
+    * Provides TQL initialization during the `init` Foundry lifecycle hook.
     */
    static foundryInit()
    {
       // Set the sheet to render quests.
       Quest.setSheet(QuestPreview);
 
-      // Register FQL module settings.
+      // Register TQL module settings.
       ModuleSettings.register();
 
       // Preload Handlebars templates and register helpers.
@@ -124,7 +128,7 @@ export default class FQLHooks
    }
 
    /**
-    * Provides the remainder of FQL initialization during the `ready` Foundry lifecycle hook.
+    * Provides the remainder of TQL initialization during the `ready` Foundry lifecycle hook.
     *
     * @returns {Promise<void>}
     */
@@ -133,11 +137,11 @@ export default class FQLHooks
       // Only attempt to run DB migration for GM.
       if (game.user.isGM) { await DBMigration.migrate(); }
 
-      // Add the FQL unique Quest data type to the Foundry core data types.
+      // Add the TQL unique Quest data type to the Foundry core data types.
       CONST.ENTITY_TYPES?.push(Quest.documentName);
       CONST.ENTITY_LINK_TYPES?.push(Quest.documentName);
 
-      // Add the FQL Quest data type to CONFIG.
+      // Add the TQL Quest data type to CONFIG.
       CONFIG[Quest.documentName] = {
          entityClass: Quest,
          documentClass: Quest,
@@ -169,27 +173,27 @@ export default class FQLHooks
       // Initialize current client based macro images based on current state.
       await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
 
-      // Support for LibThemer; add FQL options to LibThemer.
+      // Support for LibThemer; add TQL options to LibThemer.
       const libThemer = game.modules.get('lib-themer');
       if (libThemer?.active)
       {
-         await libThemer?.api?.registerTheme('/modules/forien-quest-log/assets/themes/lib-themer/fql.json');
+         await libThemer?.api?.registerTheme('/modules/typhonjs-quest-log/assets/themes/lib-themer/tql.json');
       }
 
-      // Fire our own lifecycle event to inform any other modules that depend on FQL QuestDB.
-      Hooks.callAll('ForienQuestLog.Lifecycle.ready');
+      // Fire our own lifecycle event to inform any other modules that depend on TQL QuestDB.
+      Hooks.callAll('TyphonJSQuestLog.Lifecycle.ready');
    }
 
    /**
-    * Provides the setup FQL initialization during the `setup` Foundry lifecycle hook. Make the public QuestAPI
-    * accessible from `game.modules('forien-quest-log').public.QuestAPI`.
+    * Provides the setup TQL initialization during the `setup` Foundry lifecycle hook. Make the public QuestAPI
+    * accessible from `game.modules('typhonjs-quest-log').public.QuestAPI`.
     */
    static foundrySetup()
    {
       const moduleData = Utils.getModuleData();
 
       /**
-       * @type {FQLPublicAPI}
+       * @type {TQLPublicAPI}
        */
       moduleData.public = {
          QuestAPI
@@ -200,18 +204,18 @@ export default class FQLHooks
    }
 
    /**
-    * Responds to the in game hook `getSceneControlButtons` to add the FQL quest log and floating quest log to the
-    * journal / 'notes' tool as sub categories. These controls are always added for the GM, but if FQL is hidden from
-    * players based on module setting {@link FQLSettings.hideFQLFromPlayers} the note controls do not display.
+    * Responds to the in game hook `getSceneControlButtons` to add the TQL quest log and floating quest log to the
+    * journal / 'notes' tool as sub categories. These controls are always added for the GM, but if TQL is hidden from
+    * players based on module setting {@link TQLSettings.hideTQLFromPlayers} the note controls do not display.
     *
-    * @param {SceneControl[]} controls - The scene controls to add FQL controls.
+    * @param {SceneControl[]} controls - The scene controls to add TQL controls.
     *
     * @see {@link noteControls}
     * @see https://foundryvtt.com/api/SceneControls.html
     */
    static getSceneControlButtons(controls)
    {
-      if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideFQLFromPlayers))
+      if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers))
       {
          const notes = controls.find((c) => c.name === 'notes');
          if (notes) { notes.tools.push(...noteControls); }
@@ -219,7 +223,7 @@ export default class FQLHooks
    }
 
    /**
-    * Handles Quest data drops. Also handles setting image state of any macro dropped from the FQL macro compendiums.
+    * Handles Quest data drops. Also handles setting image state of any macro dropped from the TQL macro compendiums.
     *
     * @param {object} data - The dropped data object.
     *
@@ -254,7 +258,7 @@ export default class FQLHooks
          macro = await Macro.create(macroData, { displaySheet: false });
       }
 
-      // If the macro is from the FQL macro compendiums then update the image state.
+      // If the macro is from the TQL macro compendiums then update the image state.
       if (macro)
       {
          const macroSetting = macro.getFlag(constants.moduleName, 'macro-setting');
@@ -282,14 +286,14 @@ export default class FQLHooks
       // Early out if Quest isn't in the QuestDB.
       if (!quest)
       {
-         throw new Error(game.i18n.localize('ForienQuestLog.Api.hooks.createOpenQuestMacro.error.noQuest'));
+         throw new Error(game.i18n.localize('TyphonJSQuestLog.Api.hooks.createOpenQuestMacro.error.noQuest'));
       }
 
       // The macro script data to open the quest via the public QuestAPI.
       const command = `game.modules.get('${constants.moduleName}').public.QuestAPI.open({ questId: '${questId}' });`;
 
       const macroData = {
-         name: game.i18n.format('ForienQuestLog.Api.hooks.createOpenQuestMacro.name', { name: quest.name }),
+         name: game.i18n.format('TyphonJSQuestLog.Api.hooks.createOpenQuestMacro.name', { name: quest.name }),
          type: 'script',
          command
       };
@@ -314,7 +318,7 @@ export default class FQLHooks
     * Two cases are handled. Because hooks can not be asynchronous an immediate value is returned that reflects whether
     * the drop was handled or not.
     *
-    * The first case is when an FQL macro is dropped in from a compendium.
+    * The first case is when an TQL macro is dropped in from a compendium.
     *
     * The second is when a quest is dropped into the macro hotbar. A new Quest open macro is created. The macro command
     * invokes opening the {@link QuestPreview} via {@link QuestAPI.open} by quest ID.
@@ -332,25 +336,25 @@ export default class FQLHooks
    {
       let handled = false;
 
-      // Verify if the hotbar drop is data that is handled; either a quest or macro from FQL macro compendium.
+      // Verify if the hotbar drop is data that is handled; either a quest or macro from TQL macro compendium.
       if (data.type === Quest.documentName || (data.type === 'Macro' && typeof data.pack === 'string' &&
        data.pack.startsWith(constants.moduleName)))
       {
          handled = true;
       }
 
-      // Wrap the handling code in an async IIFE. If this is a Quest data drop or a macro from the FQL macro compendium
+      // Wrap the handling code in an async IIFE. If this is a Quest data drop or a macro from the TQL macro compendium
       // pack then handle it.
       (async () =>
       {
          if (data.type === 'Macro' && typeof data.pack === 'string' && data.pack.startsWith(constants.moduleName))
          {
-            await FQLHooks.handleMacroHotbarDrop(data, slot);
+            await TQLHooks.handleMacroHotbarDrop(data, slot);
          }
 
          if (data.type === Quest.documentName)
          {
-            await FQLHooks.handleQuestHotbarDrop(data, slot);
+            await TQLHooks.handleQuestHotbarDrop(data, slot);
          }
       })();
 
@@ -359,8 +363,8 @@ export default class FQLHooks
    }
 
    /**
-    * Opens the QuestLog if the game user is a GM or if FQL isn't hidden to players by module setting
-    * {@link FQLSettings.hideFQLFromPlayers}.
+    * Opens the QuestLog if the game user is a GM or if TQL isn't hidden to players by module setting
+    * {@link TQLSettings.hideTQLFromPlayers}.
     *
     * @param {object}               [opts] - Optional parameters.
     *
@@ -374,7 +378,7 @@ export default class FQLHooks
     */
    static openQuestLog(opts)
    {
-      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideFQLFromPlayers)) { return; }
+      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) { return; }
 
       let constraints = {};
 
@@ -388,8 +392,8 @@ export default class FQLHooks
    }
 
    /**
-    * Opens the {@link QuestTracker} if the game user is a GM or if FQL isn't hidden to players by module setting
-    * {@link FQLSettings.hideFQLFromPlayers}.
+    * Opens the {@link QuestTracker} if the game user is a GM or if TQL isn't hidden to players by module setting
+    * {@link TQLSettings.hideTQLFromPlayers}.
     *
     * @param {object}               [opts] - Optional parameters.
     *
@@ -409,7 +413,7 @@ export default class FQLHooks
     */
    static async openQuestTracker(opts)
    {
-      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideFQLFromPlayers)) { return; }
+      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) { return; }
 
       await game.settings.set(constants.moduleName, settings.questTrackerEnable, true);
 
@@ -451,9 +455,9 @@ export default class FQLHooks
 
    /**
     * Handles adding the 'open quest log' button at the bottom of the journal directory. Always displayed for the GM,
-    * but only displayed to players if FQL isn't hidden via module setting {@link FQLSettings.hideFQLFromPlayers}.
+    * but only displayed to players if TQL isn't hidden via module setting {@link TQLSettings.hideTQLFromPlayers}.
     *
-    * For GMs if module setting {@link FQLSettings.showFolder} is true then the hidden `_fql_quests` folder is shown.
+    * For GMs if module setting {@link TQLSettings.showFolder} is true then the hidden `_tql_quests` folder is shown.
     *
     * @param {JournalDirectory}  app - The JournalDirectory app.
     *
@@ -463,10 +467,10 @@ export default class FQLHooks
     */
    static renderJournalDirectory(app, html)
    {
-      if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideFQLFromPlayers))
+      if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers))
       {
          const button = $(`<button class="quest-log-btn">${game.i18n.localize(
-          'ForienQuestLog.QuestLogButton')}</button>`);
+          'TyphonJSQuestLog.QuestLogButton')}</button>`);
 
          let footer = html.find('.directory-footer');
          if (footer.length === 0)
@@ -537,7 +541,7 @@ export default class FQLHooks
 }
 
 /**
- * @typedef {object} FQLPublicAPI - Exposes a few FQL classes and instances publicly.
+ * @typedef {object} TQLPublicAPI - Exposes a few TQL classes and instances publicly.
  *
  * @property {QuestAPI} QuestAPI - QuestAPI class - Exposes static methods to interact with the quest system.
  */

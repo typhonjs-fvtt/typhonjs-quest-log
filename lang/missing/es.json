@@ -1,9 +1,9 @@
 {
-    "ForienQuestLog.Tooltips.Edit": "",
-    "ForienQuestLog.QuestForm.QuestGiverNamePlaceholder": "",
-    "ForienQuestLog.Buttons.AddNewFolder": "",
-    "ForienQuestLog.Tooltips.DeleteQuestGiver": "",
-    "ForienQuestLog.Tooltips.DeleteSplash": "",
-    "ForienQuestLog.Tooltips.ChangeGiverImgPos": "",
-    "ForienQuestLog.Tooltips.ChangeSplashPos": ""
+    "TyphonJSQuestLog.Tooltips.Edit": "",
+    "TyphonJSQuestLog.QuestForm.QuestGiverNamePlaceholder": "",
+    "TyphonJSQuestLog.Buttons.AddNewFolder": "",
+    "TyphonJSQuestLog.Tooltips.DeleteQuestGiver": "",
+    "TyphonJSQuestLog.Tooltips.DeleteSplash": "",
+    "TyphonJSQuestLog.Tooltips.ChangeGiverImgPos": "",
+    "TyphonJSQuestLog.Tooltips.ChangeSplashPos": ""
 }

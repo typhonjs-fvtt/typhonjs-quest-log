@@ -10,10 +10,10 @@ import { constants, questStatus, questStatusI18n, settings }  from '../model/con
  *
  * @type {string}
  */
-const s_EVENT_NAME = 'module.forien-quest-log';
+const s_EVENT_NAME = 'module.typhonjs-quest-log';
 
 /**
- * Defines the different message types that FQL sends over `game.socket`.
+ * Defines the different message types that TQL sends over `game.socket`.
  */
 const s_MESSAGE_TYPES = {
    deletedQuest: 'deletedQuest',
@@ -28,13 +28,13 @@ const s_MESSAGE_TYPES = {
 
 /**
  * Provides a basic Socket.io implementation to send events between all connected clients. The various methods have
- * at as local and remote control mostly of GUI related actions. FQL appears to be a reactive application, but it really
+ * at as local and remote control mostly of GUI related actions. TQL appears to be a reactive application, but it really
  * is Socket doing a lot of the heavy lifting to notify clients that particular GUI apps need to be refreshed when the
  * underlying Quest data changes.
  *
  * There are also various actions that require a GM or trusted played with edit capability to act upon mostly moving
  * quests from one status to another. Reward item drops into actor sheets invokes {@link Socket.questRewardDrop} from
- * the {@link FQLHooks.dropActorSheetData} hook, but at least one GM level user must be logged in to receive this
+ * the {@link TQLHooks.dropActorSheetData} hook, but at least one GM level user must be logged in to receive this
  * message to perform the drop / removal of the reward from a Quest.
  *
  * Please see the following view control classes and the QuestDB for socket related usage:
@@ -117,7 +117,7 @@ export default class Socket
    }
 
    /**
-    * Handles the reward drop in actor sheet action from the {@link FQLHooks.dropActorSheetData} hook. If the local user
+    * Handles the reward drop in actor sheet action from the {@link TQLHooks.dropActorSheetData} hook. If the local user
     * is a GM handle this action right away otherwise send a message across the wire for the first GM user reached to
     * handle the action remotely. The reward is removed from the associated quest.
     *
@@ -135,16 +135,16 @@ export default class Socket
       if (game.user.isGM)
       {
          /**
-          * @type {FQLDropData}
+          * @type {TQLDropData}
           */
-         const fqlData = data.data._fqlData;
+         const tqlData = data.data._tqlData;
 
-         const quest = QuestDB.getQuest(fqlData.questId);
+         const quest = QuestDB.getQuest(tqlData.questId);
          if (quest)
          {
-            quest.removeReward(fqlData.uuidv4);
+            quest.removeReward(tqlData.uuidv4);
             await quest.save();
-            Socket.refreshQuestPreview({ questId: fqlData.questId });
+            Socket.refreshQuestPreview({ questId: tqlData.questId });
          }
          handled = true;
       }
@@ -295,7 +295,7 @@ export default class Socket
          Socket.refreshAll();
 
          const dirname = game.i18n.localize(questStatusI18n[target]);
-         ViewManager.notifications.info(game.i18n.format('ForienQuestLog.Notifications.QuestMoved',
+         ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestMoved',
           { name: quest.name, target: dirname }));
       }
       else
@@ -389,17 +389,17 @@ async function handleQuestRewardDrop(data)
    if (game.user.isGM)
    {
       /**
-       * @type {FQLDropData}
+       * @type {TQLDropData}
        */
-      const fqlData = data.payload.data._fqlData;
+      const tqlData = data.payload.data._tqlData;
 
       // Notify the GM that a user has dropped a reward item into an actor sheet.
       const notify = game.settings.get(constants.moduleName, settings.notifyRewardDrop);
       if (notify)
       {
-         ViewManager.notifications.info(game.i18n.format('ForienQuestLog.QuestPreview.RewardDrop', {
-            userName: fqlData.userName,
-            itemName: fqlData.itemName,
+         ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.QuestPreview.RewardDrop', {
+            userName: tqlData.userName,
+            itemName: tqlData.itemName,
             actorName: data.payload.actor.name
          }));
       }
@@ -410,12 +410,12 @@ async function handleQuestRewardDrop(data)
       // Set handled to true so no more GM level users act upon this event.
       data.payload.handled = true;
 
-      const quest = QuestDB.getQuest(fqlData.questId);
+      const quest = QuestDB.getQuest(tqlData.questId);
       if (quest)
       {
-         quest.removeReward(fqlData.uuidv4);
+         quest.removeReward(tqlData.uuidv4);
          await quest.save();
-         Socket.refreshQuestPreview({ questId: fqlData.questId });
+         Socket.refreshQuestPreview({ questId: tqlData.questId });
       }
    }
 }
@@ -489,7 +489,7 @@ async function handleQuestSetStatus(data)
       Socket.refreshAll();
 
       const dirname = game.i18n.localize(questStatusI18n[target]);
-      ViewManager.notifications.info(game.i18n.format('ForienQuestLog.Notifications.QuestMoved',
+      ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestMoved',
        { name: quest.name, target: dirname }));
    }
 
@@ -592,7 +592,7 @@ function handleUserCantOpenQuest(data)
 {
    if (game.user.isGM)
    {
-      ViewManager.notifications.warn(game.i18n.format('ForienQuestLog.Notifications.UserCantOpen',
+      ViewManager.notifications.warn(game.i18n.format('TyphonJSQuestLog.Notifications.UserCantOpen',
        { user: data.payload.user }));
    }
 }

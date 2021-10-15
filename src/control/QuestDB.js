@@ -135,7 +135,7 @@ const s_QUEST_INDEX = new Map();
 export default class QuestDB
 {
    /**
-    * Initializes the QuestDB. If FQL is hidden from the current user then no quests load. All quests are loaded based
+    * Initializes the QuestDB. If TQL is hidden from the current user then no quests load. All quests are loaded based
     * on observability by the current user.
     *
     * This method may be invoked multiple times, but it is generally important to only invoke `init` when the QuestDB
@@ -148,24 +148,24 @@ export default class QuestDB
       let folder = await Utils.initializeQuestFolder();
 
       // If the folder doesn't exist then simulate the content parameter. This should only ever occur for a player
-      // logged in when a GM activates FQL for the first time or if the _fql_quests folder is deleted.
+      // logged in when a GM activates TQL for the first time or if the _tql_quests folder is deleted.
       if (!folder)
       {
          if (game.user.isGM)
          {
-            console.log('ForienQuestLog - Failed to initialize QuestDB as the quest folder / _fql_quests is missing.');
+            console.log('TyphonJSQuestLog - Failed to initialize QuestDB as the quest folder / _tql_quests is missing.');
          }
 
          folder = { content: [] };
       }
 
-      // Skip initialization of data if FQL is hidden from the current player. FQL is never hidden from GM level users.
-      if (!Utils.isFQLHiddenFromPlayers())
+      // Skip initialization of data if TQL is hidden from the current player. TQL is never hidden from GM level users.
+      if (!Utils.isTQLHiddenFromPlayers())
       {
          // Cache `isTrustedPlayerEdit`.
          const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
 
-         // Iterate over all journal entries in `_fql_quests` folder.
+         // Iterate over all journal entries in `_tql_quests` folder.
          for (const entry of folder.content)
          {
             const content = entry.getFlag(constants.moduleName, constants.flagDB);
@@ -232,14 +232,14 @@ export default class QuestDB
     * user or adding quests that are now observable. This only really needs to occur after particular module setting
     * changes which right now is when trusted player edit is enabled / disabled.
     *
-    * @see {@link FQLSettings.trustedPlayerEdit}
+    * @see {@link TQLSettings.trustedPlayerEdit}
     */
    static consistencyCheck()
    {
       const folder = Utils.getQuestFolder();
 
-      // Early out if the folder is not available or FQL is hidden from the current player.
-      if (!folder || Utils.isFQLHiddenFromPlayers()) { return; }
+      // Early out if the folder is not available or TQL is hidden from the current player.
+      if (!folder || Utils.isTQLHiddenFromPlayers()) { return; }
 
       // Create a single map of all QuestEntry instances.
       const questEntryMap = new Map(QuestDB.getAllQuestEntries().map((e) => [e.id, e]));
@@ -338,7 +338,7 @@ export default class QuestDB
       const folder = Utils.getQuestFolder();
       if (!folder)
       {
-         console.log('ForienQuestLog - QuestDB.createQuest - quest folder not found.');
+         console.log('TyphonJSQuestLog - QuestDB.createQuest - quest folder not found.');
          return;
       }
 
@@ -870,7 +870,7 @@ export class QuestEntry
    }
 
    /**
-    * @param {QuestData}      content - The FQL quest data from journal entry.
+    * @param {QuestData}      content - The TQL quest data from journal entry.
     *
     * @param {JournalEntry}   entry - The backing journal entry.
     *
@@ -956,7 +956,7 @@ const s_GET_QUEST_ENTRY = (questId) =>
 /**
  * Provides the observability test for a quest based on the user level and permissions of the backing journal entry.
  * GM level users always can observe any quests. Trusted players w/ the module setting
- * {@link FQLSettings.trustedPlayerEdit} enabled and the owner of the quest can observe quests in the inactive status.
+ * {@link TQLSettings.trustedPlayerEdit} enabled and the owner of the quest can observe quests in the inactive status.
  * Otherwise quests are only observable by players when the default or personal permission is
  * {@link CONST.ENTITY_PERMISSIONS.OBSERVER} or higher.
  *
@@ -997,7 +997,7 @@ const s_IS_OBSERVABLE = (content, entry, isTrustedPlayerEdit = Utils.isTrustedPl
 
 /**
  * Foundry hook callback when a new JournalEntry is created. For quests there are two cases to consider. The first
- * is straight forward when a new quest is created from FQL. The second case is a bit more challenging and that occurs
+ * is straight forward when a new quest is created from TQL. The second case is a bit more challenging and that occurs
  * when a journal entry / quest is imported from a compendium. In this case we need to scrub the subquests that may no
  * longer resolve to valid journal entries in the system.
  *
@@ -1011,11 +1011,11 @@ const s_JOURNAL_ENTRY_CREATE = async (entry, options, id) =>
 {
    const content = entry.getFlag(constants.moduleName, constants.flagDB);
 
-   // Exit early if no FQL quest data is available.
+   // Exit early if no TQL quest data is available.
    if (!content) { return; }
 
-   // Process the quest content if it is currently observable and FQL is not hidden from the current user.
-   if (s_IS_OBSERVABLE(content, entry) && !Utils.isFQLHiddenFromPlayers())
+   // Process the quest content if it is currently observable and TQL is not hidden from the current user.
+   if (s_IS_OBSERVABLE(content, entry) && !Utils.isTQLHiddenFromPlayers())
    {
       const quest = new Quest(content, entry);
 
@@ -1108,7 +1108,7 @@ const s_JOURNAL_ENTRY_UPDATE = (entry, flags, options, id) =>
       let questEntry = s_GET_QUEST_ENTRY(entry.id);
 
       // Is the quest currently observable and not hidden from the current user.
-      const isObservable = s_IS_OBSERVABLE(content, entry) && !Utils.isFQLHiddenFromPlayers();
+      const isObservable = s_IS_OBSERVABLE(content, entry) && !Utils.isTQLHiddenFromPlayers();
 
       if (questEntry)
       {
@@ -1249,7 +1249,7 @@ const s_SET_QUEST_ENTRY = (entry, generate = true) =>
 
    if (!s_QUESTS_MAP[entry.status])
    {
-      console.error(`ForienQuestLog - QuestDB - set quest error - unknown status: ${entry.status}`);
+      console.error(`TyphonJSQuestLog - QuestDB - set quest error - unknown status: ${entry.status}`);
       return;
    }
 

@@ -1,4 +1,4 @@
-<div id="quest-tracker" class="fql-app fql-window-app" data-appid="{{appId}}">
+<div id="quest-tracker" class="tql-app tql-window-app" data-appid="{{appId}}">
   <header class="window-header flexrow">
     <h4 class="window-title">{{title}}</h4>
     {{#each headerButtons}}
@@ -15,9 +15,9 @@
           <a>{{name}}</a>
         </div>
         <span class="quest-tracker-span"></span>
-        {{#if (eq id ../primaryQuestId)}}<i class="is-primary fas fa-star pad-l-4" title="{{localize 'ForienQuestLog.Tooltips.PrimaryQuest'}}"></i>{{/if}}
+        {{#if (eq id ../primaryQuestId)}}<i class="is-primary fas fa-star pad-l-4" title="{{localize 'TyphonJSQuestLog.Tooltips.PrimaryQuest'}}"></i>{{/if}}
         {{#if isGM}}
-          {{#if isHidden}}<i class="is-hidden fas fa-eye-slash pad-l-4" title="{{localize 'ForienQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>{{/if}}
+          {{#if isHidden}}<i class="is-hidden fas fa-eye-slash pad-l-4" title="{{localize 'TyphonJSQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>{{/if}}
           {{#if isPersonal}}<i class="is-personal fas fa-user-shield pad-l-4" title="{{{personalActors}}}"></i>{{/if}}
         {{/if}}
         </div>
@@ -28,9 +28,9 @@
           <li class="task {{state}} subquest" {{#if (or isHidden isInactive)}}id="hidden"{{/if}}>
           <a class="quest-tracker-link {{state}}" data-quest-id="{{id}}" title="{{statusTooltip}}">{{name}}</a>
           <span class="quest-tracker-span"></span>
-          {{#if (eq id ../../primaryQuestId)}}<i class="is-primary fas fa-star pad-l-4" title="{{localize 'ForienQuestLog.Tooltips.PrimaryQuest'}}"></i>{{/if}}
+          {{#if (eq id ../../primaryQuestId)}}<i class="is-primary fas fa-star pad-l-4" title="{{localize 'TyphonJSQuestLog.Tooltips.PrimaryQuest'}}"></i>{{/if}}
           {{#if ../isGM}}
-            {{#if isHidden}}<i class="is-hidden fas fa-eye-slash pad-l-4" title="{{localize 'ForienQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>{{/if}}
+            {{#if isHidden}}<i class="is-hidden fas fa-eye-slash pad-l-4" title="{{localize 'TyphonJSQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>{{/if}}
             {{#if isPersonal}}<i class="is-personal fas fa-user-shield pad-l-4" title="{{{personalActors}}}"></i>{{/if}}
           {{/if}}
           </li>
@@ -52,7 +52,7 @@
     {{#if hasQuests}}
       </div>
     {{else}}
-      <div class="no-quests">{{localize 'ForienQuestLog.QuestTracker.NoPrimary'}}</div>
+      <div class="no-quests">{{localize 'TyphonJSQuestLog.QuestTracker.NoPrimary'}}</div>
     {{/if}}
   </section>
 </div>

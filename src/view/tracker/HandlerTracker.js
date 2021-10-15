@@ -103,8 +103,8 @@ export default class HandlerTracker
       const showPrimaryIcon = $('#quest-tracker .header-button.show-primary i');
       showPrimaryIcon.attr('class', newPrimary ? 'fas fa-star' : 'far fa-star');
       showPrimaryIcon.attr('title', game.i18n.localize(newPrimary ?
-       'ForienQuestLog.QuestTracker.Tooltips.PrimaryQuestShow' :
-        'ForienQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow'));
+       'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestShow' :
+        'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow'));
 
       questTracker.render();
    }

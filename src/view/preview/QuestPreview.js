@@ -1,4 +1,4 @@
-import FQLDialog              from '../FQLDialog.js';
+import TQLDialog              from '../TQLDialog.js';
 import QuestDB                from '../../control/QuestDB.js';
 import Socket                 from '../../control/Socket.js';
 import TinyMCE                from '../../control/TinyMCE.js';
@@ -11,7 +11,7 @@ import HandlerManage          from './HandlerManage.js';
 import { constants, jquery, settings }  from '../../model/constants.js';
 
 /**
- * QuestPreview is the main app / window of FQL for modifying individual Quest data. It appears reactive, but every
+ * QuestPreview is the main app / window of TQL for modifying individual Quest data. It appears reactive, but every
  * single time a data value is manipulated in the quest it is saved and this app renders again. There are many cases
  * when parent and subquests of the current quest also requires those QuestPreviews if visible and the {@link QuestLog}
  * to be rendered again. Additionally for remote clients socket events are broadcast to all users logged in to Foundry
@@ -19,7 +19,7 @@ import { constants, jquery, settings }  from '../../model/constants.js';
  * In the future it will be possible to reduce reliance on {@link Socket} as the {@link QuestDB} has many lifecycle
  * hooks, {@link QuestDBHooks} which can replace manual control aspects found in {@link Socket}.
  *
- * QuestPreview is the {@link Quest} sheet in Foundry parlance. In {@link FQLHooks.foundryInit} QuestPreview is set as
+ * QuestPreview is the {@link Quest} sheet in Foundry parlance. In {@link TQLHooks.foundryInit} QuestPreview is set as
  * the Quest sheet. All Quests are opened through this reference in Quest which is accessible by {@link Quest.sheet}
  *
  * The main source of QuestPreview creation is through {@link QuestAPI.open}. Both Socket, QuestLog and external
@@ -29,7 +29,7 @@ import { constants, jquery, settings }  from '../../model/constants.js';
  * The {@link JQuery} control handling of callbacks is facilitated through three separate static control classes and
  * are setup in {@link QuestPreview.activateListeners}. Two of the control classes {@link HandlerDetails} and
  * {@link HandlerManage} contain {@link JQuery} callbacks specific to the `details` and `management` tabs visible for GM
- * users and trusted players with ownership permissions when the module setting {@link FQLSettings.trustedPlayerEdit} is
+ * users and trusted players with ownership permissions when the module setting {@link TQLSettings.trustedPlayerEdit} is
  * enabled. {@link HandlerAny} contains callbacks utilized across both `details` and `management` tabs particularly
  * around handling the action icons for manipulating the quest tasks.
  *
@@ -56,7 +56,7 @@ import { constants, jquery, settings }  from '../../model/constants.js';
  * all the control callbacks are registered.
  *
  * In the handler callbacks for the delete action for quests, tasks, & rewards a special semi-modal dialog is invoked
- * via {@link FQLDialog}. A single instance of it is rendered and reused across all delete actions. Please refer to the
+ * via {@link TQLDialog}. A single instance of it is rendered and reused across all delete actions. Please refer to the
  * documentation.
  *
  * {@link ViewManager} responds to `closeQuestPreview` and `renderQuestPreview` tracking the opened QuestPreview
@@ -90,7 +90,7 @@ export default class QuestPreview extends FormApplication
       this._quest = quest;
 
       // Set the title of the FormApplication with the quest name.
-      this.options.title = game.i18n.format('ForienQuestLog.QuestPreview.Title', this._quest);
+      this.options.title = game.i18n.format('TyphonJSQuestLog.QuestPreview.Title', this._quest);
 
       /**
        * Set in `getData`. Determines if the player can accept quests which for non-GM / trusted players w/ edit allows
@@ -155,10 +155,10 @@ export default class QuestPreview extends FormApplication
       this._openedAppIds = [];
 
       /**
-       * Tracks any open FQLPermissionControl dialog that can be opened from the management tab, so that it can be
+       * Tracks any open TQLPermissionControl dialog that can be opened from the management tab, so that it can be
        * closed if this QuestPreview is closed or the tab is changed.
        *
-       * @type {FQLPermissionControl}
+       * @type {TQLPermissionControl}
        * @package
        *
        * @see {@link HandlerManage.configurePermissions}
@@ -202,15 +202,15 @@ export default class QuestPreview extends FormApplication
    static get defaultOptions()
    {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         classes: ['forien-quest-preview'],
-         template: 'modules/forien-quest-log/templates/quest-preview.html',
+         classes: ['typhonjs-quest-preview'],
+         template: 'modules/typhonjs-quest-log/templates/quest-preview.html',
          width: 700,
          height: 540,
          minimizable: true,
          resizable: true,
          submitOnChange: false,
          submitOnClose: false,
-         title: game.i18n.localize('ForienQuestLog.QuestPreview.Title'),
+         title: game.i18n.localize('TyphonJSQuestLog.QuestPreview.Title'),
          tabs: [{ navSelector: '.quest-tabs', contentSelector: '.quest-body', initial: 'details' }]
       });
    }
@@ -265,7 +265,7 @@ export default class QuestPreview extends FormApplication
       if (game.user.isGM)
       {
          buttons.unshift({
-            label: game.i18n.localize('ForienQuestLog.QuestPreview.HeaderButtons.Show'),
+            label: game.i18n.localize('TyphonJSQuestLog.QuestPreview.HeaderButtons.Show'),
             class: 'share-quest',
             icon: 'fas fa-eye',
             onclick: () => Socket.showQuestPreview(this._quest.id)
@@ -299,7 +299,7 @@ export default class QuestPreview extends FormApplication
          {
             if (Utils.copyTextToClipboard(`@Quest[${this._quest.id}]{${this._quest.name}}`))
             {
-               ui.notifications.info(game.i18n.format('ForienQuestLog.Notifications.LinkCopied'));
+               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
             }
          }
       });
@@ -377,7 +377,7 @@ export default class QuestPreview extends FormApplication
 
       super.activateEditor(name, Object.assign({}, options, tinyMCEOptions), initialContent);
 
-      // Remove the activate editor button as FQL has a transparent toolbar background. If pressed twice it will create
+      // Remove the activate editor button as TQL has a transparent toolbar background. If pressed twice it will create
       // an error.
       if (this.editors[name].button) { this.editors[name].button.remove(); }
    }
@@ -533,7 +533,7 @@ export default class QuestPreview extends FormApplication
 
    /**
     * When closing this Foundry app:
-    * - Close any associated dialogs via {@link FQLDialog.closeDialogs}
+    * - Close any associated dialogs via {@link TQLDialog.closeDialogs}
     * - Close any associated {@link QuestPreview._permControl}
     * - Close any associated {@link QuestPreview._rewardImagePopup}
     * - Close any associated {@link QuestPreview._splashImagePopup}
@@ -555,7 +555,7 @@ export default class QuestPreview extends FormApplication
     */
    async close({ noSave = false, ...options } = {})
    {
-      FQLDialog.closeDialogs({ questId: this._quest.id });
+      TQLDialog.closeDialogs({ questId: this._quest.id });
 
       // If a permission control app / dialog is open close it.
       if (this._permControl)

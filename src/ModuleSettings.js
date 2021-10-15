@@ -35,8 +35,8 @@ export default class ModuleSettings
    static register()
    {
       game.settings.register(constants.moduleName, settings.allowPlayersDrag, {
-         name: 'ForienQuestLog.Settings.allowPlayersDrag.Enable',
-         hint: 'ForienQuestLog.Settings.allowPlayersDrag.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.allowPlayersDrag.Enable',
+         hint: 'TyphonJSQuestLog.Settings.allowPlayersDrag.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -55,8 +55,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.allowPlayersCreate, {
-         name: 'ForienQuestLog.Settings.allowPlayersCreate.Enable',
-         hint: 'ForienQuestLog.Settings.allowPlayersCreate.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.allowPlayersCreate.Enable',
+         hint: 'TyphonJSQuestLog.Settings.allowPlayersCreate.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -72,8 +72,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.allowPlayersAccept, {
-         name: 'ForienQuestLog.Settings.allowPlayersAccept.Enable',
-         hint: 'ForienQuestLog.Settings.allowPlayersAccept.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.allowPlayersAccept.Enable',
+         hint: 'TyphonJSQuestLog.Settings.allowPlayersAccept.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -92,8 +92,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.trustedPlayerEdit, {
-         name: 'ForienQuestLog.Settings.trustedPlayerEdit.Enable',
-         hint: 'ForienQuestLog.Settings.trustedPlayerEdit.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.trustedPlayerEdit.Enable',
+         hint: 'TyphonJSQuestLog.Settings.trustedPlayerEdit.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -113,8 +113,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.countHidden, {
-         name: 'ForienQuestLog.Settings.countHidden.Enable',
-         hint: 'ForienQuestLog.Settings.countHidden.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.countHidden.Enable',
+         hint: 'TyphonJSQuestLog.Settings.countHidden.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -133,8 +133,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.dynamicBookmarkBackground, {
-         name: 'ForienQuestLog.Settings.dynamicBookmarkBackground.Enable',
-         hint: 'ForienQuestLog.Settings.dynamicBookmarkBackground.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.dynamicBookmarkBackground.Enable',
+         hint: 'TyphonJSQuestLog.Settings.dynamicBookmarkBackground.EnableHint',
          scope: scope.world,
          config: true,
          default: true,
@@ -147,15 +147,15 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.navStyle, {
-         name: 'ForienQuestLog.Settings.navStyle.Enable',
-         hint: 'ForienQuestLog.Settings.navStyle.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.navStyle.Enable',
+         hint: 'TyphonJSQuestLog.Settings.navStyle.EnableHint',
          scope: scope.client,
          config: true,
          default: 'bookmarks',
          type: String,
          choices: {
-            bookmarks: 'ForienQuestLog.Settings.navStyle.bookmarks',
-            classic: 'ForienQuestLog.Settings.navStyle.classic'
+            bookmarks: 'TyphonJSQuestLog.Settings.navStyle.bookmarks',
+            classic: 'TyphonJSQuestLog.Settings.navStyle.classic'
          },
          onChange: () =>
          {
@@ -168,16 +168,16 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.showTasks, {
-         name: 'ForienQuestLog.Settings.showTasks.Enable',
-         hint: 'ForienQuestLog.Settings.showTasks.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.showTasks.Enable',
+         hint: 'TyphonJSQuestLog.Settings.showTasks.EnableHint',
          scope: scope.world,
          config: true,
          default: 'default',
          type: String,
          choices: {
-            default: 'ForienQuestLog.Settings.showTasks.default',
-            onlyCurrent: 'ForienQuestLog.Settings.showTasks.onlyCurrent',
-            no: 'ForienQuestLog.Settings.showTasks.no'
+            default: 'TyphonJSQuestLog.Settings.showTasks.default',
+            onlyCurrent: 'TyphonJSQuestLog.Settings.showTasks.onlyCurrent',
+            no: 'TyphonJSQuestLog.Settings.showTasks.no'
          },
          onChange: () =>
          {
@@ -190,22 +190,22 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.defaultPermission, {
-         name: 'ForienQuestLog.Settings.defaultPermissionLevel.Enable',
-         hint: 'ForienQuestLog.Settings.defaultPermissionLevel.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.defaultPermissionLevel.Enable',
+         hint: 'TyphonJSQuestLog.Settings.defaultPermissionLevel.EnableHint',
          scope: scope.world,
          config: true,
          default: 'Observer',
          type: String,
          choices: {
-            OBSERVER: 'ForienQuestLog.Settings.defaultPermissionLevel.OBSERVER',
-            NONE: 'ForienQuestLog.Settings.defaultPermissionLevel.NONE',
-            OWNER: 'ForienQuestLog.Settings.defaultPermissionLevel.OWNER'
+            OBSERVER: 'TyphonJSQuestLog.Settings.defaultPermissionLevel.OBSERVER',
+            NONE: 'TyphonJSQuestLog.Settings.defaultPermissionLevel.NONE',
+            OWNER: 'TyphonJSQuestLog.Settings.defaultPermissionLevel.OWNER'
          }
       });
 
-      game.settings.register(constants.moduleName, settings.hideFQLFromPlayers, {
-         name: 'ForienQuestLog.Settings.hideFQLFromPlayers.Enable',
-         hint: 'ForienQuestLog.Settings.hideFQLFromPlayers.EnableHint',
+      game.settings.register(constants.moduleName, settings.hideTQLFromPlayers, {
+         name: 'TyphonJSQuestLog.Settings.hideTQLFromPlayers.Enable',
+         hint: 'TyphonJSQuestLog.Settings.hideTQLFromPlayers.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -213,11 +213,11 @@ export default class ModuleSettings
          onChange: async(value) =>
          {
             // Swap macro image based on current state. No need to await.
-            if (game.user.isGM) { Utils.setMacroImage(settings.hideFQLFromPlayers, value); }
+            if (game.user.isGM) { Utils.setMacroImage(settings.hideTQLFromPlayers, value); }
 
             if (!game.user.isGM)
             {
-               // Hide all FQL apps from non GM user and remove the ui.controls for FQL.
+               // Hide all TQL apps from non GM user and remove the ui.controls for TQL.
                if (value)
                {
                   ViewManager.closeAll({ questPreview: true, updateSetting: false });
@@ -226,7 +226,7 @@ export default class ModuleSettings
                   if (notes) { notes.tools = notes?.tools.filter((c) => !c.name.startsWith(constants.moduleName)); }
 
                   // Remove all quests from in-memory DB. This is required so that users can not retrieve quests
-                  // from the QuestAPI or content links in Foundry resolve when FQL is hidden.
+                  // from the QuestAPI or content links in Foundry resolve when TQL is hidden.
                   QuestDB.removeAll();
                }
                else
@@ -245,15 +245,15 @@ export default class ModuleSettings
             // Render the journal to show / hide open quest log button & folder.
             game?.journal?.render();
 
-            // Close or open the quest tracker based on active quests (users w/ FQL hidden will have no quests in
+            // Close or open the quest tracker based on active quests (users w/ TQL hidden will have no quests in
             // QuestDB)
             ViewManager.renderOrCloseQuestTracker({ updateSetting: false });
          }
       });
 
       game.settings.register(constants.moduleName, settings.notifyRewardDrop, {
-         name: 'ForienQuestLog.Settings.notifyRewardDrop.Enable',
-         hint: 'ForienQuestLog.Settings.notifyRewardDrop.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.notifyRewardDrop.Enable',
+         hint: 'TyphonJSQuestLog.Settings.notifyRewardDrop.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -266,8 +266,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.showFolder, {
-         name: 'ForienQuestLog.Settings.showFolder.Enable',
-         hint: 'ForienQuestLog.Settings.showFolder.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.showFolder.Enable',
+         hint: 'TyphonJSQuestLog.Settings.showFolder.EnableHint',
          scope: scope.world,
          config: true,
          default: false,
@@ -297,7 +297,7 @@ export default class ModuleSettings
             // quests.
             if (value && QuestDB.getCount({ status: questStatus.active }) === 0)
             {
-               ViewManager.notifications.info(game.i18n.localize('ForienQuestLog.Notifications.QuestTrackerNoActive'));
+               ViewManager.notifications.info(game.i18n.localize('TyphonJSQuestLog.Notifications.QuestTrackerNoActive'));
             }
 
             // Swap macro image based on current state. No need to await.
@@ -310,8 +310,8 @@ export default class ModuleSettings
       /**
        * This is the most complex module setting handling as quite a bit of logic is contained below to handle
        * setting the primary quest. Since the onChange event does not pass the old and new value the old value for
-       * {@link FQLSettings.primaryQuest} is stored in {@link FQLSessionConstants.currentPrimaryQuest} which is
-       * initially set in {@link FQLHooks.foundryReady}.
+       * {@link TQLSettings.primaryQuest} is stored in {@link TQLSessionConstants.currentPrimaryQuest} which is
+       * initially set in {@link TQLHooks.foundryReady}.
        *
        * This setting is set from {@link Socket.setQuestPrimary} or the handler in Socket.
        *
@@ -371,7 +371,7 @@ export default class ModuleSettings
             // Post a notification if a new primary quest was set.
             if (newPrimaryQuestName)
             {
-               ViewManager.notifications.info(game.i18n.format('ForienQuestLog.Notifications.QuestPrimary',
+               ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestPrimary',
                 { name: newPrimaryQuestName }));
             }
          }
@@ -396,8 +396,8 @@ export default class ModuleSettings
       });
 
       game.settings.register(constants.moduleName, settings.questTrackerResizable, {
-         name: 'ForienQuestLog.Settings.questTrackerResizable.Enable',
-         hint: 'ForienQuestLog.Settings.questTrackerResizable.EnableHint',
+         name: 'TyphonJSQuestLog.Settings.questTrackerResizable.Enable',
+         hint: 'TyphonJSQuestLog.Settings.questTrackerResizable.EnableHint',
          scope: scope.client,
          config: true,
          default: false,

@@ -1,19 +1,19 @@
 <form class="quest-preview">
   <nav class="quest-tabs tabs {{#unless canEdit}}hidden{{/unless}}" data-group="primary">
-    <a class="item" data-tab="details">{{localize 'ForienQuestLog.QuestPreview.Tabs.Details'}}</a>
+    <a class="item" data-tab="details">{{localize 'TyphonJSQuestLog.QuestPreview.Tabs.Details'}}</a>
     {{#if isGM}}
-      <a class="item" data-tab="gmnotes">{{localize 'ForienQuestLog.QuestPreview.Tabs.GMNotes'}}</a>
+      <a class="item" data-tab="gmnotes">{{localize 'TyphonJSQuestLog.QuestPreview.Tabs.GMNotes'}}</a>
     {{/if}}
-    <a class="item" data-tab="management">{{localize 'ForienQuestLog.QuestPreview.Tabs.QuestManagement'}}</a>
+    <a class="item" data-tab="management">{{localize 'TyphonJSQuestLog.QuestPreview.Tabs.QuestManagement'}}</a>
     {{#if isActive}}
       {{#if isPrimary}}
-        <a class="icon-button"><i class="is-primary fas fa-star pad-l-8" title="{{localize 'ForienQuestLog.QuestPreview.Tooltips.PrimaryQuestUnset'}}"></i></a>
+        <a class="icon-button"><i class="is-primary fas fa-star pad-l-8" title="{{localize 'TyphonJSQuestLog.QuestPreview.Tooltips.PrimaryQuestUnset'}}"></i></a>
       {{else}}
-        <a class="icon-button"><i class="is-primary far fa-star pad-l-8" title="{{localize 'ForienQuestLog.QuestPreview.Tooltips.PrimaryQuestSet'}}"></i></a>
+        <a class="icon-button"><i class="is-primary far fa-star pad-l-8" title="{{localize 'TyphonJSQuestLog.QuestPreview.Tooltips.PrimaryQuestSet'}}"></i></a>
       {{/if}}
     {{/if}}
     {{#if isHidden}}
-      <i class="is-hidden fas fa-eye-slash pad-l-8" title="{{localize 'ForienQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>
+      <i class="is-hidden fas fa-eye-slash pad-l-8" title="{{localize 'TyphonJSQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>
     {{/if}}
     {{#if isPersonal}}
       <i class="is-personal fas fa-user-shield pad-l-8" title="{{{personalActors}}}"></i>
@@ -22,16 +22,16 @@
 
   <section class="quest-body">
     <div class="tab details" data-group="primary" data-tab="details">
-      {{> "modules/forien-quest-log/templates/partials/quest-preview/details.html"}}
+      {{> "modules/typhonjs-quest-log/templates/partials/quest-preview/details.html"}}
     </div>
     {{#if isGM}}
       <div class="tab gmnotes" data-group="primary" data-tab="gmnotes">
-        {{> "modules/forien-quest-log/templates/partials/quest-preview/gmnotes.html"}}
+        {{> "modules/typhonjs-quest-log/templates/partials/quest-preview/gmnotes.html"}}
       </div>
     {{/if}}
     {{#if canEdit}}
       <div class="tab management" data-group="primary" data-tab="management">
-        {{> "modules/forien-quest-log/templates/partials/quest-preview/management.html"}}
+        {{> "modules/typhonjs-quest-log/templates/partials/quest-preview/management.html"}}
       </div>
     {{/if}}
   </section>

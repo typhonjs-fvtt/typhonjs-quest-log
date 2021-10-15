@@ -1,29 +1,29 @@
 {
-  "title": "Forien's Quest Log",
-  "description": "Modify default Forien's Quest Log colors and background",
+  "title": "TyphonJS Quest Log",
+  "description": "Modify default TyphonJS Quest Log colors and background",
 
-  "--palette-fql-qt-text-color": {
+  "--palette-tql-qt-text-color": {
     "name": "Quest Tracker text color",
     "hint": "Sets the Quest Tracker text color.",
     "type": "color",
     "default": "#eeeeee"
   },
 
-  "--palette-fql-qt-color-background": {
+  "--palette-tql-qt-color-background": {
     "name": "Quest Tracker app background color",
     "hint": "Sets the Quest Tracker app background color.",
     "type": "color",
     "default": "#00000000"
   },
 
-  "--palette-fql-qt-image-background": {
+  "--palette-tql-qt-image-background": {
     "name": "Quest Tracker background image",
     "hint": "Sets the Quest Tracker background app image.",
     "type": "imagevideo",
     "default": "ui/denim075.png"
   },
 
-  "--palette-fql-qt-color-background-entitylink": {
+  "--palette-tql-qt-color-background-entitylink": {
     "name": "Quest Tracker entity link background color",
     "hint": "Sets the Quest Tracker entity link background color.",
     "type": "color",

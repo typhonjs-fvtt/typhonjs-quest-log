@@ -12,8 +12,8 @@ import dbSchema_2    from './dbSchema_2.js';
  */
 const migrateImpl = {
    0: () => {},   // Schema level 0 is a noop / assume all data is stored in JE content.
-   1: dbSchema_1, // Migrate to schema 1 transferring any old data to JE flags.
-   2: dbSchema_2  // Schema 2 - store quest giver data in Quest data instead of doing a UUID lookup in Enrich.
+   // 1: dbSchema_1, // Migrate to schema 1 transferring any old data to JE flags.
+   // 2: dbSchema_2  // Schema 2 - store quest giver data in Quest data instead of doing a UUID lookup in Enrich.
 };
 
 /**

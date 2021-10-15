@@ -1,5 +1,5 @@
 {
-    "ForienQuestLog": {
+    "TyphonJSQuestLog": {
       "NewQuest": "새 퀘스트",
       "QuestLogButton": "퀘스트 로그",
       "Quests": "{0} 퀘스트",
@@ -183,7 +183,7 @@
           "NONE": "없음",
           "OWNER": "소유자"
         },
-        "hideFQLFromPlayers": {
+        "hideTQLFromPlayers": {
           "Enable": "퀘스트 로그를 플레이어에게 숨기기",
           "EnableHint": "활성화할 경우 퀘스트 로그가 모든 플레이어에게 숨겨진다. GM 레벨 유저만 퀘스트 로그에 액세스 할 수 있다."
         },

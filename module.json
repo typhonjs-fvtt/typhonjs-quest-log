@@ -1,26 +1,22 @@
 {
-  "name": "forien-quest-log",
-  "title": "Forien's Quest Log",
+  "name": "typhonjs-quest-log",
+  "title": "TyphonJS Quest Log",
   "description": "Provides comprehensive Quest Log system for players and Game Masters",
   "author": "Michael Leahy (TyphonJS) - MLeahy#4299",
   "authors": [
-    {
-      "name": "Forien",
-      "url": "https://www.patreon.com/forien"
-    },
     {
       "name": "Michael Leahy (TyphonJS) - MLeahy#4299",
       "url": "https://www.typhonjs.io"
     }
   ],
-  "url": "https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log",
-  "readme": "https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/blob/master/README.md",
-  "bugs": "https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/issues",
-  "changelog": "https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/releases/latest/",
+  "url": "https://github.com/typhonjs-fvtt/typhonjs-quest-log",
+  "readme": "https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/README.md",
+  "bugs": "https://github.com/typhonjs-fvtt/typhonjs-quest-log/issues",
+  "changelog": "https://github.com/typhonjs-fvtt/typhonjs-quest-log/releases/latest/",
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.7.7",
+  "version": "0.8.0-alpha1",
   "minimumCoreVersion": "0.8.6",
   "compatibleCoreVersion": "0.8.9",
   "scripts": [],
@@ -90,16 +86,16 @@
   "packs": [
     {
       "name": "macros-gm",
-      "label": "FQL Macros (GM)",
-      "module": "forien-quest-log",
+      "label": "TQL Macros (GM)",
+      "module": "typhonjs-quest-log",
       "path": "./packs/macro-gm.db",
       "entity": "Macro",
       "private": true
     },
     {
       "name": "macros-player",
-      "label": "FQL Macros (Player)",
-      "module": "forien-quest-log",
+      "label": "TQL Macros (Player)",
+      "module": "typhonjs-quest-log",
       "path": "./packs/macro-player.db",
       "entity": "Macro"
     }
@@ -107,8 +103,8 @@
   "system": [],
   "dependencies": [],
   "socket": true,
-  "manifest": "https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/releases/latest/download/module.json",
-  "download": "https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/releases/download/0.7.7/module.zip",
+  "manifest": "https://github.com/typhonjs-fvtt/typhonjs-quest-log/releases/latest/download/module.json",
+  "download": "https://github.com/typhonjs-fvtt/typhonjs-quest-log/releases/download/0.8.0-alpha1/module.zip",
   "protected": false,
   "coreTranslation": false,
   "library": false

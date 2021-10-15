@@ -126,10 +126,10 @@ export default class Enrich
          if (canEdit && questStatus.active === quest.status)
          {
             result += `<i class="move fas fa-check-circle" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.SetCompleted')}" data-target="completed" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.SetCompleted')}" data-target="completed" data-quest-id="${quest.id}"></i>\n`;
 
             result += `<i class="move fas fa-times-circle" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.SetFailed')}" data-target="failed" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.SetFailed')}" data-target="failed" data-quest-id="${quest.id}"></i>\n`;
 
             addedAction = true;
          }
@@ -138,7 +138,7 @@ export default class Enrich
          if (canEdit && questStatus.completed === quest.status)
          {
             result += `<i class="move fas fa-times-circle" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.SetFailed')}" data-target="failed" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.SetFailed')}" data-target="failed" data-quest-id="${quest.id}"></i>\n`;
 
             addedAction = true;
          }
@@ -147,7 +147,7 @@ export default class Enrich
          if (canEdit && questStatus.failed === quest.status)
          {
             result += `<i class="move fas fa-check-circle" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.SetCompleted')}" data-target="completed" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.SetCompleted')}" data-target="completed" data-quest-id="${quest.id}"></i>\n`;
 
             addedAction = true;
          }
@@ -155,7 +155,7 @@ export default class Enrich
          if ((canEdit && questStatus.inactive === quest.status) || questStatus.available === quest.status)
          {
             result += `<i class="move fas fa-play" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.SetActive')}" data-target="active" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.SetActive')}" data-target="active" data-quest-id="${quest.id}"></i>\n`;
 
             addedAction = true;
          }
@@ -163,7 +163,7 @@ export default class Enrich
          if (canEdit && questStatus.inactive !== quest.status)
          {
             result += `<i class="move fas fa-stop-circle" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.Hide')}" data-target="inactive" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.Hide')}" data-target="inactive" data-quest-id="${quest.id}"></i>\n`;
 
             addedAction = true;
          }
@@ -171,7 +171,7 @@ export default class Enrich
          if ((canEdit && questStatus.inactive === quest.status) || questStatus.active === quest.status)
          {
             result += `<i class="move fas fa-clipboard" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.SetAvailable')}" data-target="available" data-quest-id="${quest.id}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.SetAvailable')}" data-target="available" data-quest-id="${quest.id}"></i>\n`;
 
             addedAction = true;
          }
@@ -179,7 +179,7 @@ export default class Enrich
          if (canEdit)
          {
             result += `<i class="delete fas fa-trash" title="${game.i18n.localize(
-             'ForienQuestLog.Tooltips.Delete')}" data-quest-id="${quest.id}" data-quest-name="${quest.name}"></i>\n`;
+             'TyphonJSQuestLog.Tooltips.Delete')}" data-quest-id="${quest.id}" data-quest-name="${quest.name}"></i>\n`;
 
             addedAction = true;
          }
@@ -246,10 +246,10 @@ export default class Enrich
          data.questIconType = 'quest-giver';
       }
 
-      const statusLabel = game.i18n.localize(`ForienQuestLog.QuestTypes.Labels.${data.status}`);
+      const statusLabel = game.i18n.localize(`TyphonJSQuestLog.QuestTypes.Labels.${data.status}`);
 
       // The quest status in the details section.
-      data.statusLabel = game.i18n.format(`ForienQuestLog.QuestIs`, { statusLabel });
+      data.statusLabel = game.i18n.format(`TyphonJSQuestLog.QuestIs`, { statusLabel });
 
       data.statusActions = Enrich.statusActions(quest);
 
@@ -306,7 +306,7 @@ export default class Enrich
                 { statusI18n: game.i18n.localize(questStatusI18n[questStatus.inactive]) } :
                  { statusI18n: game.i18n.localize(questStatusI18n[subquest.status]) };
 
-               const statusTooltip = game.i18n.format('ForienQuestLog.Tooltips.Status', statusTooltipData);
+               const statusTooltip = game.i18n.format('TyphonJSQuestLog.Tooltips.Status', statusTooltipData);
 
                const canEditSubquest = game.user.isGM || (subquest.isOwner && isTrustedPlayerEdit);
 
@@ -382,11 +382,11 @@ export default class Enrich
 
          const draggable = (canEdit || canPlayerDrag) && (canEdit || !item.locked) && type !== 'abstract';
 
-         const lockedTooltip = canEdit ? game.i18n.localize('ForienQuestLog.Tooltips.RewardLocked') :
-          game.i18n.localize('ForienQuestLog.Tooltips.RewardLockedPlayer');
+         const lockedTooltip = canEdit ? game.i18n.localize('TyphonJSQuestLog.Tooltips.RewardLocked') :
+          game.i18n.localize('TyphonJSQuestLog.Tooltips.RewardLockedPlayer');
 
-         const unlockedTooltip = canEdit ? game.i18n.localize('ForienQuestLog.Tooltips.RewardUnlocked') :
-          game.i18n.localize('ForienQuestLog.Tooltips.RewardUnlockedPlayer');
+         const unlockedTooltip = canEdit ? game.i18n.localize('TyphonJSQuestLog.Tooltips.RewardUnlocked') :
+          game.i18n.localize('TyphonJSQuestLog.Tooltips.RewardUnlockedPlayer');
 
          // Defines if the pointer cursor is displayed. For abstract reward it always displayed for GM or when unlocked
          // for players.
@@ -479,11 +479,11 @@ export default class Enrich
  *
  * @property {string}      data_rewards.transfer.uuid - The reward Foundry UUID.
  *
- * @property {string}      data_rewards.transfer.uuidv4 - The reward FQL UUIDv4.
+ * @property {string}      data_rewards.transfer.uuidv4 - The reward TQL UUIDv4.
  *
  * @property {string}      data_rewards.unlockedTooltip - The tooltip to display for the unlocked icon.
  *
- * @property {string}      data_rewards.uuidv4 - The reward FQL UUIDv4.
+ * @property {string}      data_rewards.uuidv4 - The reward TQL UUIDv4.
  *
  * @property {object[]}    data_subquest - A list of data objects with subquest details.
  *

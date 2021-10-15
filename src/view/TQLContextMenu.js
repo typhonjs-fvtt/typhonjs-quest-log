@@ -5,10 +5,10 @@
  * clicked in a larger element. Note: be mindful that CSS style `position: fixed` is used to make the context menu
  * display relative to the main page viewport which defines the containing block, however if you use `filter`,
  * `perspective`, or `transform` in styles then that element becomes the containing block higher up than the main
- * window. FQLContextMenu does not reposition the inserted HTML which is relative to the element containing the context
+ * window. TQLContextMenu does not reposition the inserted HTML which is relative to the element containing the context
  * menu.
  */
-export default class FQLContextMenu extends ContextMenu
+export default class TQLContextMenu extends ContextMenu
 {
    /**
     * @inheritDoc

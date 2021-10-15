@@ -1,9 +1,17 @@
 ## Contribution Etiquette
 Open Source projects function most efficiently when everyone communicates well with each other. Here are some suggested practices that will let everyone else work alongside you comfortably:
 
+### **Do you have questions about the source code or other Q&A discussion?**
+ 
+* **Please use and search** the [Discussions](https://github.com/typhonjs-fvtt/typhonjs-quest-log/discussions) page for non-issue based communication, Q&A, and help requests.
+
+* **Join the [TyphonJS Discord](https://discord.gg/mnbgN8f)** and direct questions to the appropriate channel (#typhonjs-quest-log).
+
+* Please **do not directly contact maintainers** with questions; if you have a question other people might as well, so discussions should take place in public forums where others can see and learn from it as well.
+
 ### **Did you find a bug? Do you want to suggest an enhancement?**
 
-* **Ensure your contribution is novel** by searching the [Issues](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/issues) page. Be sure to look through both open and closed issues, especially for enhancement suggestions as rejected suggestions will be closed.
+* **Ensure your contribution is novel** by searching the [Issues](https://github.com/typhonjs-fvtt/typhonjs-quest-log/issues) page. Be sure to look through both open and closed issues, especially for enhancement suggestions as rejected suggestions will be closed.
 
 * If applicable **use the appropriate issue templates** to automatically apply the relevant tag to the created issue. This allows issues to be quickly differentiated as bug reports, enhancement suggestions, or whatever else without a maintainer manually adding the tag to the issue. The bug report template will specify which information to add that will aid in reproducing the bug.
 
@@ -27,20 +35,14 @@ Open Source projects function most efficiently when everyone communicates well w
 
 ### **Do you want to submit/update a translation?**
 
-* **Submit a pull request** with your new / updated JSON file in the [lang folder](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/tree/master/lang).
+* **Submit a pull request** with your new / updated JSON file in the [lang folder](https://github.com/typhonjs-fvtt/typhonjs-quest-log/tree/master/lang).
 
 * Be sure that the JSON file is either completely flat or completely nested.
 
-* If your localization does not include translations for any strings please indicate as much in the [lang / missing folder](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/tree/master/lang/missing).
+* If your localization does not include translations for any strings please indicate as much in the [lang / missing folder](https://github.com/typhonjs-fvtt/typhonjs-quest-log/tree/master/lang/missing).
 
 ### **Do you want to contribute documentation?**
 
 * Please **follow the above guidelines** regarding opening issues and submitting pull requests. Some documentation issues may be broader and ongoing, in which case you may want to contribute to assignee's forks first. Any smaller changes should still open a detailed issue and submit a detailed pull request that [closes that issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).
 
-### **Do you have questions about the source code?**
-
-* **Join the [TyphonJS Discord](https://discord.gg/mnbgN8f)** and direct questions to the appropriate channel (#forien-quest-log).
-
-* Please **do not directly contact maintainers** with questions; if you have a question other people might as well, so discussions should take place in public forums where others can see and learn from it as well.
-
-Thank you for your interest in contributing to Forien's Quest Log! :heart:
+Thank you for your interest in contributing to the TyphonJS Quest Log! :heart:

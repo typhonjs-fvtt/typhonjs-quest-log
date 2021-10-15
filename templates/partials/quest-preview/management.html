@@ -1,42 +1,42 @@
 <div class="row" xmlns="http://www.w3.org/1999/html">
   <section class="quest-settings">
-    <h2>{{localize 'ForienQuestLog.QuestPreview.Management.QuestSettings'}}</h2>
+    <h2>{{localize 'TyphonJSQuestLog.QuestPreview.Management.QuestSettings'}}</h2>
     <div class="setting-groups">
-      <button class="btn configure-perm-btn"><i class="fas fa-lock fa-fw"></i>{{localize 'ForienQuestLog.QuestPreview.Management.ConfigurePermissions'}}</button>
+      <button class="btn configure-perm-btn"><i class="fas fa-lock fa-fw"></i>{{localize 'TyphonJSQuestLog.QuestPreview.Management.ConfigurePermissions'}}</button>
     </div>
   </section>
 
   <section class="quest-splash">
     <h2>
-      {{localize 'ForienQuestLog.QuestPreview.Management.SplashArt'}}
+      {{localize 'TyphonJSQuestLog.QuestPreview.Management.SplashArt'}}
       <span class="state-container">
         <input type="checkbox" id="splash-as-icon-{{id}}" name="splash-as-icon" {{#if splashAsIcon}}checked{{/if}}>
-        <label for="splash-as-icon-{{id}}">{{localize 'ForienQuestLog.QuestPreview.Management.SplashQuestIcon'}}</label>
+        <label for="splash-as-icon-{{id}}">{{localize 'TyphonJSQuestLog.QuestPreview.Management.SplashQuestIcon'}}</label>
       </span>
     </h2>
-    <div class="splash-image" style="background-image: url('{{splash}}');background-position: {{splashPos}};" title="{{localize 'ForienQuestLog.Tooltips.Edit'}}">
+    <div class="splash-image" style="background-image: url('{{splash}}');background-position: {{splashPos}};" title="{{localize 'TyphonJSQuestLog.Tooltips.Edit'}}">
       {{#if (eq splash '')}}
-        <span class="drop-info">{{localize 'ForienQuestLog.QuestPreview.Management.SplashInfo'}}</span>
+        <span class="drop-info">{{localize 'TyphonJSQuestLog.QuestPreview.Management.SplashInfo'}}</span>
       {{/if}}
 
       {{#if splash.length}}
-        <span class="delete-splash" title="{{localize 'ForienQuestLog.Tooltips.DeleteSplash'}}"><i class="fas fa-times"></i></span>
-        <span class="change-splash-pos" title="{{localize 'ForienQuestLog.Tooltips.ChangeSplashPos'}}"><i class="fas fa-arrows-alt"></i></span>
+        <span class="delete-splash" title="{{localize 'TyphonJSQuestLog.Tooltips.DeleteSplash'}}"><i class="fas fa-times"></i></span>
+        <span class="change-splash-pos" title="{{localize 'TyphonJSQuestLog.Tooltips.ChangeSplashPos'}}"><i class="fas fa-arrows-alt"></i></span>
       {{/if}}
     </div>
   </section>
 </div>
 <section class="subquests">
   <header>
-    <h2>{{localize 'ForienQuestLog.QuestPreview.Management.QuestBranching'}}</h2>
-    <button class="btn add-subquest-btn"><i class="fas fa-plus"></i> {{localize 'ForienQuestLog.QuestPreview.Management.AddSubquest'}}</button>
+    <h2>{{localize 'TyphonJSQuestLog.QuestPreview.Management.QuestBranching'}}</h2>
+    <button class="btn add-subquest-btn"><i class="fas fa-plus"></i> {{localize 'TyphonJSQuestLog.QuestPreview.Management.AddSubquest'}}</button>
   </header>
   <ul class="subquests-box">
     {{#each data_subquest}}
     <li class="subquest-item" title="{{statusTooltip}}">
-      {{#if isPrimary}}<i class="is-primary fas fa-star pad-l-4" title="{{localize 'ForienQuestLog.Tooltips.PrimaryQuest'}}"></i>{{/if}}
+      {{#if isPrimary}}<i class="is-primary fas fa-star pad-l-4" title="{{localize 'TyphonJSQuestLog.Tooltips.PrimaryQuest'}}"></i>{{/if}}
       {{#if ../canEdit}}
-        {{#if isHidden}}<i class="is-hidden fas fa-eye-slash pad-l-4" title="{{localize 'ForienQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>{{/if}}
+        {{#if isHidden}}<i class="is-hidden fas fa-eye-slash pad-l-4" title="{{localize 'TyphonJSQuestLog.Tooltips.HiddenQuestNoPlayers'}}"></i>{{/if}}
         {{#if isPersonal}}<i class="is-personal fas fa-user-shield pad-l-4" title="{{{personalActors}}}"></i>{{/if}}
       {{/if}}
       <h2 class="quest-name-link" data-quest-id="{{id}}">{{name}}</h2>

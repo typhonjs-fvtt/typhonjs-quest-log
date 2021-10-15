@@ -1,18 +1,18 @@
 import ViewManager from '../control/ViewManager.js';
 
 /**
- * Defines the main FQL constants for module name and the DB flag.
+ * Defines the main TQL constants for module name and the DB flag.
  *
  * @type {{folderState: string, flagDB: string, moduleName: string, moduleLabel: string, primaryState: string}}
  */
 const constants = {
-   moduleName: 'forien-quest-log',
+   moduleName: 'typhonjs-quest-log',
    moduleLabel: `Forien's Quest Log`,
    flagDB: 'json'
 };
 
 /**
- * Defines the {@link JQuery} events that are used in FQL.
+ * Defines the {@link JQuery} events that are used in TQL.
  *
  * @type {{click: string, dblclick: string, dragstart: string, drop: string, focus: string, focusout: string, mousedown: string}}
  */
@@ -36,15 +36,15 @@ const jquery = {
 const noteControls = [
    {
       name: constants.moduleName,
-      title: 'ForienQuestLog.QuestLogButton',
+      title: 'TyphonJSQuestLog.QuestLogButton',
       icon: 'fas fa-scroll',
       visible: true,
       onClick: () => ViewManager.questLog.render(true, { focus: true }),
       button: true
    },
    {
-      name: 'forien-quest-log-floating-window',
-      title: 'ForienQuestLog.QuestTracker.Title',
+      name: 'typhonjs-quest-log-floating-window',
+      title: 'TyphonJSQuestLog.QuestTracker.Title',
       icon: 'fas fa-tasks',
       visible: true,
       onClick: async () => { await game.settings.set(constants.moduleName, settings.questTrackerEnable, true); },
@@ -71,11 +71,11 @@ const questStatus = {
  * @type {{active: string, available: string, completed: string, failed: string, inactive: string}}
  */
 const questStatusI18n = {
-   active: 'ForienQuestLog.QuestTypes.Active',
-   available: 'ForienQuestLog.QuestTypes.Available',
-   completed: 'ForienQuestLog.QuestTypes.Completed',
-   failed: 'ForienQuestLog.QuestTypes.Failed',
-   inactive: 'ForienQuestLog.QuestTypes.InActive'
+   active: 'TyphonJSQuestLog.QuestTypes.Active',
+   available: 'TyphonJSQuestLog.QuestTypes.Available',
+   completed: 'TyphonJSQuestLog.QuestTypes.Completed',
+   failed: 'TyphonJSQuestLog.QuestTypes.Failed',
+   inactive: 'TyphonJSQuestLog.QuestTypes.InActive'
 };
 
 /**
@@ -95,16 +95,16 @@ const questTabIndex = {
 /**
  * Stores the keys used with session storage.
  *
- * @type {FQLSessionConstants}
+ * @type {TQLSessionConstants}
  */
 const sessionConstants = {
-   currentPrimaryQuest: 'forien.questlog.currentPrimaryQuest',
-   trackerFolderState: 'forien.questtracker.folderState-',
-   trackerShowPrimary: 'forien.questtracker.showPrimary'
+   currentPrimaryQuest: 'typhonjs.questlog.currentPrimaryQuest',
+   trackerFolderState: 'typhonjs.questtracker.folderState-',
+   trackerShowPrimary: 'typhonjs.questtracker.showPrimary'
 };
 
 /**
- * @type {FQLSettings} Defines all the module settings for world and client.
+ * @type {TQLSettings} Defines all the module settings for world and client.
  */
 const settings = {
    allowPlayersAccept: 'allowPlayersAccept',
@@ -114,7 +114,7 @@ const settings = {
    defaultAbstractRewardImage: 'defaultAbstractRewardImage',
    defaultPermission: 'defaultPermission',
    dynamicBookmarkBackground: 'dynamicBookmarkBackground',
-   hideFQLFromPlayers: 'hideFQLFromPlayers',
+   hideTQLFromPlayers: 'hideTQLFromPlayers',
    navStyle: 'navStyle',
    notifyRewardDrop: 'notifyRewardDrop',
    primaryQuest: 'primaryQuest',
@@ -130,9 +130,9 @@ const settings = {
 export { constants, jquery, noteControls, questStatus, questStatusI18n, questTabIndex, sessionConstants, settings };
 
 /**
- * @typedef {object} FQLSessionConstants
+ * @typedef {object} TQLSessionConstants
  *
- * @property {string}   currentPrimaryQuest - Stores current primary quest set from {@link FQLSettings.primaryQuest}.
+ * @property {string}   currentPrimaryQuest - Stores current primary quest set from {@link TQLSettings.primaryQuest}.
  *
  * @property {string}   trackerFolderState - Stores a boolean with tacked on quest ID for whether objectives are shown.
  *
@@ -140,7 +140,7 @@ export { constants, jquery, noteControls, questStatus, questStatusI18n, questTab
  */
 
 /**
- * @typedef {object} FQLSettings
+ * @typedef {object} TQLSettings
  *
  * @property {string}   allowPlayersAccept - Allow players to accept quests.
  *
@@ -156,7 +156,7 @@ export { constants, jquery, noteControls, questStatus, questStatusI18n, questTab
  *
  * @property {string}   dynamicBookmarkBackground - Uses jQuery to dynamically set the tab background image.
  *
- * @property {string}   hideFQLFromPlayers - Completely hides FQL from players.
+ * @property {string}   hideTQLFromPlayers - Completely hides TQL from players.
  *
  * @property {string}   navStyle - Navigation style / classic / or bookmark tabs.
  *
@@ -172,7 +172,7 @@ export { constants, jquery, noteControls, questStatus, questStatusI18n, questTab
  *
  * @property {string}   questTrackerResizable - Stores the current window handling mode ('auto' or 'resize').
  *
- * @property {string}   showFolder - Shows the `_fql_quests` directory in the journal entries sidebar.
+ * @property {string}   showFolder - Shows the `_tql_quests` directory in the journal entries sidebar.
  *
  * @property {string}   showTasks - Determines if objective counts are rendered.
  *

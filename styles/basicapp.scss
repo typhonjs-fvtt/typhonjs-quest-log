@@ -1,6 +1,6 @@
 // Defines the styles for that mimics a popout Application. Used by QuestTracker to appear like a
 // popout app, but be managed directly.
-.fql-app {
+.tql-app {
   max-height: 100%;
   background: url(/ui/denim075.png) repeat;
   border-radius: 5px;
@@ -10,7 +10,7 @@
   position: absolute;
 }
 
-.fql-window-app {
+.tql-window-app {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;

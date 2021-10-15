@@ -1,8 +1,8 @@
 import QuestDB          from '../../control/QuestDB.js';
 import Socket           from '../../control/Socket.js';
 import Utils            from '../../control/Utils.js';
-import FQLContextMenu   from '../FQLContextMenu.js';
-import FQLDialog        from '../FQLDialog.js';
+import TQLContextMenu   from '../TQLContextMenu.js';
+import TQLDialog        from '../TQLDialog.js';
 
 import HandlerLog    from './HandlerLog.js';
 
@@ -42,12 +42,12 @@ export default class QuestLog extends Application
       return foundry.utils.mergeObject(super.defaultOptions, {
          id: constants.moduleName,
          classes: [constants.moduleName],
-         template: 'modules/forien-quest-log/templates/quest-log.html',
+         template: 'modules/typhonjs-quest-log/templates/quest-log.html',
          width: 700,
          height: 480,
          minimizable: true,
          resizable: true,
-         title: game.i18n.localize('ForienQuestLog.QuestLog.Title'),
+         title: game.i18n.localize('TyphonJSQuestLog.QuestLog.Title'),
          tabs: [{ navSelector: '.log-tabs', contentSelector: '.log-body', initial: 'active' }]
       });
    }
@@ -66,21 +66,21 @@ export default class QuestLog extends Application
       // Here we use a bit of jQuery to retrieve the background image of .window-content to match the game system
       // background image for the bookmark tabs. This is only done if the module setting is checked which it is by
       // default and the background image actually exists. The fallback is the default parchment image set in the
-      // FQL styles.
+      // TQL styles.
       const navStyle = game.settings.get(constants.moduleName, settings.navStyle);
       const dynamicBackground = game.settings.get(constants.moduleName, settings.dynamicBookmarkBackground);
       if ('bookmarks' === navStyle && dynamicBackground)
       {
-         const windowContent = $('#forien-quest-log .window-content');
-         const fqlBookmarkItem = $('#forien-quest-log .item');
+         const windowContent = $('#typhonjs-quest-log .window-content');
+         const tqlBookmarkItem = $('#typhonjs-quest-log .item');
 
          const backImage = windowContent.css('background-image');
          const backBlendMode = windowContent.css('background-blend-mode');
          const backColor = windowContent.css('background-color');
 
-         fqlBookmarkItem.css('background-image', backImage);
-         fqlBookmarkItem.css('background-color', backColor);
-         fqlBookmarkItem.css('background-blend-mode', backBlendMode);
+         tqlBookmarkItem.css('background-image', backImage);
+         tqlBookmarkItem.css('background-color', backColor);
+         tqlBookmarkItem.css('background-blend-mode', backBlendMode);
       }
 
       html.on(jquery.click, '.new-quest-btn', HandlerLog.questAdd);
@@ -107,7 +107,7 @@ export default class QuestLog extends Application
     */
    async close(options)
    {
-      FQLDialog.closeDialogs({ isQuestLog: true });
+      TQLDialog.closeDialogs({ isQuestLog: true });
       return super.close(options);
    }
 
@@ -121,7 +121,7 @@ export default class QuestLog extends Application
    _contextMenu(html)
    {
       const menuItemCopyLink = {
-         name: 'ForienQuestLog.QuestLog.ContextMenu.CopyEntityLink',
+         name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyEntityLink',
          icon: '<i class="fas fa-link"></i>',
          callback: (menu) =>
          {
@@ -130,7 +130,7 @@ export default class QuestLog extends Application
 
             if (quest && Utils.copyTextToClipboard(`@Quest[${quest.id}]{${quest.name}}`))
             {
-               ui.notifications.info(game.i18n.format('ForienQuestLog.Notifications.LinkCopied'));
+               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
             }
          }
       };
@@ -148,7 +148,7 @@ export default class QuestLog extends Application
       if (game.user.isGM)
       {
          const menuItemQuestID = {
-            name: 'ForienQuestLog.QuestLog.ContextMenu.CopyQuestID',
+            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyQuestID',
             icon: '<i class="fas fa-key"></i>',
             callback: (menu) =>
             {
@@ -157,7 +157,7 @@ export default class QuestLog extends Application
 
                if (quest && Utils.copyTextToClipboard(quest.id))
                {
-                  ui.notifications.info(game.i18n.format('ForienQuestLog.Notifications.QuestIDCopied'));
+                  ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
                }
             }
          };
@@ -166,7 +166,7 @@ export default class QuestLog extends Application
          menuItemsOther.push(menuItemQuestID);
 
          menuItemsActive.push({
-            name: 'ForienQuestLog.QuestLog.ContextMenu.PrimaryQuest',
+            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.PrimaryQuest',
             icon: '<i class="fas fa-star"></i>',
             callback: (menu) =>
             {
@@ -179,14 +179,14 @@ export default class QuestLog extends Application
 
       // Must show two different context menus as only the active / in progress tab potentially has the menu option to
       // allow the GM to set the primary quest.
-      new FQLContextMenu(html, '.tab:not([data-tab="active"]) .drag-quest', menuItemsOther);
-      new FQLContextMenu(html, '.tab[data-tab="active"] .drag-quest', menuItemsActive);
+      new TQLContextMenu(html, '.tab:not([data-tab="active"]) .drag-quest', menuItemsOther);
+      new TQLContextMenu(html, '.tab[data-tab="active"] .drag-quest', menuItemsActive);
    }
 
    /**
     * Retrieves the sorted quest collection from the {@link QuestDB.sortCollect} and sets several state parameters for
-    * GM / player / trusted player edit along with several module settings: {@link FQLSettings.allowPlayersAccept},
-    * {@link FQLSettings.allowPlayersCreate}, {@link FQLSettings.showTasks} and {@link FQLSettings.navStyle}.
+    * GM / player / trusted player edit along with several module settings: {@link TQLSettings.allowPlayersAccept},
+    * {@link TQLSettings.allowPlayersCreate}, {@link TQLSettings.showTasks} and {@link TQLSettings.navStyle}.
     *
     * @override
     * @inheritDoc
@@ -233,7 +233,7 @@ export default class QuestLog extends Application
       const currentPosition = super.setPosition(opts);
 
       // Retrieve all the table elements.
-      const tableElements = $('#forien-quest-log .table');
+      const tableElements = $('#typhonjs-quest-log .table');
 
       // Retrieve the active table.
       const tabIndex = questTabIndex[this?._tabs[0]?.active];
@@ -241,11 +241,11 @@ export default class QuestLog extends Application
 
       if (table)
       {
-         const fqlPosition = $('#forien-quest-log')[0].getBoundingClientRect();
+         const tqlPosition = $('#typhonjs-quest-log')[0].getBoundingClientRect();
          const tablePosition = table.getBoundingClientRect();
 
          // Manually calculate the max height for the table based on the position of the main window div and table.
-         tableElements.css('max-height', `${currentPosition.height - (tablePosition.top - fqlPosition.top + 16)}px`);
+         tableElements.css('max-height', `${currentPosition.height - (tablePosition.top - tqlPosition.top + 16)}px`);
       }
 
       return currentPosition;

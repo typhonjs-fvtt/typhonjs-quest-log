@@ -1,7 +1,6 @@
 # FoundryVTT - TyphonJS Quest Log
 
-<img title="TyphonJS Quest Log version" src="https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/typhonjs-fvtt/typhonjs-quest-log/master/module.json&label=TyphonJS%27s+Quest+Log+version&query=version&style=flat-square&color=success"> 
-![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftyphonjs-fvtt%2Ftyphonjs-quest-log%2Fmaster%2Fmodule.json&label=Foundry%20Version&query=$.compatibleCoreVersion&colorB=orange)
+<img title="TyphonJS Quest Log version" src="https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/typhonjs-fvtt/typhonjs-quest-log/master/module.json&label=TyphonJS%27s+Quest+Log+version&query=version&style=flat-square&color=success">![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftyphonjs-fvtt%2Ftyphonjs-quest-log%2Fmaster%2Fmodule.json&label=Foundry%20Version&query=$.compatibleCoreVersion&colorB=orange)
 ![GitHub release](https://img.shields.io/github/release-date/typhonjs-fvtt/typhonjs-quest-log)
 [![GitHub commits](https://img.shields.io/github/commits-since/typhonjs-fvtt/typhonjs-quest-log/latest)](https://github.com/typhonjs-fvtt/typhonjs-quest-log/commits/)
 ![the latest version zip](https://img.shields.io/github/downloads/typhonjs-fvtt/typhonjs-quest-log/latest/module.zip)

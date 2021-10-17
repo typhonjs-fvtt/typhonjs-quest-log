@@ -9,6 +9,8 @@ import QuestCollection  from '../model/QuestCollection.js';
 import QuestPreview     from '../view/preview/QuestPreview.js';
 
 import ModuleSettings   from '../ModuleSettings.js';
+import { PluginLoader } from '../plugins/PluginManager.js';
+
 import DBMigration      from '../../database/DBMigration.js';
 
 import { constants, noteControls, sessionConstants, settings } from '../model/constants.js';
@@ -119,12 +121,15 @@ export default class TQLHooks
       // Set the sheet to render quests.
       Quest.setSheet(QuestPreview);
 
+      // Initialize / add plugins.
+      PluginLoader.foundryInit();
+
       // Register TQL module settings.
       ModuleSettings.register();
 
-      // Preload Handlebars templates and register helpers.
-      Utils.preloadTemplates();
-      Utils.registerHandlebarsHelpers();
+      // // Preload Handlebars templates and register helpers.
+      // Utils.preloadTemplates();
+      // Utils.registerHandlebarsHelpers();
    }
 
    /**
@@ -156,14 +161,17 @@ export default class TQLHooks
       // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
       await QuestDB.init();
 
-      // Initialize all main GUI views.
-      ViewManager.init();
+      // Initialize / add plugins.
+      await PluginLoader.foundryReady();
+
+      // // Initialize all main GUI views.
+      // ViewManager.init();
 
       // Allow and process incoming socket data.
       Socket.listen();
 
       // Start watching sidebar updates.
-      FoundryUIManager.init();
+      // FoundryUIManager.init();
 
       // Need to track any current primary quest as Foundry settings don't provide a old / new state on setting
       // change. The current primary quest state is saved in session storage.

@@ -1,5 +1,4 @@
 import HandlerTracker   from './HandlerTracker.js';
-import FoundryUIManager from '../../control/FoundryUIManager.js';
 import QuestDB          from '../../control/QuestDB.js';
 import Socket           from '../../control/Socket.js';
 import Utils            from '../../control/Utils.js';
@@ -7,6 +6,9 @@ import TQLContextMenu   from '../TQLContextMenu.js';
 import collect          from '../../../external/collect.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '../../model/constants.js';
+
+// TODO: Temporarily importing the plugin manager eventbus
+import { eventbus } from '../../plugins/PluginManager.js';
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -463,7 +465,8 @@ export default class QuestTracker extends Application
             this._pinned = true;
             this._inPinDropRect = true;
             game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-            FoundryUIManager.updateTracker();
+            eventbus.trigger('tql:foundryuimanager:update:tracker');
+            // FoundryUIManager.updateTracker();
             return opts; // Early out as updateTracker above calls setPosition again.
          }
          else
@@ -509,7 +512,8 @@ export default class QuestTracker extends Application
       // Mutates `checkPosition` to set maximum left position. Must do this calculation after `super.setPosition`
       // as in some cases `super.setPosition` will override the changes of `FoundryUIManager.checkPosition`.
       const currentInPinDropRect = this._inPinDropRect;
-      this._inPinDropRect = FoundryUIManager.checkPosition(currentPosition);
+      this._inPinDropRect = eventbus.triggerSync('tql:foundryuimanager:check:position', currentPosition);
+      // this._inPinDropRect = FoundryUIManager.checkPosition(currentPosition);
 
       // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
       // has changed.

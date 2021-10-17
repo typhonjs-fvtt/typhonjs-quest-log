@@ -420,4 +420,27 @@ export default class Utils
       return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
        (c ^ (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
    }
+
+   static onPluginLoad(ev)
+   {
+      ev.eventbus.on('tql:utils:copy:text:to:clipboard', Utils.copyTextToClipboard, Utils);
+      ev.eventbus.on('tql:utils:create:jquery:dblclick', Utils.createJQueryDblClick, Utils);
+      ev.eventbus.on('tql:utils:get:data:from:uuid', Utils.getDataFromUUID, Utils);
+      ev.eventbus.on('tql:utils:get:document:from:uuid', Utils.getDocumentFromUUID, Utils);
+      ev.eventbus.on('tql:utils:get:module:data', Utils.getModuleData, Utils);
+      ev.eventbus.on('tql:utils:get:quest:folder', Utils.getQuestFolder, Utils);
+      ev.eventbus.on('tql:utils:get:uuid', Utils.getUUID, Utils);
+      ev.eventbus.on('tql:utils:initialize:quest:folder', Utils.initializeQuestFolder, Utils);
+      ev.eventbus.on('tql:utils:is:trusted:player:edit', Utils.isTrustedPlayerEdit, Utils);
+      ev.eventbus.on('tql:utils:is:hidden:from:players', Utils.isTQLHiddenFromPlayers, Utils);
+      ev.eventbus.on('tql:utils:set:macro:image', Utils.setMacroImage, Utils);
+      ev.eventbus.on('tql:utils:show:sheet:from:uuid', Utils.showSheetFromUUID, Utils);
+      // ev.eventbus.on('tql:utils:preload:templates', Utils.preloadTemplates, Utils);
+      // ev.eventbus.on('tql:utils:register:handlebars:helpers', Utils.registerHandlebarsHelpers, Utils);
+      ev.eventbus.on('tql:utils:uuidv4', Utils.uuidv4, Utils);
+
+      // Preload Handlebars templates and register helpers.
+      Utils.preloadTemplates();
+      Utils.registerHandlebarsHelpers();
+   }
 }

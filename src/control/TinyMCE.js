@@ -1,6 +1,3 @@
-import ViewManager   from './ViewManager.js';
-import Utils         from './Utils.js';
-
 /**
  * Provides custom options for TinyMCE.
  *
@@ -41,6 +38,11 @@ export default class TinyMCE
             items: foundryBaseItems
          }
       ].concat(s_DEFAULT_STYLE_FORMATS);
+
+      /**
+       * Must store a local reference of the eventbus to be used in the TinyMCE options callbacks.
+       */
+      const eventbus = this._eventbus;
 
       return {
          plugins: 'emoticons hr image link lists typhonjs-oembed charmap table code save help',
@@ -114,13 +116,15 @@ export default class TinyMCE
                             '  }\n' +
                             '</style>\n';
 
-                           if (Utils.copyTextToClipboard(backSelector))
+                           if (eventbus.triggerSync('tql:utils:copy:text:to:clipboard', backSelector))
                            {
-                              ViewManager.notifications.info(`Copied background style selector to clipboard.`);
+                              eventbus.trigger('tql:viewmanager:notifications:info',
+                               'Copied background style selector to clipboard.');
                            }
                            else
                            {
-                              ViewManager.notifications.warn(`Could not copy background style selector.`);
+                              eventbus.trigger('tql:viewmanager:notifications:warn',
+                               'Could not copy background style selector.');
                            }
                         }
                      });
@@ -142,6 +146,13 @@ export default class TinyMCE
             }));
          }
       };
+   }
+
+   static onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      ev.eventbus.on('tql:tinymce:options', TinyMCE.options, TinyMCE);
    }
 }
 

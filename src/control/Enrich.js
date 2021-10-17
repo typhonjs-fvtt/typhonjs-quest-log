@@ -1,6 +1,4 @@
 import QuestDB    from './QuestDB.js';
-import Utils      from './Utils.js';
-import DOMPurify  from '../../external/DOMPurify.js';
 
 import { constants, questStatus, questStatusI18n, settings } from '../model/constants.js';
 
@@ -113,7 +111,8 @@ export default class Enrich
    {
       let result = '';
 
-      const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      const isTrustedPlayerEdit = this._eventbus.triggerSync('tql:utils:is:trusted:player:edit');
       const canAccept = game.settings.get(constants.moduleName, settings.allowPlayersAccept);
       const canEdit = game.user.isGM || (isTrustedPlayerEdit && quest.isOwner);
 
@@ -211,7 +210,8 @@ export default class Enrich
       const isPrimary = quest.isPrimary;
       const personalActors = quest.getPersonalActors();
 
-      const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      const isTrustedPlayerEdit = this._eventbus.triggerSync('tql:utils:is:trusted:player:edit');
       const canEdit =  game.user.isGM || (isOwner && isTrustedPlayerEdit);
       const playerEdit = isOwner;
 
@@ -231,7 +231,9 @@ export default class Enrich
       data.isPrimary = isPrimary;
 
       // Enrich w/ TextEditor, but first sanitize w/ DOMPurify, allowing only iframes with YouTube embed.
-      data.description = TextEditor.enrichHTML(DOMPurify.sanitizeWithVideo(data.description), {
+      // data.description = TextEditor.enrichHTML(DOMPurify.sanitizeWithVideo(data.description), {
+      data.description = TextEditor.enrichHTML(this._eventbus.triggerSync(
+       'tql:dompurify:sanitize:video', data.description), {
          secrets: canEdit || playerEdit
       });
 
@@ -372,7 +374,8 @@ export default class Enrich
       {
          return {
             ...task,
-            name: TextEditor.enrichHTML(DOMPurify.sanitize(task.name))
+            // name: TextEditor.enrichHTML(DOMPurify.sanitize(task.name))
+            name: TextEditor.enrichHTML(this._eventbus.triggerSync('tql:dompurify:sanitize', task.name))
          };
       });
 
@@ -396,7 +399,8 @@ export default class Enrich
          const itemLink = type === 'item' && !canEdit && !canPlayerDrag && !item.locked;
 
          return {
-            name: TextEditor.enrichHTML(DOMPurify.sanitize(item.data.name)),
+            // name: TextEditor.enrichHTML(DOMPurify.sanitize(item.data.name)),
+            name: TextEditor.enrichHTML(this._eventbus.triggerSync('tql:dompurify:sanitize', item.data.name)),
             img: item.data.img,
             type,
             hidden: item.hidden,
@@ -429,6 +433,16 @@ export default class Enrich
       }
 
       return data;
+   }
+
+   static onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      ev.eventbus.on('tql:enrich:giver:from:quest', Enrich.giverFromQuest, Enrich);
+      ev.eventbus.on('tql:enrich:giver:from:uuid', Enrich.giverFromUUID, Enrich);
+      ev.eventbus.on('tql:enrich:status:actions', Enrich.statusActions, Enrich);
+      ev.eventbus.on('tql:enrich:quest', Enrich.quest, Enrich);
    }
 }
 

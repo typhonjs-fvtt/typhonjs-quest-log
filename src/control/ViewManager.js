@@ -263,6 +263,24 @@ export default class ViewManager
 
       return true;
    }
+
+   static onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      ViewManager.init();
+
+      ev.eventbus.on('tql:viewmanager:notifications:error', ViewManager.notifications.error, s_NOTIFICATIONS);
+      ev.eventbus.on('tql:viewmanager:notifications:info', ViewManager.notifications.info, s_NOTIFICATIONS);
+      ev.eventbus.on('tql:viewmanager:notifications:warn', ViewManager.notifications.warn, s_NOTIFICATIONS);
+      ev.eventbus.on('tql:viewmanager:close:all', ViewManager.closeAll, ViewManager);
+      ev.eventbus.on('tql:viewmanager:is:quest:tracker:visible', ViewManager.isQuestTrackerVisible, ViewManager);
+      ev.eventbus.on('tql:viewmanager:refresh:quest:preview', ViewManager.refreshQuestPreview, ViewManager);
+      ev.eventbus.on('tql:viewmanager:render:all', ViewManager.renderAll, ViewManager);
+      ev.eventbus.on('tql:viewmanager:render:or:close:quest:tracker', ViewManager.renderOrCloseQuestTracker, ViewManager);
+      ev.eventbus.on('tql:viewmanager:quest:added', ViewManager.questAdded, ViewManager);
+      ev.eventbus.on('tql:viewmanager:verify:quest:can:add', ViewManager.verifyQuestCanAdd, ViewManager);
+   }
 }
 
 /**

@@ -1,7 +1,6 @@
 import TQLDialog              from '../TQLDialog.js';
 import QuestDB                from '../../control/QuestDB.js';
 import Socket                 from '../../control/Socket.js';
-import TinyMCE                from '../../control/TinyMCE.js';
 import Utils                  from '../../control/Utils.js';
 
 import HandlerAny             from './HandlerAny.js';
@@ -9,6 +8,9 @@ import HandlerDetails         from './HandlerDetails.js';
 import HandlerManage          from './HandlerManage.js';
 
 import { constants, jquery, settings }  from '../../model/constants.js';
+
+// TODO: Temporarily importing the plugin manager eventbus
+import { eventbus } from '../../plugins/PluginManager.js';
 
 /**
  * QuestPreview is the main app / window of TQL for modifying individual Quest data. It appears reactive, but every
@@ -369,7 +371,8 @@ export default class QuestPreview extends FormApplication
     */
    activateEditor(name, options = {}, initialContent = '')
    {
-      const tinyMCEOptions = TinyMCE.options({
+      // TODO: replace direct eventbus usage with onPluginLoad implementation.
+      const tinyMCEOptions = eventbus.triggerSync('tql:tinymce:options', {
          editorName: name,
          initialContent,
          questId: this._quest.id

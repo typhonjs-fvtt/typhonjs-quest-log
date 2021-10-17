@@ -160,9 +160,29 @@ export default class FoundryUIManager
    static unregister()
    {
       window.removeEventListener('resize', s_WINDOW_RESIZE);
+
       Hooks.off('collapseSidebar', FoundryUIManager.collapseSidebar);
       Hooks.off('renderSceneNavigation', FoundryUIManager.updateTrackerPinned);
       Hooks.off('renderQuestTracker', s_QUEST_TRACKER_RENDERED);
+   }
+
+   static onPluginLoad(ev)
+   {
+      FoundryUIManager.init();
+
+      this._eventbus = ev.eventbus;
+
+      ev.eventbus.on('tql:foundryuimanager:check:position', FoundryUIManager.checkPosition, FoundryUIManager);
+
+      ev.eventbus.on('tql:foundryuimanager:update:tracker', FoundryUIManager.updateTracker, FoundryUIManager);
+
+      ev.eventbus.on('tql:foundryuimanager:update:tracker:pinned', FoundryUIManager.updateTrackerPinned,
+       FoundryUIManager);
+   }
+
+   static onPluginUnload()
+   {
+      FoundryUIManager.unregister();
    }
 }
 

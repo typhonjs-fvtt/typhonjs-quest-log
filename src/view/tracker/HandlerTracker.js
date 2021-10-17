@@ -1,9 +1,12 @@
-import FoundryUIManager from '../../control/FoundryUIManager.js';
+// import FoundryUIManager from '../../control/FoundryUIManager.js';
 import QuestAPI         from '../../control/public/QuestAPI.js';
 import QuestDB          from '../../control/QuestDB.js';
 import Socket           from '../../control/Socket.js';
 
 import { constants, sessionConstants, settings } from '../../model/constants.js';
+
+// TODO: Temporarily importing the plugin manager eventbus
+import { eventbus } from '../../plugins/PluginManager.js';
 
 /**
  * Provides all {@link JQuery} and {@link PointerEvent} callbacks for the {@link QuestTracker}.
@@ -53,7 +56,8 @@ export default class HandlerTracker
          questTracker._pinned = true;
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
          questTracker.element.css('animation', '');
-         FoundryUIManager.updateTracker();
+         eventbus.trigger('tql:foundryuimanager:update:tracker');
+         // FoundryUIManager.updateTracker();
       }
    }
 

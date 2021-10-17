@@ -158,11 +158,11 @@ export default class TQLHooks
       // Add our QuestCollection to the game collections.
       game.collections.set(Quest.documentName, new QuestCollection());
 
-      // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
-      await QuestDB.init();
-
       // Initialize / add plugins.
       await PluginLoader.foundryReady();
+
+      // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
+      // await QuestDB.init();
 
       // // Initialize all main GUI views.
       // ViewManager.init();

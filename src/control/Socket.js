@@ -1,6 +1,6 @@
 import QuestAPI      from './public/QuestAPI.js';
 import QuestDB       from './QuestDB.js';
-import Utils         from './Utils.js';
+// import Utils         from './Utils.js';
 import ViewManager   from './ViewManager.js';
 
 import { constants, questStatus, questStatusI18n, settings }  from '../model/constants.js';
@@ -286,7 +286,7 @@ export default class Socket
 
       // If the current user is a GM or trusted player with edit capability and owner of the quest immediately perform
       // the status move.
-      if (game.user.isGM || (Utils.isTrustedPlayerEdit() && quest.isOwner))
+      if (game.user.isGM || (this._eventbus.triggerSync('tql:utils:is:trusted:player:edit') && quest.isOwner))
       {
          await quest.setStatus(target);
          handled = true;
@@ -348,6 +348,22 @@ export default class Socket
             user: game.user.name
          }
       });
+   }
+
+   static async onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      Socket.listen();
+
+      ev.eventbus.on('tql:socket:deleted:quest', Socket.deletedQuest, Socket);
+      ev.eventbus.on('tql:socket:quest:reward:drop', Socket.questRewardDrop, Socket);
+      ev.eventbus.on('tql:socket:refresh:all', Socket.refreshAll, Socket);
+      ev.eventbus.on('tql:socket:refresh:quest:preview', Socket.refreshQuestPreview, Socket);
+      ev.eventbus.on('tql:socket:set:quest:primary', Socket.setQuestPrimary, Socket);
+      ev.eventbus.on('tql:socket:set:quest:status', Socket.setQuestStatus, Socket);
+      ev.eventbus.on('tql:socket:show:quest:preview', Socket.showQuestPreview, Socket);
+      ev.eventbus.on('tql:socket:user:cant:open:quest', Socket.userCantOpenQuest, Socket);
    }
 }
 

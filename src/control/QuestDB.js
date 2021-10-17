@@ -778,6 +778,31 @@ export default class QuestDB
          inactive: s_QUESTS_COLLECT[questStatus.inactive].sort(sortInactive)
       };
    }
+
+   static async onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      await QuestDB.init();
+
+      ev.eventbus.on('tql:questdb:consistency:check', QuestDB.consistencyCheck, QuestDB);
+      ev.eventbus.on('tql:questdb:create:quest', QuestDB.createQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:delete:quest', QuestDB.deleteQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:enrich:all', QuestDB.enrichAll, QuestDB);
+      ev.eventbus.on('tql:questdb:enrich:quests', QuestDB.enrichQuests, QuestDB);
+      ev.eventbus.on('tql:questdb:filter', QuestDB.filter, QuestDB);
+      ev.eventbus.on('tql:questdb:filter:collect', QuestDB.filterCollect, QuestDB);
+      ev.eventbus.on('tql:questdb:find', QuestDB.find, QuestDB);
+      ev.eventbus.on('tql:questdb:get:all:quest:entries', QuestDB.getAllQuestEntries, QuestDB);
+      ev.eventbus.on('tql:questdb:get:all:quests', QuestDB.getAllQuests, QuestDB);
+      ev.eventbus.on('tql:questdb:get:count', QuestDB.getCount, QuestDB);
+      ev.eventbus.on('tql:questdb:get:quest', QuestDB.getQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:get:quest:entry', QuestDB.getQuestEntry, QuestDB);
+      ev.eventbus.on('tql:questdb:iterator:entries', QuestDB.iteratorEntries, QuestDB);
+      ev.eventbus.on('tql:questdb:iterator:quests', QuestDB.iteratorQuests, QuestDB);
+      ev.eventbus.on('tql:questdb:remove:all', QuestDB.removeAll, QuestDB);
+      ev.eventbus.on('tql:questdb:sort:collect', QuestDB.sortCollect, QuestDB);
+   }
 }
 
 /**

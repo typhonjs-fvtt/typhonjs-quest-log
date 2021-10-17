@@ -36,8 +36,18 @@ export class PluginLoader
    static async foundryReady()
    {
       await pluginManager.add({
+         name: 'tql-system-questdb',
+         instance: SystemPlugins.QuestDB
+      });
+
+      await pluginManager.add({
          name: 'tql-system-viewmanager',
          instance: SystemPlugins.ViewManager
+      });
+
+      await pluginManager.add({
+         name: 'tql-system-socket',
+         instance: SystemPlugins.Socket
       });
 
       await pluginManager.add({

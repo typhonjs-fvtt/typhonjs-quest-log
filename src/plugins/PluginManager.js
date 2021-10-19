@@ -2,6 +2,8 @@ import * as SystemPlugins  from './system/index.js';
 
 import PluginManager       from '../../external/PluginManager.js';
 
+import { constants }       from '../model/constants.js';
+
 const pluginManager = new PluginManager();
 
 export const eventbus = pluginManager.getEventbus();
@@ -35,6 +37,24 @@ export class PluginLoader
          name: 'tql-system-enrich',
          instance: SystemPlugins.Enrich
       });
+
+      // Initialize public API plugin and assign to module data.
+      pluginManager.add({
+         name: 'tql-system-quest-api',
+         instance: SystemPlugins.QuestAPIModule
+      });
+
+      const moduleData = game.modules.get(constants.moduleName);
+
+      /**
+       * @type {TQLPublicAPI}
+       */
+      moduleData.public = {
+         QuestAPI: SystemPlugins.QuestAPIModule.default
+      };
+
+      // Freeze the public API so it can't be modified.
+      Object.freeze(moduleData.public);
    }
 
    static async foundryReady()

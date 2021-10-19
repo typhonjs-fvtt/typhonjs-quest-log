@@ -1,4 +1,3 @@
-import QuestAPI         from './public/QuestAPI.js';
 import Quest            from '../model/Quest.js';
 import QuestCollection  from '../model/QuestCollection.js';
 import QuestPreview     from '../view/preview/QuestPreview.js';
@@ -180,17 +179,17 @@ export default class TQLHooks
     */
    static foundrySetup()
    {
-      const moduleData = game.modules.get(constants.moduleName);
-
-      /**
-       * @type {TQLPublicAPI}
-       */
-      moduleData.public = {
-         QuestAPI
-      };
-
-      // Freeze the public API so it can't be modified.
-      Object.freeze(moduleData.public);
+      // const moduleData = game.modules.get(constants.moduleName);
+      //
+      // /**
+      //  * @type {TQLPublicAPI}
+      //  */
+      // moduleData.public = {
+      //    QuestAPI
+      // };
+      //
+      // // Freeze the public API so it can't be modified.
+      // Object.freeze(moduleData.public);
    }
 
    /**

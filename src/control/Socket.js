@@ -1,4 +1,4 @@
-import QuestAPI      from './public/QuestAPI.js';
+// import QuestAPI      from './public/QuestAPI.js';
 
 import { constants, questStatus, questStatusI18n, settings }  from '../model/constants.js';
 
@@ -603,7 +603,8 @@ function handleRefreshQuestPreview(data)
  */
 function handleShowQuestPreview(data)
 {
-   QuestAPI.open({ questId: data.payload.questId, notify: false });
+   // QuestAPI.open({ questId: data.payload.questId, notify: false });
+   s_EVENTBUS.trigger('tql:questapi:open', { questId: data.payload.questId, notify: false });
 }
 
 /**

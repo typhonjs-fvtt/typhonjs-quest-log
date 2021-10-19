@@ -1,19 +1,16 @@
-import FoundryUIManager from './FoundryUIManager.js';
 import QuestDB          from './QuestDB.js';
-import Socket           from './Socket.js';
-import Utils            from './Utils.js';
-import ViewManager      from './ViewManager.js';
 import QuestAPI         from './public/QuestAPI.js';
 import Quest            from '../model/Quest.js';
 import QuestCollection  from '../model/QuestCollection.js';
 import QuestPreview     from '../view/preview/QuestPreview.js';
 
 import ModuleSettings   from '../ModuleSettings.js';
-import { PluginLoader } from '../plugins/PluginManager.js';
 
 import DBMigration      from '../../database/DBMigration.js';
 
-import { constants, noteControls, sessionConstants, settings } from '../model/constants.js';
+import { eventbus, PluginLoader } from '../plugins/PluginManager.js';
+
+import { constants, jquery, noteControls, sessionConstants, settings } from '../model/constants.js';
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -91,7 +88,7 @@ export default class TQLHooks
    {
       if (typeof data !== 'object' || data?._tqlData?.type !== 'reward') { return; }
 
-      await Socket.questRewardDrop({
+      await eventbus.triggerAsync('tql:socket:quest:reward:drop', {
          actor: { id: actor.id, name: actor.data.name },
          sheet: { id: sheet.id },
          data
@@ -126,10 +123,6 @@ export default class TQLHooks
 
       // Register TQL module settings.
       ModuleSettings.register();
-
-      // // Preload Handlebars templates and register helpers.
-      // Utils.preloadTemplates();
-      // Utils.registerHandlebarsHelpers();
    }
 
    /**
@@ -161,25 +154,15 @@ export default class TQLHooks
       // Initialize / add plugins.
       await PluginLoader.foundryReady();
 
-      // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
-      // await QuestDB.init();
-
-      // // Initialize all main GUI views.
-      // ViewManager.init();
-
-      // Allow and process incoming socket data.
-      Socket.listen();
-
-      // Start watching sidebar updates.
-      // FoundryUIManager.init();
-
       // Need to track any current primary quest as Foundry settings don't provide a old / new state on setting
       // change. The current primary quest state is saved in session storage.
       sessionStorage.setItem(sessionConstants.currentPrimaryQuest,
        game.settings.get(constants.moduleName, settings.primaryQuest));
 
       // Initialize current client based macro images based on current state.
-      await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
+      // await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
+      await eventbus.triggerAsync('tql:utils:macro:image:set',
+       [settings.questTrackerEnable, settings.questTrackerResizable]);
 
       // Support for LibThemer; add TQL options to LibThemer.
       const libThemer = game.modules.get('lib-themer');
@@ -198,7 +181,7 @@ export default class TQLHooks
     */
    static foundrySetup()
    {
-      const moduleData = Utils.getModuleData();
+      const moduleData = game.modules.get(constants.moduleName);
 
       /**
        * @type {TQLPublicAPI}
@@ -241,7 +224,9 @@ export default class TQLHooks
     */
    static async handleMacroHotbarDrop(data, slot)
    {
-      const uuid = Utils.getUUID(data);
+      // const uuid = Utils.getUUID(data);
+      const uuid = eventbus.triggerSync('tql:utils:uuid:get', data);
+
       const document = await fromUuid(uuid);
 
       if (!document) { return; }
@@ -270,7 +255,11 @@ export default class TQLHooks
       if (macro)
       {
          const macroSetting = macro.getFlag(constants.moduleName, 'macro-setting');
-         if (macroSetting) { await Utils.setMacroImage(macroSetting); }
+         if (macroSetting)
+         {
+            // await Utils.setMacroImage(macroSetting);
+            await eventbus.triggerAsync('tql:utils:macro:image:set', macroSetting);
+         }
 
          await game.user.assignHotbarMacro(macro, slot);
       }
@@ -396,7 +385,8 @@ export default class TQLHooks
          constraints = (({ left, top, width, height }) => ({ left, top, width, height }))(opts);
       }
 
-      ViewManager.questLog.render(true, { focus: true, ...constraints });
+      const questLog = eventbus.triggerSync('tql:viewmanager:quest:log:get');
+      if (questLog) { questLog.render(true, { focus: true, ...constraints }); }
    }
 
    /**
@@ -441,7 +431,7 @@ export default class TQLHooks
             // Set to indicate an override of any pinned state.
             constraints.override = true;
 
-            const tracker = ViewManager.questTracker;
+            const tracker = eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
             // Defer to make sure quest tracker is rendered before setting position.
             setTimeout(() =>
@@ -488,15 +478,17 @@ export default class TQLHooks
          }
          footer.append(button);
 
-         button.click(() =>
+         button.on(jquery.click, () =>
          {
-            ViewManager.questLog.render(true);
+            const questLog = eventbus.triggerSync('tql:viewmanager:quest:log:get');
+            if (questLog) { questLog.render(true); }
          });
       }
 
       if (!(game.user.isGM && game.settings.get(constants.moduleName, settings.showFolder)))
       {
-         const folder = Utils.getQuestFolder();
+         // const folder = Utils.getQuestFolder();
+         const folder = eventbus.triggerSync('tql:utils:quest:folder:get');
          if (folder !== void 0)
          {
             const element = html.find(`.folder[data-folder-id="${folder.id}"]`);
@@ -520,7 +512,8 @@ export default class TQLHooks
     */
    static renderJournalSheet(app, html)
    {
-      const folder = Utils.getQuestFolder();
+      // const folder = Utils.getQuestFolder();
+      const folder = eventbus.triggerSync('tql:utils:quest:folder:get');
       if (folder)
       {
          const option = html.find(`option[value="${folder.id}"]`);

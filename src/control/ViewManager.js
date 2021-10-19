@@ -279,6 +279,11 @@ export default class ViewManager
       ev.eventbus.on('tql:viewmanager:render:all', ViewManager.renderAll, ViewManager);
       ev.eventbus.on('tql:viewmanager:render:or:close:quest:tracker', ViewManager.renderOrCloseQuestTracker, ViewManager);
       ev.eventbus.on('tql:viewmanager:quest:added', ViewManager.questAdded, ViewManager);
+      ev.eventbus.on('tql:viewmanager:quest:log:get', () => ViewManager.questLog, ViewManager);
+      ev.eventbus.on('tql:viewmanager:quest:preview:delete', (questId) => ViewManager.questPreview.delete(questId), ViewManager);
+      ev.eventbus.on('tql:viewmanager:quest:preview:get', (questId) => ViewManager.questPreview.get(questId), ViewManager);
+      ev.eventbus.on('tql:viewmanager:quest:preview:set', (questId, view) => ViewManager.questPreview.set(questId, view), ViewManager);
+      ev.eventbus.on('tql:viewmanager:quest:tracker:get', () => ViewManager.questTracker, ViewManager);
       ev.eventbus.on('tql:viewmanager:verify:quest:can:add', ViewManager.verifyQuestCanAdd, ViewManager);
    }
 }

@@ -1,4 +1,3 @@
-import ViewManager   from './ViewManager.js';
 import QuestTracker  from '../view/tracker/QuestTracker.js';
 
 /**
@@ -35,7 +34,8 @@ export default class FoundryUIManager
    static checkPosition(position)
    {
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
-      const tracker = ViewManager.questTracker;
+
+      const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
       // Detect if the new position overlaps with the sidebar.
       if (sidebarData.gapX >= 0 && position.left + tracker.position.width > sidebarData.left - s_SPACE_X)
@@ -92,7 +92,7 @@ export default class FoundryUIManager
     */
    static updateTracker()
    {
-      const tracker = ViewManager.questTracker;
+      const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
       // Make sure the tracker is rendered or rendering.
       if (!tracker.rendered && Application.RENDER_STATES.RENDERING !== tracker._state) { return; }
@@ -145,7 +145,7 @@ export default class FoundryUIManager
     */
    static updateTrackerPinned()
    {
-      const tracker = ViewManager.questTracker;
+      const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
       const pinned = tracker.pinned;
       const sidebarData = sidebar.open;
 
@@ -168,9 +168,9 @@ export default class FoundryUIManager
 
    static onPluginLoad(ev)
    {
-      FoundryUIManager.init();
-
       this._eventbus = ev.eventbus;
+
+      FoundryUIManager.init();
 
       ev.eventbus.on('tql:foundryuimanager:check:position', FoundryUIManager.checkPosition, FoundryUIManager);
 

@@ -1,7 +1,5 @@
 import QuestAPI      from './public/QuestAPI.js';
 import QuestDB       from './QuestDB.js';
-// import Utils         from './Utils.js';
-import ViewManager   from './ViewManager.js';
 
 import { constants, questStatus, questStatusI18n, settings }  from '../model/constants.js';
 
@@ -64,7 +62,7 @@ export default class Socket
       if (typeof deleteData === 'object')
       {
          const questId = deleteData.deleteId;
-         const questPreview = ViewManager.questPreview.get(questId);
+         const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', questId);
 
          // Close the associated QuestPreview for the deleted Quest.
          if (questPreview !== void 0)
@@ -174,14 +172,14 @@ export default class Socket
     */
    static refreshAll(options = {})
    {
-      ViewManager.renderAll({ force: true, ...options });
+      s_EVENTBUS.trigger('tql:viewmanager:render:all', { force: true, ...options });
 
       game.socket.emit(s_EVENT_NAME, {
-         type: s_MESSAGE_TYPES.refreshAll,
-         payload: {
-            options
-         }
-      });
+        type: s_MESSAGE_TYPES.refreshAll,
+        payload: {
+           options
+        }
+     });
    }
 
    /**
@@ -200,7 +198,7 @@ export default class Socket
     */
    static refreshQuestPreview({ questId, updateLog = true, ...options })
    {
-      ViewManager.refreshQuestPreview(questId, options);
+      s_EVENTBUS.trigger('tql:viewmanager:refresh:quest:preview', questId, options);
 
       // Send a socket message for remote clients to render.
       game.socket.emit(s_EVENT_NAME, {
@@ -286,7 +284,7 @@ export default class Socket
 
       // If the current user is a GM or trusted player with edit capability and owner of the quest immediately perform
       // the status move.
-      if (game.user.isGM || (this._eventbus.triggerSync('tql:utils:is:trusted:player:edit') && quest.isOwner))
+      if (game.user.isGM || (s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit') && quest.isOwner))
       {
          await quest.setStatus(target);
          handled = true;
@@ -295,8 +293,9 @@ export default class Socket
          Socket.refreshAll();
 
          const dirname = game.i18n.localize(questStatusI18n[target]);
-         ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestMoved',
-          { name: quest.name, target: dirname }));
+
+         s_EVENTBUS.trigger('tql:viewmanager:notifications:info', game.i18n.format(
+          'TyphonJSQuestLog.Notifications.QuestMoved', { name: quest.name, target: dirname }));
       }
       else
       {
@@ -352,7 +351,7 @@ export default class Socket
 
    static async onPluginLoad(ev)
    {
-      this._eventbus = ev.eventbus;
+      s_EVENTBUS = ev.eventbus;
 
       Socket.listen();
 
@@ -365,7 +364,14 @@ export default class Socket
       ev.eventbus.on('tql:socket:show:quest:preview', Socket.showQuestPreview, Socket);
       ev.eventbus.on('tql:socket:user:cant:open:quest', Socket.userCantOpenQuest, Socket);
    }
+
+   static async onPluginUnload()
+   {
+      s_EVENTBUS = void 0;
+   }
 }
+
+let s_EVENTBUS = void 0;
 
 // Receiving message implementation ----------------------------------------------------------------------------------
 
@@ -382,7 +388,7 @@ export default class Socket
  */
 async function handleDeletedQuest(data)
 {
-   const questPreview = ViewManager.questPreview.get(data.payload.questId);
+   const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', data.payload.questId);
    if (questPreview !== void 0)
    {
       // Must always use `noSave` as the quest has already been deleted; no auto-save of QuestPreview is allowed.
@@ -413,7 +419,8 @@ async function handleQuestRewardDrop(data)
       const notify = game.settings.get(constants.moduleName, settings.notifyRewardDrop);
       if (notify)
       {
-         ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.QuestPreview.RewardDrop', {
+         s_EVENTBUS.trigger('tql:viewmanager:notifications:info', game.i18n.format(
+          'TyphonJSQuestLog.QuestPreview.RewardDrop', {
             userName: tqlData.userName,
             itemName: tqlData.itemName,
             actorName: data.payload.actor.name
@@ -505,14 +512,15 @@ async function handleQuestSetStatus(data)
       Socket.refreshAll();
 
       const dirname = game.i18n.localize(questStatusI18n[target]);
-      ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestMoved',
-       { name: quest.name, target: dirname }));
+
+      s_EVENTBUS.trigger('tql:viewmanager:notifications:info', game.i18n.format(
+       'TyphonJSQuestLog.Notifications.QuestMoved', { name: quest.name, target: dirname }));
    }
 
    // For non-GM users close QuestPreview when made hidden / inactive.
    if (!game.user.isGM && target === questStatus.inactive)
    {
-      const questPreview = ViewManager.questPreview.get(data.payload.questId);
+      const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', data.payload.questId);
       if (questPreview !== void 0)
       {
          // Use `noSave` just for sanity in this case as this is a remote close.
@@ -531,7 +539,8 @@ async function handleQuestSetStatus(data)
 function handleRefreshAll(data)
 {
    const options = typeof data.payload.options === 'object' ? data.payload.options : {};
-   ViewManager.renderAll({ force: true, ...options });
+
+   s_EVENTBUS.trigger('tql:viewmanager:render:all', { force: true, ...options });
 }
 
 /**
@@ -551,7 +560,7 @@ function handleRefreshQuestPreview(data)
    {
       for (const id of questId)
       {
-         const questPreview = ViewManager.questPreview.get(id);
+         const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', id);
          if (questPreview !== void 0)
          {
             const quest = QuestDB.getQuest(id);
@@ -568,7 +577,7 @@ function handleRefreshQuestPreview(data)
    }
    else
    {
-      const questPreview = ViewManager.questPreview.get(questId);
+      const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', questId);
       if (questPreview !== void 0)
       {
          const quest = QuestDB.getQuest(questId);
@@ -608,7 +617,7 @@ function handleUserCantOpenQuest(data)
 {
    if (game.user.isGM)
    {
-      ViewManager.notifications.warn(game.i18n.format('TyphonJSQuestLog.Notifications.UserCantOpen',
-       { user: data.payload.user }));
+      s_EVENTBUS.trigger('tql:viewmanager:notifications:warn', game.i18n.format(
+       'TyphonJSQuestLog.Notifications.UserCantOpen', { user: data.payload.user }));
    }
 }

@@ -1,9 +1,8 @@
-import QuestDB       from './QuestDB.js';
 import QuestLog      from '../view/log/QuestLog.js';
 import QuestPreview  from '../view/preview/QuestPreview.js';
 import QuestTracker  from '../view/tracker/QuestTracker.js';
 
-import { constants, questStatus, questStatusI18n, settings } from '../model/constants.js';
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../model/constants.js';
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -57,9 +56,9 @@ export default class ViewManager
       Hooks.on('renderQuestPreview', s_QUEST_PREVIEW_RENDER);
 
       // Right now ViewManager responds to permission changes across add, remove, update of quests.
-      Hooks.on(QuestDB.hooks.addQuestEntry, s_QUEST_ENTRY_ADD);
-      Hooks.on(QuestDB.hooks.removeQuestEntry, s_QUEST_ENTRY_REMOVE);
-      Hooks.on(QuestDB.hooks.updateQuestEntry, s_QUEST_ENTRY_UPDATE);
+      Hooks.on(questDBHooks.addQuestEntry, s_QUEST_ENTRY_ADD);
+      Hooks.on(questDBHooks.removeQuestEntry, s_QUEST_ENTRY_REMOVE);
+      Hooks.on(questDBHooks.updateQuestEntry, s_QUEST_ENTRY_UPDATE);
    }
 
    /**
@@ -119,7 +118,7 @@ export default class ViewManager
    {
       return game.settings.get(constants.moduleName, settings.questTrackerEnable) &&
        (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) &&
-        QuestDB.getCount({ status: questStatus.active }) > 0;
+        this._eventbus.triggerSync('tql:questdb:count:get', { status: questStatus.active }) > 0;
    }
 
    /**

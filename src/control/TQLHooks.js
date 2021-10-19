@@ -1,4 +1,3 @@
-import QuestDB          from './QuestDB.js';
 import QuestAPI         from './public/QuestAPI.js';
 import Quest            from '../model/Quest.js';
 import QuestCollection  from '../model/QuestCollection.js';
@@ -104,7 +103,7 @@ export default class TQLHooks
     */
    static dropCanvasData(foundryCanvas, data)
    {
-      if (data.type === 'Quest' && QuestDB.getQuest(data.id) !== void 0)
+      if (data.type === 'Quest' && eventbus.triggerSync('tql:questdb:quest:get', data.id) !== void 0)
       {
          data.type = 'JournalEntry';
       }
@@ -278,7 +277,7 @@ export default class TQLHooks
    {
       const questId = data.id;
 
-      const quest = QuestDB.getQuest(questId);
+      const quest = eventbus.triggerSync('tql:questdb:quest:get', questId);
 
       // Early out if Quest isn't in the QuestDB.
       if (!quest)

@@ -1,11 +1,8 @@
-import Enrich           from './Enrich.js';
-import Socket           from './Socket.js';
-import Utils            from './Utils.js';
 import Quest            from '../model/Quest.js';
 import QuestPreviewShim from '../view/preview/QuestPreviewShim.js';
 import collect          from '../../external/collect.js';
 
-import { constants, questStatus, settings } from '../model/constants.js';
+import { constants, questDBHooks, questStatus, settings } from '../model/constants.js';
 
 /**
  * Stores all {@link QuestEntry} instances in a map of Maps. This provides fast retrieval and quick insert / removal
@@ -145,7 +142,7 @@ export default class QuestDB
     */
    static async init()
    {
-      let folder = await Utils.initializeQuestFolder();
+      let folder = await s_EVENTBUS.triggerAsync('tql:utils:quest:folder:initialize');
 
       // If the folder doesn't exist then simulate the content parameter. This should only ever occur for a player
       // logged in when a GM activates TQL for the first time or if the _tql_quests folder is deleted.
@@ -160,10 +157,11 @@ export default class QuestDB
       }
 
       // Skip initialization of data if TQL is hidden from the current player. TQL is never hidden from GM level users.
-      if (!Utils.isTQLHiddenFromPlayers())
+      // if (!Utils.isTQLHiddenFromPlayers())
+      if (!s_EVENTBUS.triggerSync('tql:utils:is:hidden:from:players'))
       {
-         // Cache `isTrustedPlayerEdit`.
-         const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+         // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+         const isTrustedPlayerEdit = s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit');
 
          // Iterate over all journal entries in `_tql_quests` folder.
          for (const entry of folder.content)
@@ -215,7 +213,7 @@ export default class QuestDB
    /**
     * @returns {QuestDBHooks} The QuestDB hooks.
     */
-   static get hooks() { return s_DB_HOOKS; }
+   static get hooks() { return questDBHooks; }
 
    /**
     * @returns {FilterFunctions} Various useful filter functions.
@@ -236,16 +234,19 @@ export default class QuestDB
     */
    static consistencyCheck()
    {
-      const folder = Utils.getQuestFolder();
+      // const folder = Utils.getQuestFolder();
+      const folder = s_EVENTBUS.triggerSync('tql:utils:quest:folder:get');
 
       // Early out if the folder is not available or TQL is hidden from the current player.
-      if (!folder || Utils.isTQLHiddenFromPlayers()) { return; }
+      // if (!folder || Utils.isTQLHiddenFromPlayers()) { return; }
+      if (!folder || s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit')) { return; }
 
       // Create a single map of all QuestEntry instances.
       const questEntryMap = new Map(QuestDB.getAllQuestEntries().map((e) => [e.id, e]));
 
       // Cache if the current player has trusted player edit capabilities.
-      const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      const isTrustedPlayerEdit = s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit');
 
       // Iterate over all quests.
       for (const entry of folder.content)
@@ -322,7 +323,9 @@ export default class QuestDB
       // trusted players.
       if (!game.user.isGM)
       {
-         data.status = Utils.isTrustedPlayerEdit() ? questStatus.inactive : questStatus.available;
+         data.status = s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit') ? questStatus.inactive :
+          questStatus.available;
+
          permission[game.user.id] = CONST.ENTITY_PERMISSIONS.OWNER;
       }
 
@@ -335,7 +338,7 @@ export default class QuestDB
       // Creating a new quest will add any missing data / schema.
       const tempQuest = new Quest(data);
 
-      const folder = Utils.getQuestFolder();
+      const folder = s_EVENTBUS.triggerSync('tql:utils:quest:folder:get');
       if (!folder)
       {
          console.log('TyphonJSQuestLog - QuestDB.createQuest - quest folder not found.');
@@ -358,13 +361,13 @@ export default class QuestDB
       {
          parentQuest.addSubquest(entry.id);
          await parentQuest.save();
-         Socket.refreshQuestPreview({ questId: parentQuest.id });
+         s_EVENTBUS.trigger('tql:socket:refresh:quest:preview', { questId: parentQuest.id });
       }
 
       const quest = QuestDB.getQuest(entry.id);
 
       // Players don't see Hidden tab, but assistant GM can, so emit anyway
-      Socket.refreshAll();
+      s_EVENTBUS.trigger('tql:socket:refresh:all');
 
       return quest;
    }
@@ -453,7 +456,7 @@ export default class QuestDB
    {
       for (const questEntry of QuestDB.iteratorEntries())
       {
-         questEntry.enrich = Enrich.quest(questEntry.quest);
+         questEntry.enrich = s_EVENTBUS.triggerSync('tql:enrich:quest', questEntry.quest);
       }
    }
 
@@ -471,7 +474,7 @@ export default class QuestDB
          const questEntry = QuestDB.getQuestEntry(questId);
          if (questEntry)
          {
-            questEntry.enrich = Enrich.quest(questEntry.quest);
+            questEntry.enrich = s_EVENTBUS.triggerSync('tql:enrich:quest', questEntry.quest);
          }
       }
    }
@@ -781,29 +784,41 @@ export default class QuestDB
 
    static async onPluginLoad(ev)
    {
-      this._eventbus = ev.eventbus;
+      s_EVENTBUS = ev.eventbus;
 
-      await QuestDB.init();
-
+      ev.eventbus.on('tql:questdb:all:quest:entries:get', QuestDB.getAllQuestEntries, QuestDB);
+      ev.eventbus.on('tql:questdb:all:quests:get', QuestDB.getAllQuests, QuestDB);
+      ev.eventbus.on('tql:questdb:collect:sort', QuestDB.sortCollect, QuestDB);
+      ev.eventbus.on('tql:questdb:collect:filter', QuestDB.filterCollect, QuestDB);
       ev.eventbus.on('tql:questdb:consistency:check', QuestDB.consistencyCheck, QuestDB);
-      ev.eventbus.on('tql:questdb:create:quest', QuestDB.createQuest, QuestDB);
-      ev.eventbus.on('tql:questdb:delete:quest', QuestDB.deleteQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:count:get', QuestDB.getCount, QuestDB);
       ev.eventbus.on('tql:questdb:enrich:all', QuestDB.enrichAll, QuestDB);
       ev.eventbus.on('tql:questdb:enrich:quests', QuestDB.enrichQuests, QuestDB);
       ev.eventbus.on('tql:questdb:filter', QuestDB.filter, QuestDB);
-      ev.eventbus.on('tql:questdb:filter:collect', QuestDB.filterCollect, QuestDB);
       ev.eventbus.on('tql:questdb:find', QuestDB.find, QuestDB);
-      ev.eventbus.on('tql:questdb:get:all:quest:entries', QuestDB.getAllQuestEntries, QuestDB);
-      ev.eventbus.on('tql:questdb:get:all:quests', QuestDB.getAllQuests, QuestDB);
-      ev.eventbus.on('tql:questdb:get:count', QuestDB.getCount, QuestDB);
-      ev.eventbus.on('tql:questdb:get:quest', QuestDB.getQuest, QuestDB);
-      ev.eventbus.on('tql:questdb:get:quest:entry', QuestDB.getQuestEntry, QuestDB);
+      ev.eventbus.on('tql:questdb:quest:create', QuestDB.createQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:quest:delete', QuestDB.deleteQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:quest:get', QuestDB.getQuest, QuestDB);
+      ev.eventbus.on('tql:questdb:quest:entry:get', QuestDB.getQuestEntry, QuestDB);
       ev.eventbus.on('tql:questdb:iterator:entries', QuestDB.iteratorEntries, QuestDB);
       ev.eventbus.on('tql:questdb:iterator:quests', QuestDB.iteratorQuests, QuestDB);
       ev.eventbus.on('tql:questdb:remove:all', QuestDB.removeAll, QuestDB);
-      ev.eventbus.on('tql:questdb:sort:collect', QuestDB.sortCollect, QuestDB);
+
+      await QuestDB.init();
+   }
+
+   static async onPluginUnload()
+   {
+      s_EVENTBUS = void 0;
    }
 }
+
+/**
+ * Stores the plugin eventbus at module level.
+ *
+ * @type {Eventbus}
+ */
+let s_EVENTBUS = void 0;
 
 /**
  * Provides the internal object stored in the QuestDB that contains the Quest and enriched data along with
@@ -889,7 +904,7 @@ export class QuestEntry
       /**
        * @type {EnrichData}
        */
-      this.enrich = Enrich.quest(this.quest);
+      this.enrich = s_EVENTBUS.triggerSync('tql:enrich:quest', this.quest);
 
       return this;
    }
@@ -953,21 +968,6 @@ Object.freeze(Filter);
 Object.freeze(Sort);
 
 /**
- * Defines all of the DB Hook callbacks. Please see {@link QuestDB} for more documentation.
- *
- * @type {QuestDBHooks}
- */
-const s_DB_HOOKS = {
-   addedAllQuestEntries: 'addedAllQuestEntries',
-   addQuestEntry: 'addQuestEntry',
-   createQuestEntry: 'createQuestEntry',
-   deleteQuestEntry: 'deleteQuestEntry',
-   removedAllQuestEntries: 'removedAllQuestEntries',
-   removeQuestEntry: 'removeQuestEntry',
-   updateQuestEntry: 'updateQuestEntry',
-};
-
-/**
  * @param {string}   questId - The Quest / JournalEntry ID.
  *
  * @returns {QuestEntry} The stored QuestEntry.
@@ -993,7 +993,8 @@ const s_GET_QUEST_ENTRY = (questId) =>
  *
  * @returns {boolean}   Is quest observable by the current user?
  */
-const s_IS_OBSERVABLE = (content, entry, isTrustedPlayerEdit = Utils.isTrustedPlayerEdit()) =>
+const s_IS_OBSERVABLE = (content, entry,
+ isTrustedPlayerEdit = s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit')) =>
 {
    let isObservable;
 
@@ -1040,7 +1041,7 @@ const s_JOURNAL_ENTRY_CREATE = async (entry, options, id) =>
    if (!content) { return; }
 
    // Process the quest content if it is currently observable and TQL is not hidden from the current user.
-   if (s_IS_OBSERVABLE(content, entry) && !Utils.isTQLHiddenFromPlayers())
+   if (s_IS_OBSERVABLE(content, entry) && !s_EVENTBUS.triggerSync('tql:utils:is:hidden:from:players'))
    {
       const quest = new Quest(content, entry);
 
@@ -1103,12 +1104,12 @@ const s_JOURNAL_ENTRY_DELETE = async (entry, options, id) =>
       const savedIds = quest.parent ? [quest.parent, ...quest.subquests] : [...quest.subquests];
 
       // Send the delete quest socket message to all clients.
-      await Socket.deletedQuest({
+      await s_EVENTBUS.triggerAsync('tql:socket:deleted:quest', {
          deleteId: entry.id,
          savedIds
       });
 
-      Socket.refreshAll();
+      s_EVENTBUS.trigger('tql:socket:refresh:all');
    }
 };
 
@@ -1133,7 +1134,8 @@ const s_JOURNAL_ENTRY_UPDATE = (entry, flags, options, id) =>
       let questEntry = s_GET_QUEST_ENTRY(entry.id);
 
       // Is the quest currently observable and not hidden from the current user.
-      const isObservable = s_IS_OBSERVABLE(content, entry) && !Utils.isTQLHiddenFromPlayers();
+      const isObservable = s_IS_OBSERVABLE(content, entry) &&
+       !s_EVENTBUS.triggerSync('tql:utils:is:hidden:from:players');
 
       if (questEntry)
       {
@@ -1301,26 +1303,6 @@ const s_SET_QUEST_ENTRY = (entry, generate = true) =>
  * @typedef {object} FilterFunctions
  *
  * @property {Function} IS_OBSERVABLE - Filters by `isObservable` cached in QuestEntry.
- */
-
-/**
- * @typedef {object} QuestDBHooks
- *
- * @property {string}   addedAllQuestEntries - Invoked in {@link QuestDB.init} when all quests have been loaded.
- *
- * @property {string}   addQuestEntry - Invoked in {@link QuestDB.consistencyCheck} and s_JOURNAL_ENTRY_UPDATE when a
- *                                      quest is added to the {@link QuestDB}.
- *
- * @property {string}   createQuestEntry - Invoked in s_JOURNAL_ENTRY_CREATE in {@link QuestDB} when a quest is created.
- *
- * @property {string}   deleteQuestEntry - Invoked in s_JOURNAL_ENTRY_DELETE in {@link QuestDB} when a quest is deleted.
- *
- * @property {string}   removedAllQuestEntries - Invoked in {@link QuestDB.removeAll} when all quests are removed.
- *
- * @property {string}   removeQuestEntry - Invoked in {@link QuestDB.consistencyCheck} and s_JOURNAL_ENTRY_UPDATE when a
- *                                         quest is removed from the {@link QuestDB}.
- *
- * @property {string}   updateQuestEntry - Invoked in s_JOURNAL_ENTRY_UPDATE when a quest is updated in {@link QuestDB}.
  */
 
 /**

@@ -1,5 +1,3 @@
-import QuestDB    from './QuestDB.js';
-
 import { constants, questStatus, questStatusI18n, settings } from '../model/constants.js';
 
 /**
@@ -261,7 +259,7 @@ export default class Enrich
 
       if (data.parent !== null)
       {
-         const parentQuest = QuestDB.getQuest(data.parent);
+         const parentQuest = this._eventbus.triggerSync('tql:questdb:quest:get', data.parent);
          if (parentQuest)
          {
             data.isSubquest = parentQuest.isObservable;
@@ -282,7 +280,7 @@ export default class Enrich
       {
          for (const questId of data.subquests)
          {
-            const subquest = QuestDB.getQuest(questId);
+            const subquest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
             // isObservable filters out non-owned hidden quests for trustedPlayerEdit.
             if (subquest && subquest.isObservable)

@@ -1,5 +1,4 @@
 import QuestAPI      from './public/QuestAPI.js';
-import QuestDB       from './QuestDB.js';
 
 import { constants, questStatus, questStatusI18n, settings }  from '../model/constants.js';
 
@@ -137,7 +136,8 @@ export default class Socket
           */
          const tqlData = data.data._tqlData;
 
-         const quest = QuestDB.getQuest(tqlData.questId);
+         const quest = s_EVENTBUS.triggerSync('tql:questdb:quest:get', tqlData.questId);
+
          if (quest)
          {
             quest.removeReward(tqlData.uuidv4);
@@ -230,7 +230,7 @@ export default class Socket
       if (game.user.isGM)
       {
          // Get any currently set primary quest.
-         const currentQuestEntry = QuestDB.getQuestEntry(game.settings.get(
+         const currentQuestEntry = s_EVENTBUS.triggerSync('tql:questdb:quest:entry:get', game.settings.get(
           constants.moduleName, settings.primaryQuest));
 
          // If the current set primary quest is different from provided quest then set new primary quest.
@@ -433,7 +433,7 @@ async function handleQuestRewardDrop(data)
       // Set handled to true so no more GM level users act upon this event.
       data.payload.handled = true;
 
-      const quest = QuestDB.getQuest(tqlData.questId);
+      const quest = s_EVENTBUS.triggerSync('tql:questdb:quest:get', tqlData.questId);
       if (quest)
       {
          quest.removeReward(tqlData.uuidv4);
@@ -457,11 +457,12 @@ async function handleQuestSetPrimary(data)
    // If this message has not already been handled and this user is a GM then handle it now then set `handled` to true.
    if (game.user.isGM && !data.payload.handled)
    {
-      const quest = QuestDB.getQuest(data.payload.questId);
+      const quest = s_EVENTBUS.triggerSync('tql:questdb:quest:get', data.payload.questId);
       if (quest === void 0) { return; }
 
       // Get any currently set primary quest.
-      const currentQuestEntry = QuestDB.getQuestEntry(game.settings.get(constants.moduleName, settings.primaryQuest));
+      const currentQuestEntry = s_EVENTBUS.triggerSync('tql:questdb:quest:entry:get',
+       game.settings.get(constants.moduleName, settings.primaryQuest));
 
       // If the current set primary quest is different from provided quest then set new primary quest.
       if (currentQuestEntry !== void 0 && currentQuestEntry.id !== quest.id)
@@ -496,7 +497,7 @@ async function handleQuestSetStatus(data)
    // If this message has not already been handled and this user is a GM then handle it now then set `handled` to true.
    if (game.user.isGM && !data.payload.handled)
    {
-      const quest = QuestDB.getQuest(data.payload.questId);
+      const quest = s_EVENTBUS.triggerSync('tql:questdb:quest:get', data.payload.questId);
       if (quest)
       {
          await quest.setStatus(target);
@@ -563,7 +564,7 @@ function handleRefreshQuestPreview(data)
          const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', id);
          if (questPreview !== void 0)
          {
-            const quest = QuestDB.getQuest(id);
+            const quest = s_EVENTBUS.triggerSync('tql:questdb:quest:get', id);
             if (!quest)
             {
                questPreview.close();
@@ -580,7 +581,7 @@ function handleRefreshQuestPreview(data)
       const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', questId);
       if (questPreview !== void 0)
       {
-         const quest = QuestDB.getQuest(questId);
+         const quest = s_EVENTBUS.triggerSync('tql:questdb:quest:get', questId);
          if (!quest)
          {
             questPreview.close();

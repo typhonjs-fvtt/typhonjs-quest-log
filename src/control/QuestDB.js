@@ -239,7 +239,7 @@ export default class QuestDB
 
       // Early out if the folder is not available or TQL is hidden from the current player.
       // if (!folder || Utils.isTQLHiddenFromPlayers()) { return; }
-      if (!folder || s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit')) { return; }
+      if (!folder || s_EVENTBUS.triggerSync('tql:utils:is:hidden:from:players')) { return; }
 
       // Create a single map of all QuestEntry instances.
       const questEntryMap = new Map(QuestDB.getAllQuestEntries().map((e) => [e.id, e]));

@@ -55,6 +55,18 @@ export class PluginLoader
 
       // Freeze the public API so it can't be modified.
       Object.freeze(moduleData.public);
+
+      // Add setting control / responder to settings changes.
+      pluginManager.add({
+         name: 'tql-system-settings-control',
+         instance: SystemPlugins.SettingsControl
+      });
+
+      // Add setting dispatch / triggers events w/ data for all settings changes.
+      pluginManager.add({
+         name: 'tql-system-settings-dispatch',
+         instance: SystemPlugins.SettingsDispatch
+      });
    }
 
    static async foundryReady()

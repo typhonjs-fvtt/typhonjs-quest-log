@@ -2,8 +2,6 @@ import Quest            from '../model/Quest.js';
 import QuestCollection  from '../model/QuestCollection.js';
 import QuestPreview     from '../view/preview/QuestPreview.js';
 
-import ModuleSettings   from '../ModuleSettings.js';
-
 import DBMigration      from '../../database/DBMigration.js';
 
 import { eventbus, PluginLoader } from '../plugins/PluginManager.js';
@@ -118,9 +116,6 @@ export default class TQLHooks
 
       // Initialize / add plugins.
       PluginLoader.foundryInit();
-
-      // Register TQL module settings.
-      ModuleSettings.register();
    }
 
    /**

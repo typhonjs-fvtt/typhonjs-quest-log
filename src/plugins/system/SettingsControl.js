@@ -1,4 +1,4 @@
-import { constants, noteControls, questStatus, sessionConstants, settings } from '../../model/constants.js';
+import { constants, questStatus, sessionConstants, settings } from '../../model/constants.js';
 
 /**
  * Defines if logging setting changes to the console occurs.
@@ -123,6 +123,8 @@ export default class SettingsControl
          {
             // Initialize QuestDB loading all quests that are currently observable for the user.
             await this._eventbus.triggerAsync('tql:questdb:init');
+
+            const noteControls = this._eventbus.triggerSync('tql:data:notecontrol:get');
 
             // Add back ui.controls
             const notes = ui?.controls?.controls.find((c) => c.name === 'notes');
@@ -284,7 +286,9 @@ export default class SettingsControl
    {
       this._eventbus = ev.eventbus;
 
-      ev.eventbus.on('tql:settings:change:any', SettingsControl.handleDispatch, SettingsControl);
-      ev.eventbus.on('tql:settings:log:enable', (enabled) => loggingEnabled = enabled);
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:settings:change:any', this.handleDispatch, this, opts);
+      ev.eventbus.on('tql:settings:log:enable', (enabled) => loggingEnabled = enabled, void 0, opts);
    }
 }

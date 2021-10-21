@@ -1,8 +1,8 @@
-import QuestLog      from '../view/log/QuestLog.js';
-import QuestPreview  from '../view/preview/QuestPreview.js';
-import QuestTracker  from '../view/tracker/QuestTracker.js';
+import QuestLog      from '../../view/log/QuestLog.js';
+import QuestPreview  from '../../view/preview/QuestPreview.js';
+import QuestTracker  from '../../view/tracker/QuestTracker.js';
 
-import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../model/constants.js';
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../model/constants.js';
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -267,23 +267,29 @@ export default class ViewManager
    {
       this._eventbus = ev.eventbus;
 
-      ViewManager.init();
+      this.init();
 
-      ev.eventbus.on('tql:viewmanager:notifications:error', ViewManager.notifications.error, s_NOTIFICATIONS);
-      ev.eventbus.on('tql:viewmanager:notifications:info', ViewManager.notifications.info, s_NOTIFICATIONS);
-      ev.eventbus.on('tql:viewmanager:notifications:warn', ViewManager.notifications.warn, s_NOTIFICATIONS);
-      ev.eventbus.on('tql:viewmanager:close:all', ViewManager.closeAll, ViewManager);
-      ev.eventbus.on('tql:viewmanager:is:quest:tracker:visible', ViewManager.isQuestTrackerVisible, ViewManager);
-      ev.eventbus.on('tql:viewmanager:refresh:quest:preview', ViewManager.refreshQuestPreview, ViewManager);
-      ev.eventbus.on('tql:viewmanager:render:all', ViewManager.renderAll, ViewManager);
-      ev.eventbus.on('tql:viewmanager:render:or:close:quest:tracker', ViewManager.renderOrCloseQuestTracker, ViewManager);
-      ev.eventbus.on('tql:viewmanager:quest:added', ViewManager.questAdded, ViewManager);
-      ev.eventbus.on('tql:viewmanager:quest:log:get', () => ViewManager.questLog, ViewManager);
-      ev.eventbus.on('tql:viewmanager:quest:preview:delete', (questId) => ViewManager.questPreview.delete(questId), ViewManager);
-      ev.eventbus.on('tql:viewmanager:quest:preview:get', (questId) => ViewManager.questPreview.get(questId), ViewManager);
-      ev.eventbus.on('tql:viewmanager:quest:preview:set', (questId, view) => ViewManager.questPreview.set(questId, view), ViewManager);
-      ev.eventbus.on('tql:viewmanager:quest:tracker:get', () => ViewManager.questTracker, ViewManager);
-      ev.eventbus.on('tql:viewmanager:verify:quest:can:add', ViewManager.verifyQuestCanAdd, ViewManager);
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:viewmanager:notifications:error', this.notifications.error, s_NOTIFICATIONS, opts);
+      ev.eventbus.on('tql:viewmanager:notifications:info', this.notifications.info, s_NOTIFICATIONS, opts);
+      ev.eventbus.on('tql:viewmanager:notifications:warn', this.notifications.warn, s_NOTIFICATIONS, opts);
+      ev.eventbus.on('tql:viewmanager:close:all', this.closeAll, this, opts);
+      ev.eventbus.on('tql:viewmanager:is:quest:tracker:visible', this.isQuestTrackerVisible, this, opts);
+      ev.eventbus.on('tql:viewmanager:refresh:quest:preview', this.refreshQuestPreview, this, opts);
+      ev.eventbus.on('tql:viewmanager:render:all', this.renderAll, this, opts);
+      ev.eventbus.on('tql:viewmanager:render:or:close:quest:tracker', this.renderOrCloseQuestTracker, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:added', this.questAdded, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:log:close', this.questLog.close, this.questLog, opts);
+      ev.eventbus.on('tql:viewmanager:quest:log:get', () => this.questLog, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:log:render', this.questLog.render, this.questLog, opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:delete', (questId) => this.questPreview.delete(questId), this,
+       opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:get', (questId) => this.questPreview.get(questId), this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:set', (questId, view) => this.questPreview.set(questId, view), this,
+       opts);
+      ev.eventbus.on('tql:viewmanager:quest:tracker:get', () => this.questTracker, this, opts);
+      ev.eventbus.on('tql:viewmanager:verify:quest:can:add', this.verifyQuestCanAdd, this, opts);
    }
 }
 

@@ -152,7 +152,7 @@ export default class TinyMCE
    {
       this._eventbus = ev.eventbus;
 
-      ev.eventbus.on('tql:tinymce:options', TinyMCE.options, TinyMCE);
+      ev.eventbus.on('tql:tinymce:options', this.options, this, { guard: true });
    }
 }
 

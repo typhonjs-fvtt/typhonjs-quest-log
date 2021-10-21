@@ -1,12 +1,12 @@
-import Quest            from '../model/Quest.js';
-import QuestCollection  from '../model/QuestCollection.js';
-import QuestPreview     from '../view/preview/QuestPreview.js';
+import Quest            from './model/Quest.js';
+import QuestCollection  from './plugins/data/QuestCollection.js';
+import QuestPreview     from './view/preview/QuestPreview.js';
 
-import DBMigration      from '../../database/DBMigration.js';
+import DBMigration      from '../database/DBMigration.js';
 
-import { eventbus, PluginLoader } from '../plugins/PluginManager.js';
+import { eventbus, PluginLoader } from './plugins/PluginManager.js';
 
-import { constants, jquery, noteControls, sessionConstants, settings } from '../model/constants.js';
+import { constants, jquery, sessionConstants, settings } from './model/constants.js';
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -45,7 +45,6 @@ export default class TQLHooks
       // Foundry startup hooks.
       Hooks.once('init', TQLHooks.foundryInit);
       Hooks.once('ready', TQLHooks.foundryReady);
-      Hooks.once('setup', TQLHooks.foundrySetup);
 
       // Respond to Foundry in game hooks.
       Hooks.on('dropActorSheetData', TQLHooks.dropActorSheetData);
@@ -141,8 +140,16 @@ export default class TQLHooks
          sheetClass: QuestPreview
       };
 
+      const questCollection = new QuestCollection();
+
+      // Add the quest collection to the plugin eventbus to access QuestDB.
+      await eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-data-quest-collection',
+         instance: questCollection
+      });
+
       // Add our QuestCollection to the game collections.
-      game.collections.set(Quest.documentName, new QuestCollection());
+      game.collections.set(Quest.documentName, questCollection);
 
       // Initialize / add plugins.
       await PluginLoader.foundryReady();
@@ -164,27 +171,12 @@ export default class TQLHooks
          await libThemer?.api?.registerTheme('/modules/typhonjs-quest-log/assets/themes/lib-themer/tql.json');
       }
 
+      // const data = eventbus.triggerSync('plugins:get:plugin:events').sort(
+      //  (el1, el2) => el1.plugin.localeCompare(el2.plugin));
+      // console.log(`PluginManager events:\n${JSON.stringify(data, null, 3)}`);
+
       // Fire our own lifecycle event to inform any other modules that depend on TQL QuestDB.
       Hooks.callAll('TyphonJSQuestLog.Lifecycle.ready');
-   }
-
-   /**
-    * Provides the setup TQL initialization during the `setup` Foundry lifecycle hook. Make the public QuestAPI
-    * accessible from `game.modules('typhonjs-quest-log').public.QuestAPI`.
-    */
-   static foundrySetup()
-   {
-      // const moduleData = game.modules.get(constants.moduleName);
-      //
-      // /**
-      //  * @type {TQLPublicAPI}
-      //  */
-      // moduleData.public = {
-      //    QuestAPI
-      // };
-      //
-      // // Freeze the public API so it can't be modified.
-      // Object.freeze(moduleData.public);
    }
 
    /**
@@ -201,6 +193,8 @@ export default class TQLHooks
    {
       if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers))
       {
+         const noteControls = eventbus.triggerSync('tql:data:notecontrol:get');
+
          const notes = controls.find((c) => c.name === 'notes');
          if (notes) { notes.tools.push(...noteControls); }
       }

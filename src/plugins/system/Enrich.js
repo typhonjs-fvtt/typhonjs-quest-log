@@ -1,4 +1,4 @@
-import { constants, questStatus, questStatusI18n, settings } from '../model/constants.js';
+import { constants, questStatus, questStatusI18n, settings } from '../../model/constants.js';
 
 /**
  * Enrich populates content with a lot of additional data that doesn't necessarily have to be saved
@@ -437,10 +437,12 @@ export default class Enrich
    {
       this._eventbus = ev.eventbus;
 
-      ev.eventbus.on('tql:enrich:giver:from:quest', Enrich.giverFromQuest, Enrich);
-      ev.eventbus.on('tql:enrich:giver:from:uuid', Enrich.giverFromUUID, Enrich);
-      ev.eventbus.on('tql:enrich:status:actions', Enrich.statusActions, Enrich);
-      ev.eventbus.on('tql:enrich:quest', Enrich.quest, Enrich);
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:enrich:giver:from:quest', this.giverFromQuest, this, opts);
+      ev.eventbus.on('tql:enrich:giver:from:uuid', this.giverFromUUID, this, opts);
+      ev.eventbus.on('tql:enrich:status:actions', this.statusActions, this, opts);
+      ev.eventbus.on('tql:enrich:quest', this.quest, this, opts);
    }
 }
 

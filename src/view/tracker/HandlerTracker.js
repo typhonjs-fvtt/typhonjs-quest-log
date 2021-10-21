@@ -1,7 +1,7 @@
 // import FoundryUIManager from '../../control/FoundryUIManager.js';
-import QuestAPI         from '../../control/public/QuestAPI.js';
-import QuestDB          from '../../control/QuestDB.js';
-import Socket           from '../../control/Socket.js';
+import QuestAPI         from '../../plugins/system/public/QuestAPI.js';
+import QuestDB          from '../../plugins/system/QuestDB.js';
+import Socket           from '../../plugins/system/Socket.js';
 
 import { constants, sessionConstants, settings } from '../../model/constants.js';
 

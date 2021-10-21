@@ -1,7 +1,7 @@
 import HandlerTracker   from './HandlerTracker.js';
-import QuestDB          from '../../control/QuestDB.js';
-import Socket           from '../../control/Socket.js';
-import Utils            from '../../control/Utils.js';
+import QuestDB          from '../../plugins/system/QuestDB.js';
+import Socket           from '../../plugins/system/Socket.js';
+import Utils            from '../../plugins/system/Utils.js';
 import TQLContextMenu   from '../TQLContextMenu.js';
 import collect          from '../../../external/collect.js';
 

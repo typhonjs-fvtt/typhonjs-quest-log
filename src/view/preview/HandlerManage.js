@@ -1,5 +1,5 @@
-import QuestDB                from '../../control/QuestDB.js';
-import ViewManager            from '../../control/ViewManager.js';
+import QuestDB                from '../../plugins/system/QuestDB.js';
+import ViewManager            from '../../plugins/system/ViewManager.js';
 import TQLPermissionControl   from '../TQLPermissionControl.js';
 
 /**

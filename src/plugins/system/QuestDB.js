@@ -1,8 +1,8 @@
-import Quest            from '../model/Quest.js';
-import QuestPreviewShim from '../view/preview/QuestPreviewShim.js';
-import collect          from '../../external/collect.js';
+import Quest            from '../../model/Quest.js';
+import QuestPreviewShim from '../../view/preview/QuestPreviewShim.js';
+import collect          from '../../../external/collect.js';
 
-import { constants, questDBHooks, questStatus, settings } from '../model/constants.js';
+import { constants, questDBHooks, questStatus, settings } from '../../model/constants.js';
 
 /**
  * Stores all {@link QuestEntry} instances in a map of Maps. This provides fast retrieval and quick insert / removal
@@ -786,24 +786,26 @@ export default class QuestDB
    {
       s_EVENTBUS = ev.eventbus;
 
-      ev.eventbus.on('tql:questdb:all:quest:entries:get', QuestDB.getAllQuestEntries, QuestDB);
-      ev.eventbus.on('tql:questdb:all:quests:get', QuestDB.getAllQuests, QuestDB);
-      ev.eventbus.on('tql:questdb:collect:sort', QuestDB.sortCollect, QuestDB);
-      ev.eventbus.on('tql:questdb:collect:filter', QuestDB.filterCollect, QuestDB);
-      ev.eventbus.on('tql:questdb:consistency:check', QuestDB.consistencyCheck, QuestDB);
-      ev.eventbus.on('tql:questdb:count:get', QuestDB.getCount, QuestDB);
-      ev.eventbus.on('tql:questdb:enrich:all', QuestDB.enrichAll, QuestDB);
-      ev.eventbus.on('tql:questdb:enrich:quests', QuestDB.enrichQuests, QuestDB);
-      ev.eventbus.on('tql:questdb:filter', QuestDB.filter, QuestDB);
-      ev.eventbus.on('tql:questdb:find', QuestDB.find, QuestDB);
-      ev.eventbus.on('tql:questdb:quest:create', QuestDB.createQuest, QuestDB);
-      ev.eventbus.on('tql:questdb:quest:delete', QuestDB.deleteQuest, QuestDB);
-      ev.eventbus.on('tql:questdb:quest:get', QuestDB.getQuest, QuestDB);
-      ev.eventbus.on('tql:questdb:quest:entry:get', QuestDB.getQuestEntry, QuestDB);
-      ev.eventbus.on('tql:questdb:init', QuestDB.init, QuestDB);
-      ev.eventbus.on('tql:questdb:iterator:entries', QuestDB.iteratorEntries, QuestDB);
-      ev.eventbus.on('tql:questdb:iterator:quests', QuestDB.iteratorQuests, QuestDB);
-      ev.eventbus.on('tql:questdb:remove:all', QuestDB.removeAll, QuestDB);
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:questdb:all:quest:entries:get', this.getAllQuestEntries, this, opts);
+      ev.eventbus.on('tql:questdb:all:quests:get', this.getAllQuests, this, opts);
+      ev.eventbus.on('tql:questdb:collect:sort', this.sortCollect, this, opts);
+      ev.eventbus.on('tql:questdb:collect:filter', this.filterCollect, this, opts);
+      ev.eventbus.on('tql:questdb:consistency:check', this.consistencyCheck, this, opts);
+      ev.eventbus.on('tql:questdb:count:get', this.getCount, this, opts);
+      ev.eventbus.on('tql:questdb:enrich:all', this.enrichAll, this, opts);
+      ev.eventbus.on('tql:questdb:enrich:quests', this.enrichQuests, this, opts);
+      ev.eventbus.on('tql:questdb:filter', this.filter, this, opts);
+      ev.eventbus.on('tql:questdb:find', this.find, this, opts);
+      ev.eventbus.on('tql:questdb:quest:create', this.createQuest, this, opts);
+      ev.eventbus.on('tql:questdb:quest:delete', this.deleteQuest, this, opts);
+      ev.eventbus.on('tql:questdb:quest:get', this.getQuest, this, opts);
+      ev.eventbus.on('tql:questdb:quest:entry:get', this.getQuestEntry, this, opts);
+      ev.eventbus.on('tql:questdb:init', this.init, this, opts);
+      ev.eventbus.on('tql:questdb:iterator:entries', this.iteratorEntries, this, opts);
+      ev.eventbus.on('tql:questdb:iterator:quests', this.iteratorQuests, this, opts);
+      ev.eventbus.on('tql:questdb:remove:all', this.removeAll, this, opts);
 
       await QuestDB.init();
    }

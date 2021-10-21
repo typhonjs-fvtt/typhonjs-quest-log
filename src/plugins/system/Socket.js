@@ -1,6 +1,6 @@
 // import QuestAPI      from './public/QuestAPI.js';
 
-import { constants, questStatus, questStatusI18n, settings }  from '../model/constants.js';
+import { constants, questStatus, questStatusI18n, settings }  from '../../model/constants.js';
 
 /**
  * Defines the event name to send all messages to over  `game.socket`.
@@ -355,14 +355,16 @@ export default class Socket
 
       Socket.listen();
 
-      ev.eventbus.on('tql:socket:deleted:quest', Socket.deletedQuest, Socket);
-      ev.eventbus.on('tql:socket:quest:reward:drop', Socket.questRewardDrop, Socket);
-      ev.eventbus.on('tql:socket:refresh:all', Socket.refreshAll, Socket);
-      ev.eventbus.on('tql:socket:refresh:quest:preview', Socket.refreshQuestPreview, Socket);
-      ev.eventbus.on('tql:socket:set:quest:primary', Socket.setQuestPrimary, Socket);
-      ev.eventbus.on('tql:socket:set:quest:status', Socket.setQuestStatus, Socket);
-      ev.eventbus.on('tql:socket:show:quest:preview', Socket.showQuestPreview, Socket);
-      ev.eventbus.on('tql:socket:user:cant:open:quest', Socket.userCantOpenQuest, Socket);
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:socket:deleted:quest', this.deletedQuest, this, opts);
+      ev.eventbus.on('tql:socket:quest:reward:drop', this.questRewardDrop, this, opts);
+      ev.eventbus.on('tql:socket:refresh:all', this.refreshAll, this, opts);
+      ev.eventbus.on('tql:socket:refresh:quest:preview', this.refreshQuestPreview, this, opts);
+      ev.eventbus.on('tql:socket:set:quest:primary', this.setQuestPrimary, this, opts);
+      ev.eventbus.on('tql:socket:set:quest:status', this.setQuestStatus, this, opts);
+      ev.eventbus.on('tql:socket:show:quest:preview', this.showQuestPreview, this, opts);
+      ev.eventbus.on('tql:socket:user:cant:open:quest', this.userCantOpenQuest, this, opts);
    }
 
    static async onPluginUnload()

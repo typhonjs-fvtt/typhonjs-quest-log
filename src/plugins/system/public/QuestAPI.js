@@ -1,4 +1,4 @@
-import { constants, questDBHooks, settings } from '../../model/constants.js';
+import { constants, questDBHooks, settings } from '../../../model/constants.js';
 
 /**
  * Quest public API. QuestAPI exposes control capabilities publicly. This functionality is gated as necessary depending
@@ -86,8 +86,10 @@ export function onPluginLoad(ev)
 {
    s_EVENTBUS = ev.eventbus;
 
-   ev.eventbus.on('tql:questapi:db', QuestAPI.DB, QuestAPI);
-   ev.eventbus.on('tql:questapi:open', QuestAPI.open, QuestAPI);
+   const opts = { guard: true };
+
+   ev.eventbus.on('tql:questapi:db', () => this.DB, this, opts);
+   ev.eventbus.on('tql:questapi:open', this.open, this, opts);
 }
 
 export function onPluginUnload()

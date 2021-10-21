@@ -1,7 +1,7 @@
-import QuestAPI      from '../../control/public/QuestAPI.js';
-import QuestDB       from '../../control/QuestDB.js';
-import ViewManager   from '../../control/ViewManager.js';
-import Socket        from '../../control/Socket.js';
+import QuestAPI      from '../../plugins/system/public/QuestAPI.js';
+import QuestDB       from '../../plugins/system/QuestDB.js';
+import ViewManager   from '../../plugins/system/ViewManager.js';
+import Socket        from '../../plugins/system/Socket.js';
 import TQLDialog     from '../TQLDialog.js';
 
 /**

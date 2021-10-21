@@ -1,5 +1,3 @@
-import ViewManager from '../control/ViewManager.js';
-
 /**
  * Defines the main TQL constants for module name and the DB flag.
  *
@@ -27,30 +25,6 @@ const jquery = {
    keydown: 'keydown',
    mousedown: 'mousedown'
 };
-
-/**
- * Defines the left-hand UI control note buttons.
- *
- * @type {object[]}
- */
-const noteControls = [
-   {
-      name: constants.moduleName,
-      title: 'TyphonJSQuestLog.QuestLogButton',
-      icon: 'fas fa-scroll',
-      visible: true,
-      onClick: () => ViewManager.questLog.render(true, { focus: true }),
-      button: true
-   },
-   {
-      name: 'typhonjs-quest-log-floating-window',
-      title: 'TyphonJSQuestLog.QuestTracker.Title',
-      icon: 'fas fa-tasks',
-      visible: true,
-      onClick: async () => { await game.settings.set(constants.moduleName, settings.questTrackerEnable, true); },
-      button: true
-   }
-];
 
 /**
  * Defines all of the DB Hook callbacks. Please see {@link QuestDB} for more documentation.
@@ -145,7 +119,6 @@ const settings = {
 export {
    constants,
    jquery,
-   noteControls,
    questDBHooks,
    questStatus,
    questStatusI18n,

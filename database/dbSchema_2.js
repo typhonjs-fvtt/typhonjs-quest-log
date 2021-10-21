@@ -1,6 +1,6 @@
 import DBMigration   from './DBMigration.js';
-import Enrich        from '../src/control/Enrich.js';
-import Utils         from '../src/control/Utils.js';
+import Enrich        from '../src/plugins/system/Enrich.js';
+import Utils         from '../src/plugins/system/Utils.js';
 import Quest         from '../src/model/Quest.js';
 
 import { constants, questStatus } from '../src/model/constants.js';

@@ -14,7 +14,9 @@ export default class DOMPurifyPlugin
 
    static onPluginLoad(ev)
    {
-      ev.eventbus.on('tql:dompurify:sanitize', DOMPurifyPlugin.sanitize, DOMPurifyPlugin);
-      ev.eventbus.on('tql:dompurify:sanitize:video', DOMPurifyPlugin.sanitizeWithVideo, DOMPurifyPlugin);
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:dompurify:sanitize', this.sanitize, this, opts);
+      ev.eventbus.on('tql:dompurify:sanitize:video', this.sanitizeWithVideo, this, opts);
    }
 }

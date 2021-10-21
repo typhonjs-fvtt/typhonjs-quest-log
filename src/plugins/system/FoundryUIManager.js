@@ -1,4 +1,4 @@
-import QuestTracker  from '../view/tracker/QuestTracker.js';
+import QuestTracker  from '../../view/tracker/QuestTracker.js';
 
 /**
  * Manages the state of the Foundry UI elements including the {@link Hotbar}, {@link SceneNavigation} and
@@ -15,7 +15,7 @@ export default class FoundryUIManager
    {
       window.addEventListener('resize', s_WINDOW_RESIZE);
       Hooks.on('collapseSidebar', FoundryUIManager.collapseSidebar);
-      Hooks.on('renderSceneNavigation', FoundryUIManager.updateTrackerPinned);
+      Hooks.on('renderSceneNavigation', FoundryUIManager.updateTrackerPinned.bind(this));
       Hooks.on('renderQuestTracker', s_QUEST_TRACKER_RENDERED);
 
       sidebar.currentCollapsed = ui?.sidebar?._collapsed || false;
@@ -172,12 +172,11 @@ export default class FoundryUIManager
 
       FoundryUIManager.init();
 
-      ev.eventbus.on('tql:foundryuimanager:check:position', FoundryUIManager.checkPosition, FoundryUIManager);
+      const opts = { guard: true };
 
-      ev.eventbus.on('tql:foundryuimanager:update:tracker', FoundryUIManager.updateTracker, FoundryUIManager);
-
-      ev.eventbus.on('tql:foundryuimanager:update:tracker:pinned', FoundryUIManager.updateTrackerPinned,
-       FoundryUIManager);
+      ev.eventbus.on('tql:foundryuimanager:check:position', this.checkPosition, this, opts);
+      ev.eventbus.on('tql:foundryuimanager:update:tracker', this.updateTracker, this, opts);
+      ev.eventbus.on('tql:foundryuimanager:update:tracker:pinned', this.updateTrackerPinned, this, opts);
    }
 
    static onPluginUnload()

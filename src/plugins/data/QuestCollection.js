@@ -1,5 +1,4 @@
-import QuestDB from '../control/QuestDB.js';
-import Quest   from '../model/Quest.js';
+import Quest   from '../../model/Quest.js';
 
 /**
  * Provides a shim to link QuestDB to a Foundry Collection. Instead of storing any data directly the appropriate methods
@@ -44,7 +43,7 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    contents()
    {
-      return QuestDB.getAllQuests();
+      return this._eventbus.triggerSync('tql:questdb:all:quests:get');
    }
 
    /**
@@ -54,7 +53,7 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    *entries()
    {
-      for (const quest of QuestDB.iteratorQuests())
+      for (const quest of this._eventbus.triggerSync('tql:questdb:iterator:quests'))
       {
          yield [quest.id, quest];
       }
@@ -79,7 +78,7 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    get(questId, { strict = false } = {})
    {
-      const entry = QuestDB.getQuest(questId);
+      const entry = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
       if (strict && (entry === void 0))
       {
@@ -132,6 +131,11 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    values()
    {
-      return QuestDB.iteratorQuests();
+      return this._eventbus.triggerSync('tql:questdb:iterator:quests');
+   }
+
+   onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
    }
 }

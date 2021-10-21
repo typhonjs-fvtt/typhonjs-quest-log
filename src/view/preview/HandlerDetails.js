@@ -1,6 +1,6 @@
-import Enrich     from '../../control/Enrich.js';
-import Socket     from '../../control/Socket.js';
-import Utils      from '../../control/Utils.js';
+import Enrich     from '../../plugins/system/Enrich.js';
+import Socket     from '../../plugins/system/Socket.js';
+import Utils      from '../../plugins/system/Utils.js';
 import TQLDialog  from '../TQLDialog.js';
 
 import { constants, jquery, settings } from '../../model/constants.js';

@@ -1,5 +1,5 @@
 import DBMigration   from './DBMigration.js';
-import Utils         from '../src/control/Utils.js';
+import Utils         from '../src/plugins/system/Utils.js';
 import Quest         from '../src/model/Quest.js';
 
 import { constants, questStatus }   from '../src/model/constants.js';

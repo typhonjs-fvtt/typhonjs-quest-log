@@ -1,5 +1,5 @@
-import Socket        from '../src/control/Socket.js';
-import Utils         from '../src/control/Utils.js';
+import Socket        from '../src/plugins/system/Socket.js';
+import Utils         from '../src/plugins/system/Utils.js';
 import { constants } from '../src/model/constants.js';
 
 import dbSchema_1    from './dbSchema_1.js';

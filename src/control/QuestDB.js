@@ -800,6 +800,7 @@ export default class QuestDB
       ev.eventbus.on('tql:questdb:quest:delete', QuestDB.deleteQuest, QuestDB);
       ev.eventbus.on('tql:questdb:quest:get', QuestDB.getQuest, QuestDB);
       ev.eventbus.on('tql:questdb:quest:entry:get', QuestDB.getQuestEntry, QuestDB);
+      ev.eventbus.on('tql:questdb:init', QuestDB.init, QuestDB);
       ev.eventbus.on('tql:questdb:iterator:entries', QuestDB.iteratorEntries, QuestDB);
       ev.eventbus.on('tql:questdb:iterator:quests', QuestDB.iteratorQuests, QuestDB);
       ev.eventbus.on('tql:questdb:remove:all', QuestDB.removeAll, QuestDB);

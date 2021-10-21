@@ -1,8 +1,3 @@
-import FoundryUIManager from '../../control/FoundryUIManager.js';
-import QuestDB          from '../../control/QuestDB.js';
-import Utils            from '../../control/Utils.js';
-import ViewManager      from '../../control/ViewManager.js';
-
 import { constants, noteControls, questStatus, sessionConstants, settings } from '../../model/constants.js';
 
 /**
@@ -27,84 +22,107 @@ export default class SettingsControl
 
       if (typeof dispatchFunction === 'function')
       {
-         dispatchFunction(data.value);
+         dispatchFunction.call(this, data.value);
       }
    }
 
    static handle_allowPlayersAccept(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.allowPlayersAccept, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.allowPlayersAccept, value);
+      }
 
       // Must enrich all quests again in QuestDB.
-      QuestDB.enrichAll();
+      this._eventbus.trigger('tql:questdb:enrich:all');
 
       // Render all views as quest status actions need to be shown or hidden for some players.
-      ViewManager.renderAll({ questPreview: true });
+      this._eventbus.trigger('tql:viewmanager:render:all', { questPreview: true });
    }
 
    static handle_allowPlayersCreate(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.allowPlayersCreate, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.allowPlayersCreate, value);
+      }
 
       // Render quest log to show / hide add quest button.
-      if (ViewManager.questLog.rendered) { ViewManager.questLog.render(); }
+      const questLog = this._eventbus.triggerSync('tql:viewmanager:quest:log:get');
+      if (questLog && questLog.rendered)
+      {
+         questLog.render();
+      }
    }
 
    static handle_allowPlayersDrag(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.allowPlayersDrag, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.allowPlayersDrag, value);
+      }
 
       // Must enrich all quests again in QuestDB.
-      QuestDB.enrichAll();
+      this._eventbus.trigger('tql:questdb:enrich:all');
 
       // Render all views; immediately stops / enables player drag if Quest view is open.
-      ViewManager.renderAll({ force: true, questPreview: true });
+      this._eventbus.trigger('tql:viewmanager:render:all', { force: true, questPreview: true });
    }
 
    static handle_countHidden(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.countHidden, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.countHidden, value);
+      }
 
       // Must enrich all quests again in QuestDB.
-      QuestDB.enrichAll();
+      this._eventbus.trigger('tql:questdb:enrich:all');
 
       // Must render the quest log / floating quest log / quest tracker.
-      ViewManager.renderAll();
+      this._eventbus.trigger('tql:viewmanager:render:all');
    }
 
    static handle_dynamicBookmarkBackground()
    {
       // Must render the quest log.
-      if (ViewManager.questLog.rendered) { ViewManager.questLog.render(); }
+      const questLog = this._eventbus.triggerSync('tql:viewmanager:quest:log:get');
+      if (questLog && questLog.rendered)
+      {
+         questLog.render();
+      }
    }
 
    static async handle_hideTQLFromPlayers(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.hideTQLFromPlayers, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.hideTQLFromPlayers, value);
+      }
 
       if (!game.user.isGM)
       {
          // Hide all TQL apps from non GM user and remove the ui.controls for TQL.
          if (value)
          {
-            ViewManager.closeAll({ questPreview: true, updateSetting: false });
+            this._eventbus.trigger('tql:viewmanager:close:all', { questPreview: true, updateSetting: false });
 
             const notes = ui?.controls?.controls.find((c) => c.name === 'notes');
             if (notes) { notes.tools = notes?.tools.filter((c) => !c.name.startsWith(constants.moduleName)); }
 
             // Remove all quests from in-memory DB. This is required so that users can not retrieve quests
             // from the QuestAPI or content links in Foundry resolve when TQL is hidden.
-            QuestDB.removeAll();
+            this._eventbus.trigger('tql:questdb:remove:all');
          }
          else
          {
             // Initialize QuestDB loading all quests that are currently observable for the user.
-            await QuestDB.init();
+            await this._eventbus.triggerAsync('tql:questdb:init');
 
             // Add back ui.controls
             const notes = ui?.controls?.controls.find((c) => c.name === 'notes');
@@ -118,33 +136,40 @@ export default class SettingsControl
       game?.journal?.render();
 
       // Close or open the quest tracker based on active quests (users w/ TQL hidden will have no quests in
-      // QuestDB)
-      ViewManager.renderOrCloseQuestTracker({ updateSetting: false });
+      // QuestDB).
+      this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker', { updateSetting: false });
    }
 
    static handle_navStyle()
    {
       // Must enrich all quests again in QuestDB.
-      QuestDB.enrichAll();
+      this._eventbus.trigger('tql:questdb:enrich:all');
 
       // Must render the quest log.
-      if (ViewManager.questLog.rendered) { ViewManager.questLog.render(); }
+      const questLog = this._eventbus.triggerSync('tql:viewmanager:quest:log:get');
+      if (questLog && questLog.rendered)
+      {
+         questLog.render();
+      }
    }
 
    static handle_notifyRewardDrop(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.notifyRewardDrop, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.notifyRewardDrop, value);
+      }
    }
 
    static handle_primaryQuest(value)
    {
       // Any current primary quest.
-      const currentQuestEntry = QuestDB.getQuestEntry(
+      const currentQuestEntry = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
        sessionStorage.getItem(sessionConstants.currentPrimaryQuest));
 
       // The new primary quest or none at all if value is an empty string.
-      const newQuestEntry = QuestDB.getQuestEntry(value);
+      const newQuestEntry = this._eventbus.triggerSync('tql:questdb:quest:entry:get', value);
 
       // Store all quest IDs that need to be updated which include parent / subquests.
       const updateQuestIds = [];
@@ -178,16 +203,16 @@ export default class SettingsControl
       // If any quest IDs were stored then update all QuestPreviews after enriching the quest data.
       if (updateQuestIds.length)
       {
-         QuestDB.enrichQuests(...updateQuestIds);
-         ViewManager.refreshQuestPreview(updateQuestIds);
-         ViewManager.renderAll({ force: true });
+         this._eventbus.trigger('tql:questdb:enrich:quests', ...updateQuestIds);
+         this._eventbus.trigger('tql:viewmanager:refresh:quest:preview', updateQuestIds);
+         this._eventbus.trigger('tql:viewmanager:render:all', { force: true });
       }
 
       // Post a notification if a new primary quest was set.
       if (newPrimaryQuestName)
       {
-         ViewManager.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestPrimary',
-          { name: newPrimaryQuestName }));
+         this._eventbus.trigger('tql:viewmanager:notifications:info', game.i18n.format(
+          'TyphonJSQuestLog.Notifications.QuestPrimary', { name: newPrimaryQuestName }));
       }
    }
 
@@ -195,29 +220,33 @@ export default class SettingsControl
    {
       // Potentially Post notification that the quest tracker is enabled, but not visible as there are no active
       // quests.
-      if (value && !Utils.isTQLHiddenFromPlayers() && QuestDB.getCount({ status: questStatus.active }) === 0)
+      const isTQLHiddenFromPlayers = this._eventbus.triggerSync('tql:utils:is:hidden:from:players');
+      const activeCount = this._eventbus.triggerSync('tql:questdb:count:get', { status: questStatus.active });
+
+      if (value && !isTQLHiddenFromPlayers && activeCount === 0)
       {
-         ViewManager.notifications.info(game.i18n.localize('TyphonJSQuestLog.Notifications.QuestTrackerNoActive'));
+         this._eventbus.trigger('tql:viewmanager:notifications:info', game.i18n.localize(
+          'TyphonJSQuestLog.Notifications.QuestTrackerNoActive'));
       }
 
       // Swap macro image based on current state. No need to await.
-      Utils.setMacroImage(settings.questTrackerEnable, value);
+      this._eventbus.trigger('tql:utils:macro:image:set', settings.questTrackerEnable, value);
 
-      ViewManager.renderOrCloseQuestTracker();
+      this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
    }
 
    static handle_questTrackerPinned()
    {
       // The quest tracker pinned state has changed so update any Foundry UI management.
-      FoundryUIManager.updateTrackerPinned();
+      this._eventbus.trigger('tql:foundryuimanager:update:tracker:pinned');
    }
 
    static handle_questTrackerResizable(value)
    {
-      ViewManager.renderOrCloseQuestTracker();
+      this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
 
       // Swap macro image based on current state. No need to await.
-      Utils.setMacroImage(settings.questTrackerResizable, value);
+      this._eventbus.trigger('tql:utils:macro:image:set', settings.questTrackerResizable, value);
    }
 
    static handle_showFolder()
@@ -229,23 +258,26 @@ export default class SettingsControl
    static handle_showTasks()
    {
       // Must enrich all quests again in QuestDB.
-      QuestDB.enrichAll();
+      this._eventbus.trigger('tql:questdb:enrich:all');
 
       // Must render the quest log.
-      ViewManager.renderAll();
+      this._eventbus.trigger('tql:viewmanager:render:all');
    }
 
    static handle_trustedPlayerEdit(value)
    {
       // Swap macro image based on current state. No need to await.
-      if (game.user.isGM) { Utils.setMacroImage(settings.trustedPlayerEdit, value); }
+      if (game.user.isGM)
+      {
+         this._eventbus.trigger('tql:utils:macro:image:set', settings.trustedPlayerEdit, value);
+      }
 
       // Must perform a consistency check as there are possible quests that need to be added / removed
       // from the in-memory DB based on trusted player edit status.
-      QuestDB.consistencyCheck();
+      this._eventbus.trigger('tql:questdb:consistency:check');
 
       // Render all views as trusted player edit adds / removes capabilities.
-      ViewManager.renderAll({ questPreview: true });
+      this._eventbus.trigger('tql:viewmanager:render:all', { questPreview: true });
    }
 
    static onPluginLoad(ev)

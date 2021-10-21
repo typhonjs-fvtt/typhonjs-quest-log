@@ -2,8 +2,6 @@ import Quest            from './model/Quest.js';
 import QuestCollection  from './plugins/data/QuestCollection.js';
 import QuestPreview     from './view/preview/QuestPreview.js';
 
-import DBMigration      from '../database/DBMigration.js';
-
 import { eventbus, PluginLoader } from './plugins/PluginManager.js';
 
 import { constants, jquery, sessionConstants, settings } from './model/constants.js';
@@ -124,9 +122,6 @@ export default class TQLHooks
     */
    static async foundryReady()
    {
-      // Only attempt to run DB migration for GM.
-      if (game.user.isGM) { await DBMigration.migrate(); }
-
       // Add the TQL unique Quest data type to the Foundry core data types.
       CONST.ENTITY_TYPES?.push(Quest.documentName);
       CONST.ENTITY_LINK_TYPES?.push(Quest.documentName);
@@ -524,7 +519,7 @@ export default class TQLHooks
       // Only GMs can run the migration.
       if (!game.user.isGM) { return; }
 
-      await DBMigration.migrate(schemaVersion);
+      await eventbus.triggerAsync('tql:dbmigration:migrate', schemaVersion);
    }
 }
 

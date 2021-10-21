@@ -1,8 +1,8 @@
 import DBMigration   from './DBMigration.js';
-import Utils         from '../src/plugins/system/Utils.js';
-import Quest         from '../src/model/Quest.js';
 
-import { constants, questStatus }   from '../src/model/constants.js';
+import Quest         from '../../../../model/Quest.js';
+
+import { constants, questStatus }   from '../../../../model/constants.js';
 
 /**
  * Performs DB migration from schema 0 to 1.
@@ -21,11 +21,13 @@ import { constants, questStatus }   from '../src/model/constants.js';
  *    - {number} active - set if quest is in progress to Date.now().
  *    - {number} end - set if quest is completed / failed to Date.now().
  *
+ * @param {Eventbus} eventbus - The associated eventbus with DBMigration.
+ *
  * @returns {Promise<void>}
  */
-export default async function()
+export default async function(eventbus)
 {
-   const folder = await Utils.initializeQuestFolder();
+   const folder = await eventbus.triggerAsync('tql:utils:quest:folder:initialize');
    if (!folder) { return; }
 
    // Iterate through all journal entries from `_fql_quests`.

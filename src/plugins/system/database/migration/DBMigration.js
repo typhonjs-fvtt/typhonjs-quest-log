@@ -1,9 +1,7 @@
-import Socket        from '../src/plugins/system/Socket.js';
-import Utils         from '../src/plugins/system/Utils.js';
-import { constants } from '../src/model/constants.js';
+import { constants } from '../../../../model/constants.js';
 
-import dbSchema_1    from './dbSchema_1.js';
-import dbSchema_2    from './dbSchema_2.js';
+// import dbSchema_1    from './dbSchema_1.js';
+// import dbSchema_2    from './dbSchema_2.js';
 
 /**
  * Defines the callback functions to execute for each schemaVersion level.
@@ -26,8 +24,8 @@ const migrateImpl = {
  * again.
  *
  * In the case that a GM needs to manually run migration there is a hook defined in {@link FQLHooks.runDBMigration}.
- * This is `ForienQuestLog.Run.DBMigration` which can be executed by a macro with
- * `Hooks.call('ForienQuestLog.Run.DBMigration', <schemaVersion>);`. To run all migration manually substitute
+ * This is `TyphonJSQuestLog.Run.DBMigration` which can be executed by a macro with
+ * `Hooks.call('TyphonJSQuestLog.Run.DBMigration', <schemaVersion>);`. To run all migration manually substitute
  * `<schemaVersion>` with `0`.
  *
  * @see registerHooks
@@ -51,7 +49,7 @@ export default class DBMigration
    /**
     * Runs DB migration. If no `schemaVersion` is set the module setting {@link DBMigration.setting} is used to get the
     * current schema value which is stored after any migration occurs. There is a hook available
-    * `ForienQuestLog.Run.DBMigration`.
+    * `TyphonJSQuestLog.Run.DBMigration`.
     *
     * @param {number}   schemaVersion - A valid schema version from 0 to DBMigration.version - 1
     *
@@ -79,7 +77,7 @@ export default class DBMigration
             // Otherwise make sure that the schemaVersion supplied to migrate is valid.
             if (!Number.isInteger(schemaVersion) || schemaVersion < 0 || schemaVersion > DBMigration.version - 1)
             {
-               const err = `ForienQuestLog - DBMigrate.migrate - schemaVersion must be an integer (0 - ${
+               const err = `TyphonJSQuestLog - DBMigrate.migrate - schemaVersion must be an integer (0 - ${
                 DBMigration.version - 1})`;
 
                ui.notifications.error(err);
@@ -96,7 +94,8 @@ export default class DBMigration
          // Sanity check to make sure there is a schema migration function for the next schema update.
          if (typeof migrateImpl[schemaVersion] !== 'function') { return; }
 
-         const folder = await Utils.initializeQuestFolder();
+         // const folder = await Utils.initializeQuestFolder();
+        const folder = await this._eventbus.triggerAsync('tql:utils:quest:folder:initialize');
 
          // Early out if there are no journal entries / quests in the `_fql-quests` folder.
          if (folder?.content?.length === 0)
@@ -105,26 +104,42 @@ export default class DBMigration
             return;
          }
 
-         ui.notifications.info(game.i18n.localize('ForienQuestLog.Migration.Start'));
+         ui.notifications.info(game.i18n.localize('TyphonJSQuestLog.Migration.Start'));
 
          // Start at the schema version and stop when the version exceeds the max version.
          for (let version = schemaVersion; version <= this.version; version++)
          {
             if (version !== 0)
             {
-               ui.notifications.info(game.i18n.format('ForienQuestLog.Migration.Schema', { version }));
+               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Migration.Schema', { version }));
             }
 
-            await migrateImpl[version]();
+            await migrateImpl[version](this._eventbus);
          }
 
-         ui.notifications.info(game.i18n.localize('ForienQuestLog.Migration.Complete'));
+         ui.notifications.info(game.i18n.localize('TyphonJSQuestLog.Migration.Complete'));
 
-         Socket.refreshAll();
+         // TODO: SVELTE - evaluate after Svelte integration.
+         // Socket.refreshAll();
+         this._eventbus.trigger('tql:socket:refresh:all');
       }
       catch (err)
       {
          console.error(err);
       }
+   }
+
+   static async onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:dbmigration:version:get', () => this.version, this, opts);
+      ev.eventbus.on('tql:dbmigration:setting:get', () => this.setting, this, opts);
+      ev.eventbus.on('tql:dbmigration:migrate', this.migrate, this, opts);
+
+      // Only attempt to run DB migration for GM.
+      if (game.user.isGM) { await this.migrate(); }
    }
 }

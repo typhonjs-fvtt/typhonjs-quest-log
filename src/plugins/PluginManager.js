@@ -59,6 +59,16 @@ export class PluginLoader
    static async foundryReady()
    {
       await pluginManager.addAll([
+         // Allow and process incoming socket data.
+         {
+            name: 'tql-system-socket',
+            instance: SystemPlugins.Socket
+         },
+         // Handles DB migration; runs on plugin load.
+         {
+            name: 'tql-system-database-migration',
+            instance: SystemPlugins.DBMigration
+         },
          // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
          {
             name: 'tql-system-questdb',
@@ -68,11 +78,6 @@ export class PluginLoader
          {
             name: 'tql-system-viewmanager',
             instance: SystemPlugins.ViewManager
-         },
-         // Allow and process incoming socket data.
-         {
-            name: 'tql-system-socket',
-            instance: SystemPlugins.Socket
          },
          // Start watching sidebar updates.
          {

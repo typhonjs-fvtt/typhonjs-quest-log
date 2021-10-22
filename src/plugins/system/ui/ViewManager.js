@@ -33,10 +33,20 @@ export default class ViewManager
    /**
     * Initializes all GUI apps.
     */
-   static init()
+   static async init()
    {
       Apps.questLog = new QuestLog();
       Apps.questTracker = new QuestTracker();
+
+      await this._eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-view-quest-log',
+         instance: Apps.questLog
+      });
+
+      await this._eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-view-quest-tracker',
+         instance: Apps.questTracker
+      });
 
       // Load and set the quest tracker position from settings.
       try
@@ -267,17 +277,7 @@ export default class ViewManager
    {
       this._eventbus = ev.eventbus;
 
-      this.init();
-
-      await ev.eventbus.triggerAsync('plugins:async:add', {
-         name: 'tql-view-quest-log',
-         instance: Apps.questLog
-      });
-
-      await ev.eventbus.triggerAsync('plugins:async:add', {
-         name: 'tql-view-quest-tracker',
-         instance: Apps.questTracker
-      });
+      await this.init();
 
       const opts = { guard: true };
 

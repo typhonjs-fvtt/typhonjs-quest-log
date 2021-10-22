@@ -1,14 +1,8 @@
 import HandlerTracker   from './HandlerTracker.js';
-import QuestDB          from '../../plugins/system/database/QuestDB.js';
-import Socket           from '../../plugins/system/net/Socket.js';
-import Utils            from '../../plugins/system/Utils.js';
 import TQLContextMenu   from '../TQLContextMenu.js';
 import collect          from '../../../external/collect.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '../../model/constants.js';
-
-// TODO: Temporarily importing the plugin manager eventbus
-import { eventbus } from '../../plugins/PluginManager.js';
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -121,9 +115,12 @@ export default class QuestTracker extends Application
          callback: (menu) =>
          {
             const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-            const quest = QuestDB.getQuest(questId);
+            const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
-            if (quest && Utils.copyTextToClipboard(`@Quest[${quest.id}]{${quest.name}}`))
+            const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard',
+             `@Quest[${quest.id}]{${quest.name}}`);
+
+            if (quest && success)
             {
                ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
             }
@@ -143,9 +140,11 @@ export default class QuestTracker extends Application
             callback: (menu) =>
             {
                const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-               const quest = QuestDB.getQuest(questId);
+               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
-               if (quest && Utils.copyTextToClipboard(quest.id))
+               const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard', quest.id);
+
+               if (quest && success)
                {
                   ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
                }
@@ -158,8 +157,9 @@ export default class QuestTracker extends Application
             callback: (menu) =>
             {
                const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-               const quest = QuestDB.getQuest(questId);
-               if (quest) { Socket.setQuestPrimary({ quest }); }
+               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
+
+               if (quest) { this._eventbus.trigger('tql:socket:set:quest:primary', { quest }); }
             }
          });
       }
@@ -223,6 +223,8 @@ export default class QuestTracker extends Application
    {
       super.activateListeners(html);
 
+      const eventbus = this._eventbus;
+
       // Make the window draggable
       const header = html.find('header');
       new Draggable(this, html, header[0], this.options.resizable);
@@ -231,7 +233,7 @@ export default class QuestTracker extends Application
        HandlerTracker.headerPointerDown(event, header[0], this));
 
       header[0].addEventListener('pointerup', async (event) =>
-       HandlerTracker.headerPointerUp(event, header[0], this));
+       HandlerTracker.headerPointerUp(event, eventbus, header[0], this));
 
       html.on(jquery.click, '.header-button.close', void 0, this.close);
 
@@ -240,16 +242,16 @@ export default class QuestTracker extends Application
       // Add context menu.
       this._contextMenu(html);
 
-      Utils.createJQueryDblClick({
+      this._eventbus.trigger('tql:utils:jquery:dblclick:create', {
          selector: '#quest-tracker .quest-tracker-header',
-         singleCallback: (event) => HandlerTracker.questClick(event, this),
-         doubleCallback: HandlerTracker.questOpen,
+         singleCallback: (event) => HandlerTracker.questClick(event, eventbus, this),
+         doubleCallback: (event) => HandlerTracker.questOpen(event, eventbus),
       });
 
       html.on(jquery.click, '.quest-tracker-link', void 0, HandlerTracker.questOpen);
 
       html.on(jquery.click, '.quest-tracker-task', void 0, async (event) =>
-       await HandlerTracker.questTaskToggle(event));
+       await HandlerTracker.questTaskToggle(event, eventbus));
 
       /**
        * @type {JQuery} The window header element.
@@ -364,7 +366,8 @@ export default class QuestTracker extends Application
    async getData(options = {})
    {
       const showOnlyPrimary = sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true';
-      const primaryQuest = QuestDB.getQuestEntry(game.settings.get(constants.moduleName, settings.primaryQuest));
+      const primaryQuest = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
+       game.settings.get(constants.moduleName, settings.primaryQuest));
 
       // Stores the primary quest ID when all in progress quests are shown so that the star icon is drawn for the
       // primary quest.
@@ -400,10 +403,11 @@ export default class QuestTracker extends Application
        * @type {Collection}
        */
       const questEntries = showOnlyPrimary ? collect(primaryQuest ? [primaryQuest] : []) :
-       QuestDB.sortCollect({ status: questStatus.active });
+       this._eventbus.triggerSync('tql:questdb:collect:sort', { status: questStatus.active });
 
       const isGM = game.user.isGM;
-      const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+
+      const isTrustedPlayerEdit = this._eventbus.triggerSync('tql:utils:is:trusted:player:edit');
 
       return questEntries.transform((entry) =>
       {
@@ -465,8 +469,7 @@ export default class QuestTracker extends Application
             this._pinned = true;
             this._inPinDropRect = true;
             game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-            eventbus.trigger('tql:foundryuimanager:update:tracker');
-            // FoundryUIManager.updateTracker();
+            this._eventbus.trigger('tql:foundryuimanager:update:tracker');
             return opts; // Early out as updateTracker above calls setPosition again.
          }
          else
@@ -512,8 +515,7 @@ export default class QuestTracker extends Application
       // Mutates `checkPosition` to set maximum left position. Must do this calculation after `super.setPosition`
       // as in some cases `super.setPosition` will override the changes of `FoundryUIManager.checkPosition`.
       const currentInPinDropRect = this._inPinDropRect;
-      this._inPinDropRect = eventbus.triggerSync('tql:foundryuimanager:check:position', currentPosition);
-      // this._inPinDropRect = FoundryUIManager.checkPosition(currentPosition);
+      this._inPinDropRect = this._eventbus.triggerSync('tql:foundryuimanager:check:position', currentPosition);
 
       // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
       // has changed.

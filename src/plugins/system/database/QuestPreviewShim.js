@@ -1,4 +1,4 @@
-import QuestAPI from '../../plugins/system/public/QuestAPI.js';
+import QuestAPI from '../public/QuestAPI.js';
 
 /**
  * Provides a very lightweight shim for {@link JournalEntry} documents that are TQL quests. It defers to

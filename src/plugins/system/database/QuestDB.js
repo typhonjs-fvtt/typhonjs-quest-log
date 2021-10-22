@@ -1,8 +1,9 @@
-import Quest            from '../../model/Quest.js';
-import QuestPreviewShim from '../../view/preview/QuestPreviewShim.js';
-import collect          from '../../../external/collect.js';
+import Quest            from '../../../model/Quest.js';
+import QuestPreviewShim from './QuestPreviewShim.js';
 
-import { constants, questDBHooks, questStatus, settings } from '../../model/constants.js';
+import collect          from '../../../../external/collect.js';
+
+import { constants, questDBHooks, questStatus, settings } from '../../../model/constants.js';
 
 /**
  * Stores all {@link QuestEntry} instances in a map of Maps. This provides fast retrieval and quick insert / removal
@@ -157,10 +158,8 @@ export default class QuestDB
       }
 
       // Skip initialization of data if TQL is hidden from the current player. TQL is never hidden from GM level users.
-      // if (!Utils.isTQLHiddenFromPlayers())
       if (!s_EVENTBUS.triggerSync('tql:utils:is:hidden:from:players'))
       {
-         // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
          const isTrustedPlayerEdit = s_EVENTBUS.triggerSync('tql:utils:is:trusted:player:edit');
 
          // Iterate over all journal entries in `_tql_quests` folder.
@@ -179,11 +178,9 @@ export default class QuestDB
                // Also set `generate` to false as the CollectJS collections are rebuilt in below.
                s_SET_QUEST_ENTRY(new QuestEntry(quest, void 0), false);
             }
-            else
-            {
-               // If JE / Quest is not observable then still set a QuestPreview shim.
-               entry._sheet = new QuestPreviewShim(entry.id);
-            }
+
+            // Set QuestPreview shim.
+            entry._sheet = new QuestPreviewShim(entry.id);
          }
 
          // Must hydrate all QuestEntry instances after all quests have been added to s_QUEST_MAP. Hydration will build
@@ -1077,11 +1074,9 @@ const s_JOURNAL_ENTRY_CREATE = async (entry, options, id) =>
          if (removeSubs.length > 0) { await quest.save(); }
       }
    }
-   else
-   {
-      // If JE / Quest is not observable then still set a QuestPreview shim.
-      entry._sheet = new QuestPreviewShim(entry.id);
-   }
+
+   // If JE / Quest is not observable then still set a QuestPreview shim.
+   entry._sheet = new QuestPreviewShim(entry.id);
 };
 
 /**
@@ -1191,7 +1186,8 @@ const s_JOURNAL_ENTRY_UPDATE = (entry, flags, options, id) =>
 
          Hooks.callAll(QuestDB.hooks.addQuestEntry, questEntry, flags, options, id);
       }
-      else
+
+      if (!(entry._sheet instanceof QuestPreviewShim))
       {
          // If JE / Quest is not observable then still set a QuestPreview shim.
          entry._sheet = new QuestPreviewShim(entry.id);

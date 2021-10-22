@@ -1,8 +1,8 @@
-import QuestLog      from '../../view/log/QuestLog.js';
-import QuestPreview  from '../../view/preview/QuestPreview.js';
-import QuestTracker  from '../../view/tracker/QuestTracker.js';
+import QuestLog      from '../../../view/log/QuestLog.js';
+import QuestPreview  from '../../../view/preview/QuestPreview.js';
+import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
-import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../model/constants.js';
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../model/constants.js';
 
 /**
  * Locally stores the app instances which are accessible by getter methods.

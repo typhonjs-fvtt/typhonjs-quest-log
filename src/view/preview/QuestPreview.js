@@ -1,6 +1,6 @@
 import TQLDialog              from '../TQLDialog.js';
-import QuestDB                from '../../plugins/system/QuestDB.js';
-import Socket                 from '../../plugins/system/Socket.js';
+import QuestDB                from '../../plugins/system/database/QuestDB.js';
+import Socket                 from '../../plugins/system/net/Socket.js';
 import Utils                  from '../../plugins/system/Utils.js';
 
 import HandlerAny             from './HandlerAny.js';

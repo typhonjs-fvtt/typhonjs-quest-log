@@ -1,11 +1,11 @@
-import { constants, questStatus, sessionConstants, settings } from '../../model/constants.js';
+import { constants, questStatus, sessionConstants, settings } from '../../../model/constants.js';
 
 /**
  * Defines if logging setting changes to the console occurs.
  *
  * @type {boolean}
  */
-let loggingEnabled = true;
+let loggingEnabled = false;
 
 export default class SettingsControl
 {

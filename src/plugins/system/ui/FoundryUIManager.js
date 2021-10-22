@@ -1,4 +1,4 @@
-import QuestTracker  from '../../view/tracker/QuestTracker.js';
+import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
 /**
  * Manages the state of the Foundry UI elements including the {@link Hotbar}, {@link SceneNavigation} and

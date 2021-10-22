@@ -1,6 +1,6 @@
 import QuestAPI   from '../../plugins/system/public/QuestAPI.js';
-import QuestDB    from '../../plugins/system/QuestDB.js';
-import Socket     from '../../plugins/system/Socket.js';
+import QuestDB    from '../../plugins/system/database/QuestDB.js';
+import Socket     from '../../plugins/system/net/Socket.js';
 import TQLDialog  from '../TQLDialog.js';
 
 /**

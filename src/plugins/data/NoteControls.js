@@ -8,6 +8,13 @@ export default class NoteControls
 {
    static get()
    {
+      return noteControls;
+   }
+
+   static onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
       // Define an onClick callback using the plugin eventbus.
       if (noteControls[0].onClick === void 0)
       {
@@ -16,13 +23,6 @@ export default class NoteControls
             this?._eventbus.trigger('tql:viewmanager:quest:log:render', true, { focus: true });
          };
       }
-
-      return noteControls;
-   }
-
-   static onPluginLoad(ev)
-   {
-      this._eventbus = ev.eventbus;
 
       ev.eventbus.on('tql:data:notecontrol:get', this.get, this, { guard: true });
    }

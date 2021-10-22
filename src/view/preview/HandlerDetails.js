@@ -1,5 +1,5 @@
-import Enrich     from '../../plugins/system/Enrich.js';
-import Socket     from '../../plugins/system/Socket.js';
+import Enrich     from '../../plugins/system/ui/Enrich.js';
+import Socket     from '../../plugins/system/net/Socket.js';
 import Utils      from '../../plugins/system/Utils.js';
 import TQLDialog  from '../TQLDialog.js';
 

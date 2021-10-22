@@ -1,6 +1,6 @@
 // import QuestAPI      from './public/QuestAPI.js';
 
-import { constants, questStatus, questStatusI18n, settings }  from '../../model/constants.js';
+import { constants, questStatus, questStatusI18n, settings }  from '../../../model/constants.js';
 
 /**
  * Defines the event name to send all messages to over  `game.socket`.

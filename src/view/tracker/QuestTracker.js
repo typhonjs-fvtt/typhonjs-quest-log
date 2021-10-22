@@ -550,6 +550,11 @@ export default class QuestTracker extends Application
 
       return currentPosition;
    }
+
+   onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+   }
 }
 
 /**

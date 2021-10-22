@@ -263,11 +263,21 @@ export default class ViewManager
       return true;
    }
 
-   static onPluginLoad(ev)
+   static async onPluginLoad(ev)
    {
       this._eventbus = ev.eventbus;
 
       this.init();
+
+      await ev.eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-view-quest-log',
+         instance: Apps.questLog
+      });
+
+      await ev.eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-view-quest-tracker',
+         instance: Apps.questTracker
+      });
 
       const opts = { guard: true };
 

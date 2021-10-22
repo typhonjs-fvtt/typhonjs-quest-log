@@ -88,8 +88,8 @@ export function onPluginLoad(ev)
 
    const opts = { guard: true };
 
-   ev.eventbus.on('tql:questapi:db', () => this.DB, this, opts);
-   ev.eventbus.on('tql:questapi:open', this.open, this, opts);
+   ev.eventbus.on('tql:questapi:db', () => QuestAPI.DB, this, opts);
+   ev.eventbus.on('tql:questapi:open', QuestAPI.open, this, opts);
 }
 
 export function onPluginUnload()

@@ -374,7 +374,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 ------------------------------------------------------------------------------------
 
-The TyphonJS Quest Log is a detached fork of Forien's Quest Log `0.7.8` which 
+The TyphonJS Quest Log is distributed by the `Mozilla Public License, v2.0`.
+
+The TyphonJS Quest Log is a continuation and started as a detached fork of Forien's Quest Log `0.7.8` which 
 is distributed under the MIT license below.
 
 Please see [League-of-Foundry-Developers/foundryvtt-forien-quest-log](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/blob/master/LICENSE)
@@ -400,7 +402,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-The TyphonJS Quest Log is a fork of
-[Forien's Quest Log](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log)
-which is also licensed by the MIT license.

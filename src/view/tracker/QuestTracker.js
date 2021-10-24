@@ -248,7 +248,7 @@ export default class QuestTracker extends Application
          doubleCallback: (event) => HandlerTracker.questOpen(event, eventbus),
       });
 
-      html.on(jquery.click, '.quest-tracker-link', void 0, HandlerTracker.questOpen);
+      html.on(jquery.click, '.quest-tracker-link', void 0, (event) => HandlerTracker.questOpen(event, eventbus));
 
       html.on(jquery.click, '.quest-tracker-task', void 0, async (event) =>
        await HandlerTracker.questTaskToggle(event, eventbus));

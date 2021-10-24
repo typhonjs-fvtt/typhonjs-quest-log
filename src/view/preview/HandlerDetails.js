@@ -1,6 +1,3 @@
-import Enrich     from '../../plugins/system/ui/Enrich.js';
-import Socket     from '../../plugins/system/net/Socket.js';
-import Utils      from '../../plugins/system/Utils.js';
 import TQLDialog  from '../TQLDialog.js';
 
 import { constants, jquery, settings } from '../../model/constants.js';
@@ -153,11 +150,15 @@ export default class HandlerDetails
    }
 
    /**
+    * Select an image for custom quest giver.
+    *
+    * @param {Eventbus}       eventbus - Plugin manager eventbus
+    *
     * @param {Quest}          quest - The current quest being manipulated.
     *
     * @param {QuestPreview}   questPreview - The QuestPreview being manipulated.
     */
-   static questGiverCustomSelectImage(quest, questPreview)
+   static questGiverCustomSelectImage(eventbus, quest, questPreview)
    {
       const currentPath = quest.giver === 'abstract' ? quest.image : void 0;
 
@@ -169,7 +170,7 @@ export default class HandlerDetails
             quest.giver = 'abstract';
             quest.image = path;
             quest.giverName = game.i18n.localize('TyphonJSQuestLog.QuestPreview.CustomSource');
-            quest.giverData = await Enrich.giverFromQuest(quest);
+            quest.giverData = await eventbus.triggerAsync('tql:enrich:giver:from:quest', quest);
             delete quest.giverData.uuid;
 
             await questPreview.saveQuest();
@@ -193,13 +194,15 @@ export default class HandlerDetails
    /**
     * @param {JQuery.DropEvent}  event - JQuery.DropEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @param {QuestPreview}      questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async questGiverDropDocument(event, quest, questPreview)
+   static async questGiverDropDocument(event, eventbus, quest, questPreview)
    {
       event.preventDefault();
 
@@ -207,9 +210,12 @@ export default class HandlerDetails
 
       if (typeof data.id === 'string')
       {
-         const uuid = Utils.getUUID(data, ['Actor', 'Item', 'JournalEntry']);
+         // TODO: It appears that dropping in a Macro here gives UUID undefined rather than dropping to the "else"
+         // TODO: condition below to warn of wrong document type.
 
-         const giverData = await Enrich.giverFromUUID(uuid);
+         const uuid = eventbus.triggerSync('tql:utils:uuid:get', data, ['Actor', 'Item', 'JournalEntry']);
+         const giverData = await eventbus.triggerAsync('tql:enrich:giver:from:uuid', uuid);
+
          if (giverData)
          {
             quest.giver = uuid;
@@ -235,17 +241,19 @@ export default class HandlerDetails
    /**
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent.
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {QuestPreview}      questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async questGiverShowActorSheet(event, questPreview)
+   static async questGiverShowActorSheet(event, eventbus, questPreview)
    {
       const uuid = $(event.target).data('actor-uuid');
 
       if (typeof uuid === 'string' && uuid.length)
       {
-         const appId = await Utils.showSheetFromUUID(uuid, { editable: false });
+         const appId = await eventbus.triggerAsync('tql:utils:sheet:from:uuid:show', uuid, { editable: false });
 
          // If a new sheet is rendered push it to the opened appIds.
          if (appId && !questPreview._openedAppIds.includes(appId)) { questPreview._openedAppIds.push(appId); }
@@ -253,17 +261,19 @@ export default class HandlerDetails
    }
 
    /**
+    * @param {Eventbus}       eventbus - Plugin manager eventbus
+    *
     * @param {Quest}          quest - The current quest being manipulated.
     *
     * @param {QuestPreview}   questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async questGiverToggleImage(quest, questPreview)
+   static async questGiverToggleImage(eventbus, quest, questPreview)
    {
       quest.toggleImage();
 
-      const giverData = await Enrich.giverFromQuest(quest);
+      const giverData = await eventbus.triggerAsync('tql:enrich:giver:from:quest', quest);
       if (giverData)
       {
          quest.giverData = giverData;
@@ -440,16 +450,20 @@ export default class HandlerDetails
    /**
     * @param {JQuery.DragStartEvent}   event - JQuery.DragStartEvent
     *
+    * @param {Eventbus}                eventbus - Plugin manager eventbus
+    *
     * @param {Quest}                   quest - The current quest being manipulated.
     */
-   static async rewardDragStartItem(event, quest)
+   static async rewardDragStartItem(event, eventbus, quest)
    {
       const data = $(event.target).data('transfer');
 
-      const document = await Utils.getDocumentFromUUID(data, { permissionCheck: false });
+      const document = await eventbus.triggerAsync('tql:utils:document:from:uuid:get', data,
+       { permissionCheck: false });
+
       if (document)
       {
-         const uuidData = Utils.getDataFromUUID(data);
+         const uuidData = eventbus.triggerSync('tql:utils:data:from:uuid:get', data);
 
          /**
           * @type {RewardDropData}
@@ -498,13 +512,15 @@ export default class HandlerDetails
     *
     * @param {JQuery.DropEvent}  event - JQuery.DropEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @param {QuestPreview}      questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async rewardDropItem(event, quest, questPreview)
+   static async rewardDropItem(event, eventbus, quest, questPreview)
    {
       event.preventDefault();
 
@@ -523,16 +539,16 @@ export default class HandlerDetails
          const dt = event.target.closest('li.reward') || null;
          quest.sortRewards(data.uuidv4, dt?.dataset.uuidv4);
          await quest.save();
-         Socket.refreshQuestPreview({ questId: quest.id });
+         eventbus.trigger('tql:socket:refresh:quest:preview', { questId: quest.id });
       }
 
       if (data.type === 'Item' && data._tqlData === void 0)
       {
          if (typeof data.id === 'string')
          {
-            const uuid = Utils.getUUID(data);
+            const uuid = eventbus.triggerSync('tql:utils:uuid:get', data);
+            const item = await eventbus.triggerAsync('tql:enrich:giver:from:uuid', uuid);
 
-            const item = await Enrich.giverFromUUID(uuid);
             if (item)
             {
                quest.addReward({ type: 'Item', data: item, hidden: true });
@@ -673,13 +689,15 @@ export default class HandlerDetails
    /**
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent.
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @param {QuestPreview}      questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async rewardShowItemSheet(event, quest, questPreview)
+   static async rewardShowItemSheet(event, eventbus, quest, questPreview)
    {
       event.stopPropagation();
       const data = $(event.currentTarget).data('transfer');
@@ -689,7 +707,8 @@ export default class HandlerDetails
 
       if (reward && (questPreview.canEdit || !reward.locked))
       {
-         const appId = await Utils.showSheetFromUUID(data, { permissionCheck: false, editable: false });
+         const appId = await eventbus.triggerAsync('tql:utils:sheet:from:uuid:show', data,
+          { permissionCheck: false, editable: false });
 
          // If a new sheet is rendered push it to the opened appIds.
          if (appId && !questPreview._openedAppIds.includes(appId)) { questPreview._openedAppIds.push(appId); }
@@ -858,11 +877,13 @@ export default class HandlerDetails
    /**
     * @param {JQuery.DropEvent}  event - JQuery.DropEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async taskDropItem(event, quest)
+   static async taskDropItem(event, eventbus, quest)
    {
       event.preventDefault();
 
@@ -873,7 +894,7 @@ export default class HandlerDetails
          const dt = event.target.closest('li.task') || null;
          quest.sortTasks(data.uuidv4, dt?.dataset.uuidv4);
          await quest.save();
-         Socket.refreshQuestPreview({ questId: quest.id });
+         eventbus.trigger('tql:socket:refresh:quest:preview', { questId: quest.id });
       }
    }
 

@@ -1,5 +1,3 @@
-import QuestDB                from '../../plugins/system/database/QuestDB.js';
-import ViewManager            from '../../plugins/system/ui/ViewManager.js';
 import TQLPermissionControl   from '../TQLPermissionControl.js';
 
 /**
@@ -10,11 +8,13 @@ export default class HandlerManage
    /**
     * @param {Quest}          quest - The current quest being manipulated.
     *
+    * @param {Eventbus}       eventbus - Plugin manager eventbus
+    *
     * @param {QuestPreview}   questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async addSubquest(quest, questPreview)
+   static async addSubquest(quest, eventbus, questPreview)
    {
       // If a permission control app / dialog is open close it.
       if (questPreview._permControl)
@@ -23,10 +23,10 @@ export default class HandlerManage
          questPreview._permControl = void 0;
       }
 
-      if (ViewManager.verifyQuestCanAdd())
+      if (eventbus.triggerSync('tql:viewmanager:verify:quest:can:add'))
       {
-         const subquest = await QuestDB.createQuest({ parentId: quest.id });
-         ViewManager.questAdded({ quest: subquest });
+         const subquest = await eventbus.triggerAsync('tql:questdb:quest:create', { parentId: quest.id });
+         eventbus.trigger('tql:viewmanager:quest:added', { quest: subquest });
       }
    }
 

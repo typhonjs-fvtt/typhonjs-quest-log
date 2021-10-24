@@ -1,6 +1,3 @@
-import QuestAPI   from '../../plugins/system/public/QuestAPI.js';
-import QuestDB    from '../../plugins/system/database/QuestDB.js';
-import Socket     from '../../plugins/system/net/Socket.js';
 import TQLDialog  from '../TQLDialog.js';
 
 /**
@@ -13,11 +10,13 @@ export default class HandlerAny
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async questDelete(event, quest)
+   static async questDelete(event, eventbus, quest)
    {
       const questId = $(event.target).data('quest-id');
       const name = $(event.target).data('quest-name');
@@ -25,7 +24,7 @@ export default class HandlerAny
       const result = await TQLDialog.confirmDeleteQuest({ name, result: questId, questId: quest.id });
       if (result)
       {
-         await QuestDB.deleteQuest({ questId: result });
+         await eventbus.triggerAsync('tql:questdb:quest:delete', { questId: result });
       }
    }
 
@@ -33,11 +32,13 @@ export default class HandlerAny
     * Opens a {@link QuestPreview} via {@link QuestAPI.open}.
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent.
+    *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
     */
-   static questOpen(event)
+   static questOpen(event, eventbus)
    {
       const questId = $(event.currentTarget).data('quest-id');
-      QuestAPI.open({ questId });
+      eventbus.trigger('tql:questapi:open', { questId });
    }
 
    /**
@@ -46,14 +47,19 @@ export default class HandlerAny
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @returns {Promise<void>}
     */
-   static async questStatusSet(event)
+   static async questStatusSet(event, eventbus)
    {
       const target = $(event.target).data('target');
       const questId = $(event.target).data('quest-id');
 
-      const quest = QuestDB.getQuest(questId);
-      if (quest) { await Socket.setQuestStatus({ quest, target }); }
+      const quest = eventbus.triggerSync('tql:questdb:quest:get', questId);
+      if (quest)
+      {
+         await eventbus.triggerAsync('tql:socket:set:quest:status', { quest, target });
+      }
    }
 }

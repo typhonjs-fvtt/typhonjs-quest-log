@@ -1,4 +1,5 @@
 .idea/
+dist/
 docs/
 lang/untranslated.json
 node_modules/

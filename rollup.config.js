@@ -1,105 +1,78 @@
-import path       from 'path';
+import path             from 'path';
 
-import commonjs   from '@rollup/plugin-commonjs';
-import resolve    from '@rollup/plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';        // Terser is used for minification / mangling
-import virtual    from '@rollup/plugin-virtual';
+// The following plugins are for the main source bundle.
 
-// Terser config; refer to respective documentation for more information.
-const terserConfig = {
-   compress: { passes: 3 },
-   mangle: { toplevel: true, keep_classnames: true, keep_fnames: true },
-   ecma: 2020,
-   module: true
-};
+// import postcss          from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
+import svelte           from 'rollup-plugin-svelte';
 
-// The deploy path for the server bundle which includes the common code.
-const s_DEPLOY_PATH = './external';
+// The following plugins are for the 2nd external bundle pulling in `ansi-colors` from NPM.
+// import commonjs         from '@rollup/plugin-commonjs';     // This converts ansi-colors to ES6 from CJS.
 
-const s_DEPLOY_MINIFY = true;
+// The following plugins are for the 2nd & 3rd external bundles pulling in modules from NPM.
+import resolve          from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 
-// Produce sourcemaps or not
-const s_SOURCEMAP = true;
+import css              from 'rollup-plugin-css-only';
 
-// Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
-// minified / mangled.
-const outputPlugins = [];
-if (s_DEPLOY_MINIFY)
-{
-   outputPlugins.push(terser(terserConfig));
-}
+// This plugin is for importing existing sourcemaps from `unique-names-generator` NPM module. Include it for
+// any external imported source code that has sourcemaps available.
+import sourcemaps       from 'rollup-plugin-sourcemaps';
 
-/**
- * Defines the DOMPurify bundle. As per comments below a new method `sanitizeWithVideo` is added which allows
- * `iframes`, but only ones that have a `src` field with a YouTube video embed.
- *
- * @type {string}
- */
-const s_DOM_PURIFY = `import DOMPurify from './node_modules/dompurify/dist/purify.es.js';
+// Terser is used as an output plugin in both bundles to conditionally minify / mangle the output bundles depending
+// on which NPM script & .env file is referenced.
 
-// Only allow YouTube and Vimeo embeds through.
-const s_REGEX = new RegExp('^(https://www.youtube.com/embed/|https://player.vimeo.com/)');
+import { terser }       from 'rollup-plugin-terser';        // Terser is used for minification / mangling
 
-// When 'iframes' are allowed only accept ones where 'src' starts with a YouTube embed link; reject all others.
-DOMPurify.addHook('uponSanitizeElement', (node, data) => {
-   if (data.tagName === 'iframe') 
-   {
-      const src = node.getAttribute('src') || '';
-      if (!s_REGEX.test(src)) 
-      {
-         return node.parentNode.removeChild(node);
-      }
-   }
-});
+// Import config files for Terser and Postcss; refer to respective documentation for more information.
+// We are using `require` here in order to be compliant w/ `fvttdev` for testing purposes.
+import terserConfig  from './terser.config.mjs';
+// import postcssConfig from './postcss.config.mjs';
 
-// Provide a new method that allows 'iframe' but with the 'src' requirement defined above.
-// FORCE_BODY allows 'style' tags to be entered into TinyMCE code editor.
-DOMPurify.sanitizeWithVideo = (dirty) =>
-{
-   return DOMPurify.sanitize(dirty,{
-      ADD_TAGS: ['iframe'],
-      ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'],
-      FORCE_BODY: true
-   });
-}
-
-export default DOMPurify;
-`;
+const s_COMPRESS = false;
+const s_SOURCEMAPS = true;
 
 export default () =>
 {
-   return [
-      {
-         input: 'pack',
-         output: [{
-            file: `${s_DEPLOY_PATH}${path.sep}collect.js`,
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap: s_SOURCEMAP,
-         }],
-         plugins: [
-            virtual({
-               pack: `export { collect as default } from './node_modules/collect.js/src/index.js';`
-            }),
-            resolve({ browser: true }),
-            commonjs()
-         ]
+   // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
+   // minified / mangled.
+   const outputPlugins = [];
+   if (s_COMPRESS)
+   {
+      outputPlugins.push(terser(terserConfig));
+   }
+
+   // Defines whether source maps are generated / loaded from the .env file.
+   const sourcemap = s_SOURCEMAPS;
+
+   // Shortcuts
+   const PS = path.sep;
+
+   return [{
+      input: `src${PS}init.js`,
+      external: [                                  // Suppresses the warning and excludes ansi-colors from the
+         `/scripts/greensock/esm/all.js`
+      ],
+      output: {
+         file: `dist${PS}typhonjs-quest-log.js`,
+         format: 'es',
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       },
-      {
-         input: 'pack',
-         output: [{
-            file: `${s_DEPLOY_PATH}${path.sep}DOMPurify.js`,
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap: s_SOURCEMAP,
-         }],
-         plugins: [
-            virtual({
-               pack: s_DOM_PURIFY
-            })
-         ]
-      }
-   ];
+      plugins: [
+         svelte({
+            compilerOptions: {
+               // enable run-time checks when not in production
+               // dev: !production
+               dev: true
+            }
+         }),
+         css({ output: 'temp.css' }),
+         // postcss(postcssConfig),                            // Engages PostCSS for Sass / CSS processing
+         resolve({
+            browser: true,
+            dedupe: ['svelte']
+         }),
+         sourcemaps()
+      ]
+   }];
 };

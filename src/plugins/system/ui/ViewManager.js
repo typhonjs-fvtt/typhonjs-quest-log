@@ -2,6 +2,9 @@ import QuestLog      from '../../../view/log/QuestLog.js';
 import QuestPreview  from '../../../view/preview/QuestPreview.js';
 import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
+// TODO: remove
+import DemoApp       from '../../../view/demo/DemoApp.js';
+
 import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../model/constants.js';
 
 /**
@@ -16,7 +19,9 @@ import { constants, questDBHooks, questStatus, questStatusI18n, settings } from 
 const Apps = {
    questLog: void 0,
    questTracker: void 0,
-   questPreview: new Map()
+   questPreview: new Map(),
+
+   demoApp: void 0
 };
 
 /**
@@ -37,6 +42,7 @@ export default class ViewManager
    {
       Apps.questLog = new QuestLog();
       Apps.questTracker = new QuestTracker();
+      Apps.demoApp = new DemoApp();
 
       await this._eventbus.triggerAsync('plugins:async:add', {
          name: 'tql-view-quest-log',
@@ -60,6 +66,13 @@ export default class ViewManager
       catch (err) { /**/ }
 
       ViewManager.renderOrCloseQuestTracker();
+
+      Hooks.on('TQL.DemoApp.close', () => Apps.demoApp.close());
+      Hooks.on('TQL.DemoApp.render', () =>
+      {
+         Apps.demoApp.render(true);
+      });
+
 
       // Whenever a QuestPreview closes and matches any tracked app that is adding a new quest set it to undefined.
       Hooks.on('closeQuestPreview', s_QUEST_PREVIEW_CLOSED);

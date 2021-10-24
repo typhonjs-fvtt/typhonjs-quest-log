@@ -1,14 +1,13 @@
 import TQLDialog              from '../TQLDialog.js';
-import QuestDB                from '../../control/QuestDB.js';
-import Socket                 from '../../control/Socket.js';
-import TinyMCE                from '../../control/TinyMCE.js';
-import Utils                  from '../../control/Utils.js';
 
 import HandlerAny             from './HandlerAny.js';
 import HandlerDetails         from './HandlerDetails.js';
 import HandlerManage          from './HandlerManage.js';
 
 import { constants, jquery, settings }  from '../../model/constants.js';
+
+// TODO: Temporarily importing the plugin manager eventbus
+import { eventbus }           from '../../plugins/PluginManager.js';
 
 /**
  * QuestPreview is the main app / window of TQL for modifying individual Quest data. It appears reactive, but every
@@ -268,7 +267,7 @@ export default class QuestPreview extends FormApplication
             label: game.i18n.localize('TyphonJSQuestLog.QuestPreview.HeaderButtons.Show'),
             class: 'share-quest',
             icon: 'fas fa-eye',
-            onclick: () => Socket.showQuestPreview(this._quest.id)
+            onclick: () => eventbus.trigger('tql:socket:show:quest:preview', this._quest.id)
          });
       }
 
@@ -297,7 +296,10 @@ export default class QuestPreview extends FormApplication
          icon: 'fas fa-link',
          onclick: () =>
          {
-            if (Utils.copyTextToClipboard(`@Quest[${this._quest.id}]{${this._quest.name}}`))
+            const success = eventbus.triggerSync('tql:utils:copy:text:to:clipboard',
+             `@Quest[${this._quest.id}]{${this._quest.name}}`);
+
+            if (success)
             {
                ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
             }
@@ -369,7 +371,8 @@ export default class QuestPreview extends FormApplication
     */
    activateEditor(name, options = {}, initialContent = '')
    {
-      const tinyMCEOptions = TinyMCE.options({
+      // TODO: replace direct eventbus usage with onPluginLoad implementation.
+      const tinyMCEOptions = eventbus.triggerSync('tql:tinymce:options', {
          editorName: name,
          initialContent,
          questId: this._quest.id
@@ -403,16 +406,16 @@ export default class QuestPreview extends FormApplication
       // Callbacks for any user.
 
       html.on(jquery.click, '.quest-giver-name .open-actor-sheet', async (event) =>
-       await HandlerDetails.questGiverShowActorSheet(event, this));
+       await HandlerDetails.questGiverShowActorSheet(event, eventbus, this));
 
       // This CSS selector responds to any subquest attached to the details section or subquests listed in objectives.
-      html.on(jquery.click, '.quest-name-link', (event) => HandlerAny.questOpen(event));
+      html.on(jquery.click, '.quest-name-link', (event) => HandlerAny.questOpen(event, eventbus));
 
       // This registers for any element and prevents the circle / slash icon displaying for not being a drag target.
       html.on(jquery.dragenter, (event) => event.preventDefault());
 
       html.on(jquery.dragstart, '.item-reward .editable-container', async (event) =>
-       await HandlerDetails.rewardDragStartItem(event, this._quest));
+       await HandlerDetails.rewardDragStartItem(event, eventbus, this._quest));
 
       html.on(jquery.dragstart, '.quest-rewards .fa-sort', (event) => HandlerDetails.rewardDragStartSort(event));
 
@@ -420,7 +423,7 @@ export default class QuestPreview extends FormApplication
        await HandlerDetails.rewardShowImagePopout(event, this._quest, this));
 
       html.on(jquery.click, '.item-reward .editable-container', async (event) =>
-       await HandlerDetails.rewardShowItemSheet(event, this._quest, this));
+       await HandlerDetails.rewardShowItemSheet(event, eventbus, this._quest, this));
 
       html.on(jquery.click, '.splash-image-link', () => HandlerDetails.splashImagePopupShow(this._quest, this));
 
@@ -433,10 +436,10 @@ export default class QuestPreview extends FormApplication
           HandlerDetails.questEditName(event, this._quest, this));
 
          html.on(jquery.drop, '.quest-giver-gc', async (event) =>
-          await HandlerDetails.questGiverDropDocument(event, this._quest, this));
+          await HandlerDetails.questGiverDropDocument(event, eventbus, this._quest, this));
 
          html.on(jquery.click, '.quest-giver-gc .toggleImage', async () =>
-          await HandlerDetails.questGiverToggleImage(this._quest, this));
+          await HandlerDetails.questGiverToggleImage(eventbus, this._quest, this));
 
          html.on(jquery.click, '.quest-giver-gc .deleteQuestGiver', async () =>
           await HandlerDetails.questGiverDelete(this._quest, this));
@@ -447,7 +450,8 @@ export default class QuestPreview extends FormApplication
          html.on(jquery.click, '.actions.tasks .delete', async (event) =>
           await HandlerDetails.taskDelete(event, this._quest, this));
 
-         html.on(jquery.drop, '.tasks-box', async (event) => await HandlerDetails.taskDropItem(event, this._quest));
+         html.on(jquery.drop, '.tasks-box',
+          async (event) => await HandlerDetails.taskDropItem(event, eventbus, this._quest));
 
          html.on(jquery.click, '.actions.tasks .editable',
           (event) => HandlerDetails.taskEditName(event, this._quest, this));
@@ -460,10 +464,10 @@ export default class QuestPreview extends FormApplication
       if (this.canEdit || this.canAccept)
       {
          html.on(jquery.click, '.actions.quest-status i.delete', async (event) =>
-          await HandlerAny.questDelete(event, this._quest));
+          await HandlerAny.questDelete(event, eventbus, this._quest));
 
          html.on(jquery.click, '.actions.quest-status i.move', async (event) =>
-          await HandlerAny.questStatusSet(event));
+          await HandlerAny.questStatusSet(event, eventbus));
       }
 
       // Callbacks only for the GM and trusted player edit.
@@ -473,9 +477,13 @@ export default class QuestPreview extends FormApplication
           HandlerDetails.questGiverCustomEditName(event, this._quest, this));
 
          html.on(jquery.click, '.quest-giver-gc .drop-info', () =>
-          HandlerDetails.questGiverCustomSelectImage(this._quest, this));
+          HandlerDetails.questGiverCustomSelectImage(eventbus, this._quest, this));
 
-         html.on(jquery.click, '.quest-tabs .is-primary', () => Socket.setQuestPrimary({ quest: this._quest }));
+         // html.on(jquery.click, '.quest-tabs .is-primary', () => Socket.setQuestPrimary({ quest: this._quest }));
+         html.on(jquery.click, '.quest-tabs .is-primary', () =>
+         {
+            eventbus.trigger('tql:socket:set:quest:primary', { quest: this._quest });
+         });
 
          html.on(jquery.click, '.quest-rewards .add-abstract', (event) =>
           HandlerDetails.rewardAddAbstract(event, this._quest, this));
@@ -487,7 +495,7 @@ export default class QuestPreview extends FormApplication
           await HandlerDetails.rewardDelete(event, this._quest, this));
 
          html.on(jquery.drop, '.rewards-box',
-          async (event) => await HandlerDetails.rewardDropItem(event, this._quest, this));
+          async (event) => await HandlerDetails.rewardDropItem(event, eventbus, this._quest, this));
 
          html.on(jquery.click, '.quest-rewards .hide-all-rewards', async () =>
           await HandlerDetails.rewardsHideAll(this._quest, this));
@@ -515,7 +523,8 @@ export default class QuestPreview extends FormApplication
 
          // Management view callbacks -------------------------------------------------------------------------------
 
-         html.on(jquery.click, '.add-subquest-btn', async () => await HandlerManage.addSubquest(this._quest, this));
+         html.on(jquery.click, '.add-subquest-btn',
+          async () => await HandlerManage.addSubquest(this._quest, eventbus, this));
 
          html.on(jquery.click, '.configure-perm-btn', () => HandlerManage.configurePermissions(this._quest, this));
 
@@ -595,7 +604,7 @@ export default class QuestPreview extends FormApplication
 
             // Send a socket refresh event to all clients. This will also render all local apps as applicable.
             // Must update parent and any subquests / children.
-            Socket.refreshQuestPreview({
+            eventbus.trigger('tql:socket:refresh:quest:preview', {
                questId: this._quest.parent ? [this._quest.parent, this._quest.id, ...this._quest.subquests] :
                 [this._quest.id, ...this._quest.subquests],
                focus: false,
@@ -625,10 +634,14 @@ export default class QuestPreview extends FormApplication
     */
    async getData(options = {}) // eslint-disable-line no-unused-vars
    {
-      const content = QuestDB.getQuestEntry(this._quest.id).enrich;
+      // const content = QuestDB.getQuestEntry(this._quest.id).enrich;
+      const content = eventbus.triggerSync('tql:questdb:quest:entry:get', this._quest.id).enrich;
 
       this.canAccept = game.settings.get(constants.moduleName, settings.allowPlayersAccept);
-      this.canEdit = game.user.isGM || (this._quest.isOwner && Utils.isTrustedPlayerEdit());
+
+      this.canEdit = game.user.isGM || (this._quest.isOwner &&
+       eventbus.triggerSync('tql:utils:is:trusted:player:edit'));
+
       this.playerEdit = this._quest.isOwner;
 
       // By default all normal players and trusted players without ownership of a quest are always on the the default
@@ -659,7 +672,7 @@ export default class QuestPreview extends FormApplication
     */
    async refresh()
    {
-      Socket.refreshQuestPreview({
+      eventbus.trigger('tql:socket:refresh:quest:preview', {
          questId: this._quest.parent ? [this._quest.parent, this._quest.id, ...this._quest.subquests] :
           [this._quest.id, ...this._quest.subquests],
          focus: false,

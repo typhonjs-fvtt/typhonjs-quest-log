@@ -21,10 +21,12 @@
   "compatibleCoreVersion": "0.8.9",
   "scripts": [],
   "esmodules": [
-    "./src/init.js"
+    "./dist/typhonjs-quest-log.js",
+    "../scripts/greensock/esm/gsap-core.js"
   ],
   "styles": [
-    "./css/init.css"
+    "./css/init.css",
+    "./dist/temp.css"
   ],
   "languages": [
     {

@@ -8,19 +8,13 @@
 # Authors who wish to be recognized in this file should add themselves (or
 # their employer, as appropriate).
 
-4535992 <5201916+p4535992@users.noreply.github.com>
-BrotherSharp <41280723+BrotherSharper@users.noreply.github.com>
-Dilomos <49794325+Dilomos@users.noreply.github.com>
-Eadorin <eadorin@gmail.com>
-eclarke12 <42503461+eclarke12@users.noreply.github.com>
-innocenti <renato.innocenti@gmail.com>
-JJBocanegra <5797636+JJBocanegra@users.noreply.github.com>
-klo <drdwing@gmail.com>
-Lyndsey Toft <toftl@rpi.edu>
 Michael Leahy <support@typhonjs.io>
-Rughalt <802214+Rughalt@users.noreply.github.com>
-Sad <23254376+zeteticl@users.noreply.github.com>
-sdenec <8881200+sdenec@users.noreply.github.com>
-Wojciech "Forien" Szulc <mr.forien@gmail.com>
-xdy <246024+xdy@users.noreply.github.com>
-Fallayn <fallayn@users.noreply.github.com>
+
+--------------------
+
+The TyphonJS Quest Log is a continuation and started as a detached fork of Forien's Quest Log `0.7.8`. 
+For evaluating the commit log all commits on and after October 14th 2021 are a part of the TyphonJS Quest Log. 
+Commits before October 14th 2021 pertain to Forien's Quest Log.
+
+Please see the [League-of-Foundry-Developers/foundryvtt-forien-quest-log](https://github.com/League-of-Foundry-Developers/foundryvtt-forien-quest-log/blob/master/AUTHORS)
+for a list of authors involved with Forien's Quest Log.

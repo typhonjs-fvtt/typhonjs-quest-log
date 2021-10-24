@@ -1,5 +1,4 @@
-import Utils            from '../control/Utils.js';
-import QuestPreviewShim from '../view/preview/QuestPreviewShim.js';
+import { eventbus } from '../plugins/PluginManager.js';
 
 import { constants, questStatus, settings } from './constants.js';
 
@@ -43,11 +42,6 @@ export default class Quest
        * @type {JournalEntry}
        */
       this.entry = entry;
-
-      if (this.entry && this._id !== null)
-      {
-         this.entry._sheet = new QuestPreviewShim(this._id);
-      }
    }
 
    /**
@@ -130,8 +124,10 @@ export default class Quest
 
       const isInactive = this.isInactive;
 
+      const isTrustedPlayerEdit = eventbus.triggerSync('tql:utils:is:trusted:player:edit');
+
       // Special handling for trusted player edit who can only see owned quests in the hidden / inactive category.
-      if (Utils.isTrustedPlayerEdit() && isInactive) { return this.isOwner; }
+      if (isTrustedPlayerEdit && isInactive) { return this.isOwner; }
 
       // Otherwise no one can see hidden / inactive quests; perform user permission check for observer.
       return !isInactive && this.entry.testUserPermission(game.user, CONST.ENTITY_PERMISSIONS.OBSERVER);
@@ -759,7 +755,7 @@ export class Reward
       /**
        * @type {string}
        */
-      this.uuidv4 = data.uuidv4 || Utils.uuidv4();
+      this.uuidv4 = data.uuidv4 || eventbus.triggerSync('tql:utils:uuidv4');
    }
 
    /**
@@ -848,7 +844,7 @@ export class Task
       /**
        * @type {string}
        */
-      this.uuidv4 = data.uuidv4 || Utils.uuidv4();
+      this.uuidv4 = data.uuidv4 || eventbus.triggerSync('tql:utils:uuidv4');
    }
 
    /**

@@ -1,5 +1,4 @@
-import ViewManager   from './ViewManager.js';
-import QuestTracker  from '../view/tracker/QuestTracker.js';
+import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
 /**
  * Manages the state of the Foundry UI elements including the {@link Hotbar}, {@link SceneNavigation} and
@@ -16,7 +15,7 @@ export default class FoundryUIManager
    {
       window.addEventListener('resize', s_WINDOW_RESIZE);
       Hooks.on('collapseSidebar', FoundryUIManager.collapseSidebar);
-      Hooks.on('renderSceneNavigation', FoundryUIManager.updateTrackerPinned);
+      Hooks.on('renderSceneNavigation', FoundryUIManager.updateTrackerPinned.bind(this));
       Hooks.on('renderQuestTracker', s_QUEST_TRACKER_RENDERED);
 
       sidebar.currentCollapsed = ui?.sidebar?._collapsed || false;
@@ -35,7 +34,8 @@ export default class FoundryUIManager
    static checkPosition(position)
    {
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
-      const tracker = ViewManager.questTracker;
+
+      const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
       // Detect if the new position overlaps with the sidebar.
       if (sidebarData.gapX >= 0 && position.left + tracker.position.width > sidebarData.left - s_SPACE_X)
@@ -92,7 +92,7 @@ export default class FoundryUIManager
     */
    static updateTracker()
    {
-      const tracker = ViewManager.questTracker;
+      const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
       // Make sure the tracker is rendered or rendering.
       if (!tracker.rendered && Application.RENDER_STATES.RENDERING !== tracker._state) { return; }
@@ -145,7 +145,7 @@ export default class FoundryUIManager
     */
    static updateTrackerPinned()
    {
-      const tracker = ViewManager.questTracker;
+      const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
       const pinned = tracker.pinned;
       const sidebarData = sidebar.open;
 
@@ -160,9 +160,28 @@ export default class FoundryUIManager
    static unregister()
    {
       window.removeEventListener('resize', s_WINDOW_RESIZE);
+
       Hooks.off('collapseSidebar', FoundryUIManager.collapseSidebar);
       Hooks.off('renderSceneNavigation', FoundryUIManager.updateTrackerPinned);
       Hooks.off('renderQuestTracker', s_QUEST_TRACKER_RENDERED);
+   }
+
+   static onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      FoundryUIManager.init();
+
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:foundryuimanager:check:position', this.checkPosition, this, opts);
+      ev.eventbus.on('tql:foundryuimanager:update:tracker', this.updateTracker, this, opts);
+      ev.eventbus.on('tql:foundryuimanager:update:tracker:pinned', this.updateTrackerPinned, this, opts);
+   }
+
+   static onPluginUnload()
+   {
+      FoundryUIManager.unregister();
    }
 }
 

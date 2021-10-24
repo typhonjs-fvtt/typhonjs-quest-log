@@ -1,17 +1,10 @@
-import FoundryUIManager from './FoundryUIManager.js';
-import QuestDB          from './QuestDB.js';
-import Socket           from './Socket.js';
-import Utils            from './Utils.js';
-import ViewManager      from './ViewManager.js';
-import QuestAPI         from './public/QuestAPI.js';
-import Quest            from '../model/Quest.js';
-import QuestCollection  from '../model/QuestCollection.js';
-import QuestPreview     from '../view/preview/QuestPreview.js';
+import Quest            from './model/Quest.js';
+import QuestCollection  from './plugins/data/QuestCollection.js';
+import QuestPreview     from './view/preview/QuestPreview.js';
 
-import ModuleSettings   from '../ModuleSettings.js';
-import DBMigration      from '../../database/DBMigration.js';
+import { eventbus, PluginLoader } from './plugins/PluginManager.js';
 
-import { constants, noteControls, sessionConstants, settings } from '../model/constants.js';
+import { constants, jquery, sessionConstants, settings } from './model/constants.js';
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -50,7 +43,6 @@ export default class TQLHooks
       // Foundry startup hooks.
       Hooks.once('init', TQLHooks.foundryInit);
       Hooks.once('ready', TQLHooks.foundryReady);
-      Hooks.once('setup', TQLHooks.foundrySetup);
 
       // Respond to Foundry in game hooks.
       Hooks.on('dropActorSheetData', TQLHooks.dropActorSheetData);
@@ -89,7 +81,7 @@ export default class TQLHooks
    {
       if (typeof data !== 'object' || data?._tqlData?.type !== 'reward') { return; }
 
-      await Socket.questRewardDrop({
+      await eventbus.triggerAsync('tql:socket:quest:reward:drop', {
          actor: { id: actor.id, name: actor.data.name },
          sheet: { id: sheet.id },
          data
@@ -105,7 +97,7 @@ export default class TQLHooks
     */
    static dropCanvasData(foundryCanvas, data)
    {
-      if (data.type === 'Quest' && QuestDB.getQuest(data.id) !== void 0)
+      if (data.type === 'Quest' && eventbus.triggerSync('tql:questdb:quest:get', data.id) !== void 0)
       {
          data.type = 'JournalEntry';
       }
@@ -119,12 +111,8 @@ export default class TQLHooks
       // Set the sheet to render quests.
       Quest.setSheet(QuestPreview);
 
-      // Register TQL module settings.
-      ModuleSettings.register();
-
-      // Preload Handlebars templates and register helpers.
-      Utils.preloadTemplates();
-      Utils.registerHandlebarsHelpers();
+      // Initialize / add plugins.
+      PluginLoader.foundryInit();
    }
 
    /**
@@ -134,9 +122,6 @@ export default class TQLHooks
     */
    static async foundryReady()
    {
-      // Only attempt to run DB migration for GM.
-      if (game.user.isGM) { await DBMigration.migrate(); }
-
       // Add the TQL unique Quest data type to the Foundry core data types.
       CONST.ENTITY_TYPES?.push(Quest.documentName);
       CONST.ENTITY_LINK_TYPES?.push(Quest.documentName);
@@ -150,20 +135,19 @@ export default class TQLHooks
          sheetClass: QuestPreview
       };
 
+      const questCollection = new QuestCollection();
+
+      // Add the quest collection to the plugin eventbus to access QuestDB.
+      await eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-data-quest-collection',
+         instance: questCollection
+      });
+
       // Add our QuestCollection to the game collections.
-      game.collections.set(Quest.documentName, new QuestCollection());
+      game.collections.set(Quest.documentName, questCollection);
 
-      // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
-      await QuestDB.init();
-
-      // Initialize all main GUI views.
-      ViewManager.init();
-
-      // Allow and process incoming socket data.
-      Socket.listen();
-
-      // Start watching sidebar updates.
-      FoundryUIManager.init();
+      // Initialize / add plugins.
+      await PluginLoader.foundryReady();
 
       // Need to track any current primary quest as Foundry settings don't provide a old / new state on setting
       // change. The current primary quest state is saved in session storage.
@@ -171,7 +155,9 @@ export default class TQLHooks
        game.settings.get(constants.moduleName, settings.primaryQuest));
 
       // Initialize current client based macro images based on current state.
-      await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
+      // await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
+      await eventbus.triggerAsync('tql:utils:macro:image:set',
+       [settings.questTrackerEnable, settings.questTrackerResizable]);
 
       // Support for LibThemer; add TQL options to LibThemer.
       const libThemer = game.modules.get('lib-themer');
@@ -180,27 +166,12 @@ export default class TQLHooks
          await libThemer?.api?.registerTheme('/modules/typhonjs-quest-log/assets/themes/lib-themer/tql.json');
       }
 
+      // const data = eventbus.triggerSync('plugins:get:plugin:events').sort(
+      //  (el1, el2) => el1.plugin.localeCompare(el2.plugin));
+      // console.log(`PluginManager events:\n${JSON.stringify(data, null, 3)}`);
+
       // Fire our own lifecycle event to inform any other modules that depend on TQL QuestDB.
       Hooks.callAll('TyphonJSQuestLog.Lifecycle.ready');
-   }
-
-   /**
-    * Provides the setup TQL initialization during the `setup` Foundry lifecycle hook. Make the public QuestAPI
-    * accessible from `game.modules('typhonjs-quest-log').public.QuestAPI`.
-    */
-   static foundrySetup()
-   {
-      const moduleData = Utils.getModuleData();
-
-      /**
-       * @type {TQLPublicAPI}
-       */
-      moduleData.public = {
-         QuestAPI
-      };
-
-      // Freeze the public API so it can't be modified.
-      Object.freeze(moduleData.public);
    }
 
    /**
@@ -217,6 +188,8 @@ export default class TQLHooks
    {
       if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers))
       {
+         const noteControls = eventbus.triggerSync('tql:data:notecontrol:get');
+
          const notes = controls.find((c) => c.name === 'notes');
          if (notes) { notes.tools.push(...noteControls); }
       }
@@ -233,7 +206,9 @@ export default class TQLHooks
     */
    static async handleMacroHotbarDrop(data, slot)
    {
-      const uuid = Utils.getUUID(data);
+      // const uuid = Utils.getUUID(data);
+      const uuid = eventbus.triggerSync('tql:utils:uuid:get', data);
+
       const document = await fromUuid(uuid);
 
       if (!document) { return; }
@@ -262,7 +237,11 @@ export default class TQLHooks
       if (macro)
       {
          const macroSetting = macro.getFlag(constants.moduleName, 'macro-setting');
-         if (macroSetting) { await Utils.setMacroImage(macroSetting); }
+         if (macroSetting)
+         {
+            // await Utils.setMacroImage(macroSetting);
+            await eventbus.triggerAsync('tql:utils:macro:image:set', macroSetting);
+         }
 
          await game.user.assignHotbarMacro(macro, slot);
       }
@@ -281,7 +260,7 @@ export default class TQLHooks
    {
       const questId = data.id;
 
-      const quest = QuestDB.getQuest(questId);
+      const quest = eventbus.triggerSync('tql:questdb:quest:get', questId);
 
       // Early out if Quest isn't in the QuestDB.
       if (!quest)
@@ -388,7 +367,8 @@ export default class TQLHooks
          constraints = (({ left, top, width, height }) => ({ left, top, width, height }))(opts);
       }
 
-      ViewManager.questLog.render(true, { focus: true, ...constraints });
+      const questLog = eventbus.triggerSync('tql:viewmanager:quest:log:get');
+      if (questLog) { questLog.render(true, { focus: true, ...constraints }); }
    }
 
    /**
@@ -433,7 +413,7 @@ export default class TQLHooks
             // Set to indicate an override of any pinned state.
             constraints.override = true;
 
-            const tracker = ViewManager.questTracker;
+            const tracker = eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
             // Defer to make sure quest tracker is rendered before setting position.
             setTimeout(() =>
@@ -480,15 +460,17 @@ export default class TQLHooks
          }
          footer.append(button);
 
-         button.click(() =>
+         button.on(jquery.click, () =>
          {
-            ViewManager.questLog.render(true);
+            const questLog = eventbus.triggerSync('tql:viewmanager:quest:log:get');
+            if (questLog) { questLog.render(true); }
          });
       }
 
       if (!(game.user.isGM && game.settings.get(constants.moduleName, settings.showFolder)))
       {
-         const folder = Utils.getQuestFolder();
+         // const folder = Utils.getQuestFolder();
+         const folder = eventbus.triggerSync('tql:utils:quest:folder:get');
          if (folder !== void 0)
          {
             const element = html.find(`.folder[data-folder-id="${folder.id}"]`);
@@ -512,7 +494,8 @@ export default class TQLHooks
     */
    static renderJournalSheet(app, html)
    {
-      const folder = Utils.getQuestFolder();
+      // const folder = Utils.getQuestFolder();
+      const folder = eventbus.triggerSync('tql:utils:quest:folder:get');
       if (folder)
       {
          const option = html.find(`option[value="${folder.id}"]`);
@@ -536,7 +519,7 @@ export default class TQLHooks
       // Only GMs can run the migration.
       if (!game.user.isGM) { return; }
 
-      await DBMigration.migrate(schemaVersion);
+      await eventbus.triggerAsync('tql:dbmigration:migrate', schemaVersion);
    }
 }
 

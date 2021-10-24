@@ -1,9 +1,8 @@
 import DBMigration   from './DBMigration.js';
-import Enrich        from '../src/control/Enrich.js';
-import Utils         from '../src/control/Utils.js';
-import Quest         from '../src/model/Quest.js';
 
-import { constants, questStatus } from '../src/model/constants.js';
+import Quest         from '../../../../model/Quest.js';
+
+import { constants, questStatus } from '../../../../model/constants.js';
 
 /**
  * Performs DB migration from schema 1 to 2.
@@ -23,11 +22,13 @@ import { constants, questStatus } from '../src/model/constants.js';
  * user needs to open QuestPreview and simply save the quest. A macro will also be provided to update all quest giver
  * data in bulk.
  *
+ * @param {Eventbus} eventbus - The associated eventbus with DBMigration.
+ *
  * @returns {Promise<void>}
  */
-export default async function()
+export default async function(eventbus)
 {
-   const folder = await Utils.initializeQuestFolder();
+   const folder = await eventbus.triggerAsync('tql:utils:quest:folder:initialize');
    if (!folder) { return; }
 
    for (const entry of folder.content)
@@ -43,7 +44,7 @@ export default async function()
             // Load quest giver assets and store as 'giverData'.
             if (typeof quest.giver === 'string')
             {
-               const data = await Enrich.giverFromQuest(quest);
+               const data = await eventbus.triggerAsync('tql:enrich:giver:from:quest', quest);
                if (data && typeof data.img === 'string' && data.img.length) { quest.giverData = data; }
             }
 

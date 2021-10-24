@@ -1,13 +1,11 @@
-import ViewManager from '../control/ViewManager.js';
-
 /**
  * Defines the main TQL constants for module name and the DB flag.
  *
- * @type {{folderState: string, flagDB: string, moduleName: string, moduleLabel: string, primaryState: string}}
+ * @type {{flagDB: string, moduleName: string, moduleLabel: string}}
  */
 const constants = {
    moduleName: 'typhonjs-quest-log',
-   moduleLabel: `Forien's Quest Log`,
+   moduleLabel: `TyphonJS Quest Log`,
    flagDB: 'json'
 };
 
@@ -29,28 +27,19 @@ const jquery = {
 };
 
 /**
- * Defines the left-hand UI control note buttons.
+ * Defines all of the DB Hook callbacks. Please see {@link QuestDB} for more documentation.
  *
- * @type {object[]}
+ * @type {QuestDBHooks}
  */
-const noteControls = [
-   {
-      name: constants.moduleName,
-      title: 'TyphonJSQuestLog.QuestLogButton',
-      icon: 'fas fa-scroll',
-      visible: true,
-      onClick: () => ViewManager.questLog.render(true, { focus: true }),
-      button: true
-   },
-   {
-      name: 'typhonjs-quest-log-floating-window',
-      title: 'TyphonJSQuestLog.QuestTracker.Title',
-      icon: 'fas fa-tasks',
-      visible: true,
-      onClick: async () => { await game.settings.set(constants.moduleName, settings.questTrackerEnable, true); },
-      button: true
-   }
-];
+const questDBHooks = {
+   addedAllQuestEntries: 'addedAllQuestEntries',
+   addQuestEntry: 'addQuestEntry',
+   createQuestEntry: 'createQuestEntry',
+   deleteQuestEntry: 'deleteQuestEntry',
+   removedAllQuestEntries: 'removedAllQuestEntries',
+   removeQuestEntry: 'removeQuestEntry',
+   updateQuestEntry: 'updateQuestEntry',
+};
 
 /**
  * Stores strings for quest types (statuses)
@@ -127,7 +116,16 @@ const settings = {
    trustedPlayerEdit: 'trustedPlayerEdit'
 };
 
-export { constants, jquery, noteControls, questStatus, questStatusI18n, questTabIndex, sessionConstants, settings };
+export {
+   constants,
+   jquery,
+   questDBHooks,
+   questStatus,
+   questStatusI18n,
+   questTabIndex,
+   sessionConstants,
+   settings
+};
 
 /**
  * @typedef {object} TQLSessionConstants
@@ -177,4 +175,24 @@ export { constants, jquery, noteControls, questStatus, questStatusI18n, questTab
  * @property {string}   showTasks - Determines if objective counts are rendered.
  *
  * @property {string}   trustedPlayerEdit - Allows trusted players to have full quest editing capabilities.
+ */
+
+/**
+ * @typedef {object} QuestDBHooks
+ *
+ * @property {string}   addedAllQuestEntries - Invoked in {@link QuestDB.init} when all quests have been loaded.
+ *
+ * @property {string}   addQuestEntry - Invoked in {@link QuestDB.consistencyCheck} and s_JOURNAL_ENTRY_UPDATE when a
+ *                                      quest is added to the {@link QuestDB}.
+ *
+ * @property {string}   createQuestEntry - Invoked in s_JOURNAL_ENTRY_CREATE in {@link QuestDB} when a quest is created.
+ *
+ * @property {string}   deleteQuestEntry - Invoked in s_JOURNAL_ENTRY_DELETE in {@link QuestDB} when a quest is deleted.
+ *
+ * @property {string}   removedAllQuestEntries - Invoked in {@link QuestDB.removeAll} when all quests are removed.
+ *
+ * @property {string}   removeQuestEntry - Invoked in {@link QuestDB.consistencyCheck} and s_JOURNAL_ENTRY_UPDATE when a
+ *                                         quest is removed from the {@link QuestDB}.
+ *
+ * @property {string}   updateQuestEntry - Invoked in s_JOURNAL_ENTRY_UPDATE when a quest is updated in {@link QuestDB}.
  */

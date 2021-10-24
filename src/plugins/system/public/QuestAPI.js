@@ -1,5 +1,107 @@
-import QuestDB                 from '../QuestDB.js';
-import { constants, settings } from '../../model/constants.js';
+import { constants, questDBHooks, settings } from '../../../model/constants.js';
+
+/**
+ * Quest public API. QuestAPI exposes control capabilities publicly. This functionality is gated as necessary depending
+ * on user level, quest observability and module settings.
+ *
+ * A shim to the {@link QuestDB} is available via {@link QuestAPI.DB} which exposes certain QuestDB methods that are
+ * available for any player as only currently observable quests are loaded into QuestDB.
+ */
+class QuestAPI
+{
+   /**
+    * @returns {QuestDBShim} Public QuestDB access.
+    */
+   static get DB() { return QuestDBShim; }
+
+   /**
+    * Opens the Quest sheet / QuestPreview for the given questID. A check for the module setting
+    * {@link TQLSettings.hideTQLFromPlayers} provides an early out if TQL is hidden from players causing the sheet to
+    * not render. {@link ViewManager.questPreview} provides an object.
+    *
+    * @param {object}   options - Optional parameters.
+    *
+    * @param {string}   options.questId - Quest ID string to open.
+    *
+    * @param {boolean}  [options.notify=true] - Post UI notification on any error.
+    */
+   static open({ questId, notify = true })
+   {
+      if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) { return; }
+
+      try
+      {
+         const questPreview = s_EVENTBUS.triggerSync('tql:viewmanager:quest:preview:get', questId);
+
+         // Optimization to render an existing open QuestPreview with the given quest ID instead of opening a new
+         // app / view.
+         if (questPreview !== void 0)
+         {
+            questPreview.render(true, { focus: true });
+            return;
+         }
+
+         const quest = QuestDBShim.getQuest(questId);
+
+         if (quest === void 0)
+         {
+            if (notify)
+            {
+               s_EVENTBUS.trigger('tql:viewmanager:notifications:warn',
+                game.i18n.localize('TyphonJSQuestLog.Notifications.CannotOpen'));
+            }
+            else
+            {
+               s_EVENTBUS.trigger('tql:socket:user:cant:open:quest');
+            }
+            return;
+         }
+
+         if (quest.isObservable)
+         {
+            quest.sheet.render(true, { focus: true });
+         }
+      }
+      catch (error)
+      {
+         if (notify)
+         {
+            s_EVENTBUS.trigger('tql:viewmanager:notifications:error',
+             game.i18n.localize('TyphonJSQuestLog.Notifications.CannotOpen'));
+         }
+         else
+         {
+            s_EVENTBUS.trigger('tql:socket:user:cant:open:quest');
+         }
+      }
+   }
+}
+
+/**
+ * Stores the plugin manager eventbus.
+ *
+ * @param {object} ev -
+ */
+export function onPluginLoad(ev)
+{
+   s_EVENTBUS = ev.eventbus;
+
+   const opts = { guard: true };
+
+   ev.eventbus.on('tql:questapi:db', () => QuestAPI.DB, this, opts);
+   ev.eventbus.on('tql:questapi:open', QuestAPI.open, this, opts);
+}
+
+export function onPluginUnload()
+{
+   s_EVENTBUS = void 0;
+}
+
+let s_EVENTBUS = void 0;
+
+Object.freeze(QuestAPI);
+
+export default QuestAPI;
 
 /**
  * Provides a shim to the publicly exposed methods of QuestDB. Except for {@link QuestDBShim.createQuest} all other
@@ -11,7 +113,7 @@ class QuestDBShim
    /**
     * @returns {QuestDBHooks} The QuestDB hooks.
     */
-   static get hooks() { return QuestDB.hooks; }
+   static get hooks() { return questDBHooks; }
 
    /**
     * Creates a new quest and waits for the journal entry to update and QuestDB to pick up the new Quest which
@@ -27,10 +129,11 @@ class QuestDBShim
     */
    static async createQuest(options)
    {
-      if (game.user.isGM) { return QuestDB.createQuest(options); }
+      if (game.user.isGM) { return s_EVENTBUS.triggerAsync('tql:questdb:quest:create', options); }
 
       return game.settings.get(constants.moduleName, settings.allowPlayersCreate) &&
-      !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers) ? QuestDB.createQuest(options) : null;
+       !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers) ?
+        s_EVENTBUS.triggerAsync('tql:questdb:quest:create', options) : null;
    }
 
    /**
@@ -48,7 +151,7 @@ class QuestDBShim
     */
    static filter(predicate, options)
    {
-      return QuestDB.filter(predicate, options);
+      return s_EVENTBUS.triggerSync('tql:questdb:filter', predicate, options);
    }
 
    /**
@@ -79,7 +182,7 @@ class QuestDBShim
     */
    static filterCollect(options)
    {
-      return QuestDB.filterCollect(options);
+      return s_EVENTBUS.triggerSync('tql:questdb:collect:filter', options);
    }
 
    /**
@@ -97,7 +200,7 @@ class QuestDBShim
     */
    static find(predicate, options)
    {
-      return QuestDB.find(predicate, options);
+      return s_EVENTBUS.triggerSync('tql:questdb:find', predicate, options);
    }
 
    /**
@@ -107,7 +210,7 @@ class QuestDBShim
     */
    static getAllQuestEntries()
    {
-      return QuestDB.getAllQuestEntries();
+      return s_EVENTBUS.triggerSync('tql:questdb:all:quest:entries:get');
    }
 
    /**
@@ -117,7 +220,7 @@ class QuestDBShim
     */
    static getAllQuests()
    {
-      return QuestDB.getAllQuests();
+      return s_EVENTBUS.triggerSync('tql:questdb:all:quests:get');
    }
 
    /**
@@ -131,7 +234,7 @@ class QuestDBShim
     */
    static getCount(options)
    {
-      return QuestDB.getCount(options);
+      return s_EVENTBUS.triggerSync('tql:questdb:count:get', options);
    }
 
    /**
@@ -143,7 +246,7 @@ class QuestDBShim
     */
    static getQuest(questId)
    {
-      return QuestDB.getQuest(questId);
+      return s_EVENTBUS.triggerSync('tql:questdb:quest:get', questId);
    }
 
    /**
@@ -155,7 +258,7 @@ class QuestDBShim
     */
    static getQuestEntry(questId)
    {
-      return QuestDB.getQuestEntry(questId);
+      return s_EVENTBUS.triggerSync('tql:questdb:quest:entry:get', questId);
    }
 
    /**
@@ -170,7 +273,7 @@ class QuestDBShim
     */
    static iteratorEntries(options)
    {
-      return QuestDB.iteratorEntries(options);
+      return s_EVENTBUS.triggerSync('tql:questdb:iterator:entries', options);
    }
 
    /**
@@ -185,7 +288,7 @@ class QuestDBShim
     */
    static iteratorQuests(options)
    {
-      return QuestDB.iteratorQuests(options);
+      return s_EVENTBUS.triggerSync('tql:questdb:iterator:quests', options);
    }
 
    /**
@@ -207,10 +310,8 @@ class QuestDBShim
     */
    static sortCollect(options)
    {
-      return QuestDB.sortCollect(options);
+      return s_EVENTBUS.triggerSync('tql:questdb:collect:sort', options);
    }
 }
 
 Object.freeze(QuestDBShim);
-
-export default QuestDBShim;

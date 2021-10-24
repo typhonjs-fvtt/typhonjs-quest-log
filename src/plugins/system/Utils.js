@@ -1,4 +1,4 @@
-import { constants, jquery, settings } from '../model/constants.js';
+import { constants, jquery, settings } from '../../model/constants.js';
 
 /**
  * The hidden TQL quests folder name.
@@ -419,5 +419,28 @@ export default class Utils
    {
       return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
        (c ^ (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+   }
+
+   static onPluginLoad(ev)
+   {
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:utils:copy:text:to:clipboard', this.copyTextToClipboard, this, opts);
+      ev.eventbus.on('tql:utils:data:from:uuid:get', this.getDataFromUUID, this, opts);
+      ev.eventbus.on('tql:utils:document:from:uuid:get', this.getDocumentFromUUID, this, opts);
+      ev.eventbus.on('tql:utils:is:trusted:player:edit', this.isTrustedPlayerEdit, this, opts);
+      ev.eventbus.on('tql:utils:is:hidden:from:players', this.isTQLHiddenFromPlayers, this, opts);
+      ev.eventbus.on('tql:utils:jquery:dblclick:create', this.createJQueryDblClick, this, opts);
+      ev.eventbus.on('tql:utils:macro:image:set', this.setMacroImage, this, opts);
+      ev.eventbus.on('tql:utils:module:data:get', this.getModuleData, this, opts);
+      ev.eventbus.on('tql:utils:quest:folder:get', this.getQuestFolder, this, opts);
+      ev.eventbus.on('tql:utils:quest:folder:initialize', this.initializeQuestFolder, this, opts);
+      ev.eventbus.on('tql:utils:uuid:get', this.getUUID, this, opts);
+      ev.eventbus.on('tql:utils:uuidv4', this.uuidv4, this, opts);
+      ev.eventbus.on('tql:utils:sheet:from:uuid:show', this.showSheetFromUUID, this, opts);
+
+      // Preload Handlebars templates and register helpers.
+      this.preloadTemplates();
+      this.registerHandlebarsHelpers();
    }
 }

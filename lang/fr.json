@@ -120,7 +120,7 @@
       "Objective": "Objectifs :",
       "Objectives": "Objectifs",
       "Reward": "Récompense",
-      "RewardDrop": "FQL (récompense  de quête) : {userName} a donné '{itemName}' à {actorName}",
+      "RewardDrop": "TQL (récompense  de quête) : {userName} a donné '{itemName}' à {actorName}",
       "Rewards": "Récompenses :",
       "SubTitle": "sous quête faisant partie de: {0}",
       "Tabs": {

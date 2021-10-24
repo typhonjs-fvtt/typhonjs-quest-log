@@ -1,8 +1,3 @@
-import FoundryUIManager from '../../control/FoundryUIManager.js';
-import QuestAPI         from '../../control/public/QuestAPI.js';
-import QuestDB          from '../../control/QuestDB.js';
-import Socket           from '../../control/Socket.js';
-
 import { constants, sessionConstants, settings } from '../../model/constants.js';
 
 /**
@@ -39,11 +34,13 @@ export default class HandlerTracker
     *
     * @param {PointerEvent}   event - PointerEvent
     *
+    * @param {Eventbus}       eventbus - Plugin manager eventbus
+    *
     * @param {HTMLElement}    header - The app header element.
     *
     * @param {QuestTracker}   questTracker - The QuestTracker
     */
-   static async headerPointerUp(event, header, questTracker)
+   static async headerPointerUp(event, eventbus, header, questTracker)
    {
       header.releasePointerCapture(event.pointerId);
       questTracker._dragHeader = false;
@@ -53,7 +50,7 @@ export default class HandlerTracker
          questTracker._pinned = true;
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
          questTracker.element.css('animation', '');
-         FoundryUIManager.updateTracker();
+         eventbus.trigger('tql:foundryuimanager:update:tracker');
       }
    }
 
@@ -61,11 +58,13 @@ export default class HandlerTracker
     * Handles the quest open click via {@link QuestAPI.open}.
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
+    *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
     */
-   static questOpen(event)
+   static questOpen(event, eventbus)
    {
       const questId = event.currentTarget.dataset.questId;
-      QuestAPI.open({ questId });
+      eventbus.trigger('tql:questapi:open', { questId });
    }
 
    /**
@@ -73,13 +72,15 @@ export default class HandlerTracker
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
     *
-    * @param {QuestTracker} questTracker - The QuestTracker.
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
+    * @param {QuestTracker}      questTracker - The QuestTracker.
     */
-   static questClick(event, questTracker)
+   static questClick(event, eventbus, questTracker)
    {
       const questId = event.currentTarget.dataset.questId;
 
-      const questEntry = QuestDB.getQuestEntry(questId);
+      const questEntry = eventbus.triggerSync('tql:questdb:quest:entry:get', questId);
       if (questEntry && questEntry.enrich.hasObjectives)
       {
          const folderState = sessionStorage.getItem(`${sessionConstants.trackerFolderState}${questId}`);
@@ -113,8 +114,10 @@ export default class HandlerTracker
     * Handles toggling {@link Quest} tasks when clicked on by a user that is the GM or owner of quest.
     *
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
+    *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
     */
-   static async questTaskToggle(event)
+   static async questTaskToggle(event, eventbus)
    {
       // Don't handle any clicks of internal anchor elements such as entity content links.
       if ($(event.target).is('.quest-tracker-task a')) { return; }
@@ -122,7 +125,7 @@ export default class HandlerTracker
       const questId = event.currentTarget.dataset.questId;
       const uuidv4 = event.currentTarget.dataset.uuidv4;
 
-      const quest = QuestDB.getQuest(questId);
+      const quest = eventbus.triggerSync('tql:questdb:quest:get', questId);
 
       if (quest)
       {
@@ -132,7 +135,7 @@ export default class HandlerTracker
             task.toggle();
             await quest.save();
 
-            Socket.refreshQuestPreview({
+            eventbus.trigger('tql:socket:refresh:quest:preview', {
                questId,
                focus: false
             });

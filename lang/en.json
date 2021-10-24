@@ -67,7 +67,7 @@
       "DragDropActorPlayer": "Drag & Drop Actor, Item or Journal Entry.",
       "DragDropRewards": "Drag & drop items here to add them as rewards.",
       "InvalidQuestId": "Cannot open Quest Preview due to invalid Quest ID.",
-      "RewardDrop": "FQL (quest reward): {userName} dropped '{itemName}' onto {actorName}",
+      "RewardDrop": "TQL (quest reward): {userName} dropped '{itemName}' onto {actorName}",
 
       "HeaderButtons": {
         "Show": "Show to Players"

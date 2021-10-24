@@ -1,9 +1,11 @@
-import QuestDB       from './QuestDB.js';
-import QuestLog      from '../view/log/QuestLog.js';
-import QuestPreview  from '../view/preview/QuestPreview.js';
-import QuestTracker  from '../view/tracker/QuestTracker.js';
+import QuestLog      from '../../../view/log/QuestLog.js';
+import QuestPreview  from '../../../view/preview/QuestPreview.js';
+import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
-import { constants, questStatus, questStatusI18n, settings } from '../model/constants.js';
+// TODO: remove
+import DemoApp       from '../../../view/demo/DemoApp.js';
+
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../model/constants.js';
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -17,7 +19,9 @@ import { constants, questStatus, questStatusI18n, settings } from '../model/cons
 const Apps = {
    questLog: void 0,
    questTracker: void 0,
-   questPreview: new Map()
+   questPreview: new Map(),
+
+   demoApp: void 0
 };
 
 /**
@@ -34,10 +38,21 @@ export default class ViewManager
    /**
     * Initializes all GUI apps.
     */
-   static init()
+   static async init()
    {
       Apps.questLog = new QuestLog();
       Apps.questTracker = new QuestTracker();
+      Apps.demoApp = new DemoApp();
+
+      await this._eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-view-quest-log',
+         instance: Apps.questLog
+      });
+
+      await this._eventbus.triggerAsync('plugins:async:add', {
+         name: 'tql-view-quest-tracker',
+         instance: Apps.questTracker
+      });
 
       // Load and set the quest tracker position from settings.
       try
@@ -52,14 +67,21 @@ export default class ViewManager
 
       ViewManager.renderOrCloseQuestTracker();
 
+      Hooks.on('TQL.DemoApp.close', () => Apps.demoApp.close());
+      Hooks.on('TQL.DemoApp.render', () =>
+      {
+         Apps.demoApp.render(true);
+      });
+
+
       // Whenever a QuestPreview closes and matches any tracked app that is adding a new quest set it to undefined.
       Hooks.on('closeQuestPreview', s_QUEST_PREVIEW_CLOSED);
       Hooks.on('renderQuestPreview', s_QUEST_PREVIEW_RENDER);
 
       // Right now ViewManager responds to permission changes across add, remove, update of quests.
-      Hooks.on(QuestDB.hooks.addQuestEntry, s_QUEST_ENTRY_ADD);
-      Hooks.on(QuestDB.hooks.removeQuestEntry, s_QUEST_ENTRY_REMOVE);
-      Hooks.on(QuestDB.hooks.updateQuestEntry, s_QUEST_ENTRY_UPDATE);
+      Hooks.on(questDBHooks.addQuestEntry, s_QUEST_ENTRY_ADD);
+      Hooks.on(questDBHooks.removeQuestEntry, s_QUEST_ENTRY_REMOVE);
+      Hooks.on(questDBHooks.updateQuestEntry, s_QUEST_ENTRY_UPDATE);
    }
 
    /**
@@ -119,7 +141,7 @@ export default class ViewManager
    {
       return game.settings.get(constants.moduleName, settings.questTrackerEnable) &&
        (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) &&
-        QuestDB.getCount({ status: questStatus.active }) > 0;
+        this._eventbus.triggerSync('tql:questdb:count:get', { status: questStatus.active }) > 0;
    }
 
    /**
@@ -262,6 +284,35 @@ export default class ViewManager
       }
 
       return true;
+   }
+
+   static async onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      await this.init();
+
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:viewmanager:notifications:error', this.notifications.error, s_NOTIFICATIONS, opts);
+      ev.eventbus.on('tql:viewmanager:notifications:info', this.notifications.info, s_NOTIFICATIONS, opts);
+      ev.eventbus.on('tql:viewmanager:notifications:warn', this.notifications.warn, s_NOTIFICATIONS, opts);
+      ev.eventbus.on('tql:viewmanager:close:all', this.closeAll, this, opts);
+      ev.eventbus.on('tql:viewmanager:is:quest:tracker:visible', this.isQuestTrackerVisible, this, opts);
+      ev.eventbus.on('tql:viewmanager:refresh:quest:preview', this.refreshQuestPreview, this, opts);
+      ev.eventbus.on('tql:viewmanager:render:all', this.renderAll, this, opts);
+      ev.eventbus.on('tql:viewmanager:render:or:close:quest:tracker', this.renderOrCloseQuestTracker, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:added', this.questAdded, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:log:close', this.questLog.close, this.questLog, opts);
+      ev.eventbus.on('tql:viewmanager:quest:log:get', () => this.questLog, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:log:render', this.questLog.render, this.questLog, opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:delete', (questId) => this.questPreview.delete(questId), this,
+       opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:get', (questId) => this.questPreview.get(questId), this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:set', (questId, view) => this.questPreview.set(questId, view), this,
+       opts);
+      ev.eventbus.on('tql:viewmanager:quest:tracker:get', () => this.questTracker, this, opts);
+      ev.eventbus.on('tql:viewmanager:verify:quest:can:add', this.verifyQuestCanAdd, this, opts);
    }
 }
 

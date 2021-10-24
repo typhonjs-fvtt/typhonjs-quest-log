@@ -67,7 +67,7 @@
       "DragDropActorPlayer": "Akteur, Gegenstand oder Notizbucheintrag hierher ziehen.",
       "DragDropRewards": "Gegenstände hierher ziehen, um sie als Belohnung festzulegen.",
       "InvalidQuestId": "Cannot open Quest Preview due to invalid Quest ID.",
-      "RewardDrop": "FQL (Questbelohnung): {userName} hat '{itemName}' auf {actorName} gezogen",
+      "RewardDrop": "TQL (Questbelohnung): {userName} hat '{itemName}' auf {actorName} gezogen",
 
       "HeaderButtons": {
         "Show": "Spielern zeigen"

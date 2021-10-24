@@ -1,10 +1,7 @@
-import QuestDB          from '../../control/QuestDB.js';
-import Socket           from '../../control/Socket.js';
-import Utils            from '../../control/Utils.js';
 import TQLContextMenu   from '../TQLContextMenu.js';
 import TQLDialog        from '../TQLDialog.js';
 
-import HandlerLog    from './HandlerLog.js';
+import HandlerLog       from './HandlerLog.js';
 
 import { constants, jquery, questStatusI18n, questTabIndex, settings } from '../../model/constants.js';
 
@@ -83,18 +80,20 @@ export default class QuestLog extends Application
          tqlBookmarkItem.css('background-blend-mode', backBlendMode);
       }
 
-      html.on(jquery.click, '.new-quest-btn', HandlerLog.questAdd);
+      const eventbus = this._eventbus;
 
-      html.on(jquery.click, '.actions.quest-status i.delete', HandlerLog.questDelete);
+      html.on(jquery.click, '.new-quest-btn', () => HandlerLog.questAdd(eventbus));
+
+      html.on(jquery.click, '.actions.quest-status i.delete', (event) => HandlerLog.questDelete(event, eventbus));
 
       // This registers for any element and prevents the circle / slash icon displaying for not being a drag target.
       html.on(jquery.dragenter, (event) => event.preventDefault());
 
       html.on(jquery.dragstart, '.drag-quest', void 0, HandlerLog.questDragStart);
 
-      html.on(jquery.click, '.title', void 0, HandlerLog.questOpen);
+      html.on(jquery.click, '.title', void 0, (event) => HandlerLog.questOpen(event, eventbus));
 
-      html.on(jquery.click, '.actions.quest-status i.move', HandlerLog.questStatusSet);
+      html.on(jquery.click, '.actions.quest-status i.move', (event) => HandlerLog.questStatusSet(event, eventbus));
 
       this._contextMenu(html);
    }
@@ -126,9 +125,12 @@ export default class QuestLog extends Application
          callback: (menu) =>
          {
             const questId = $(menu)?.closest('.drag-quest')?.data('quest-id');
-            const quest = QuestDB.getQuest(questId);
+            const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
-            if (quest && Utils.copyTextToClipboard(`@Quest[${quest.id}]{${quest.name}}`))
+            const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard',
+             `@Quest[${quest.id}]{${quest.name}}`);
+
+            if (quest && success)
             {
                ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
             }
@@ -153,9 +155,11 @@ export default class QuestLog extends Application
             callback: (menu) =>
             {
                const questId = $(menu)?.closest('.drag-quest')?.data('quest-id');
-               const quest = QuestDB.getQuest(questId);
+               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
-               if (quest && Utils.copyTextToClipboard(quest.id))
+               const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard', quest.id);
+
+               if (quest && success)
                {
                   ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
                }
@@ -171,8 +175,11 @@ export default class QuestLog extends Application
             callback: (menu) =>
             {
                const questId = $(menu)?.closest('.drag-quest')?.data('quest-id');
-               const quest = QuestDB.getQuest(questId);
-               if (quest) { Socket.setQuestPrimary({ quest }); }
+               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
+               if (quest)
+               {
+                  this._eventbus.trigger('tql:socket:set:quest:primary', { quest });
+               }
             }
          });
       }
@@ -198,13 +205,13 @@ export default class QuestLog extends Application
          options,
          isGM: game.user.isGM,
          isPlayer: !game.user.isGM,
-         isTrustedPlayerEdit: Utils.isTrustedPlayerEdit(),
+         isTrustedPlayerEdit: this._eventbus.triggerSync('tql:utils:is:trusted:player:edit'),
          canAccept: game.settings.get(constants.moduleName, settings.allowPlayersAccept),
          canCreate: game.settings.get(constants.moduleName, settings.allowPlayersCreate),
          showTasks: game.settings.get(constants.moduleName, settings.showTasks),
          style: game.settings.get(constants.moduleName, settings.navStyle),
          questStatusI18n,
-         quests: QuestDB.sortCollect()
+         quests: this._eventbus.triggerSync('tql:questdb:collect:sort')
       });
    }
 
@@ -249,5 +256,10 @@ export default class QuestLog extends Application
       }
 
       return currentPosition;
+   }
+
+   onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
    }
 }

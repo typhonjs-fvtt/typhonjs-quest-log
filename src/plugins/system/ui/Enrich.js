@@ -1,8 +1,4 @@
-import QuestDB    from './QuestDB.js';
-import Utils      from './Utils.js';
-import DOMPurify  from '../../external/DOMPurify.js';
-
-import { constants, questStatus, questStatusI18n, settings } from '../model/constants.js';
+import { constants, questStatus, questStatusI18n, settings } from '../../../model/constants.js';
 
 /**
  * Enrich populates content with a lot of additional data that doesn't necessarily have to be saved
@@ -113,7 +109,8 @@ export default class Enrich
    {
       let result = '';
 
-      const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      const isTrustedPlayerEdit = this._eventbus.triggerSync('tql:utils:is:trusted:player:edit');
       const canAccept = game.settings.get(constants.moduleName, settings.allowPlayersAccept);
       const canEdit = game.user.isGM || (isTrustedPlayerEdit && quest.isOwner);
 
@@ -211,7 +208,8 @@ export default class Enrich
       const isPrimary = quest.isPrimary;
       const personalActors = quest.getPersonalActors();
 
-      const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      // const isTrustedPlayerEdit = Utils.isTrustedPlayerEdit();
+      const isTrustedPlayerEdit = this._eventbus.triggerSync('tql:utils:is:trusted:player:edit');
       const canEdit =  game.user.isGM || (isOwner && isTrustedPlayerEdit);
       const playerEdit = isOwner;
 
@@ -231,7 +229,9 @@ export default class Enrich
       data.isPrimary = isPrimary;
 
       // Enrich w/ TextEditor, but first sanitize w/ DOMPurify, allowing only iframes with YouTube embed.
-      data.description = TextEditor.enrichHTML(DOMPurify.sanitizeWithVideo(data.description), {
+      // data.description = TextEditor.enrichHTML(DOMPurify.sanitizeWithVideo(data.description), {
+      data.description = TextEditor.enrichHTML(this._eventbus.triggerSync(
+       'tql:dompurify:sanitize:video', data.description), {
          secrets: canEdit || playerEdit
       });
 
@@ -259,7 +259,7 @@ export default class Enrich
 
       if (data.parent !== null)
       {
-         const parentQuest = QuestDB.getQuest(data.parent);
+         const parentQuest = this._eventbus.triggerSync('tql:questdb:quest:get', data.parent);
          if (parentQuest)
          {
             data.isSubquest = parentQuest.isObservable;
@@ -280,7 +280,7 @@ export default class Enrich
       {
          for (const questId of data.subquests)
          {
-            const subquest = QuestDB.getQuest(questId);
+            const subquest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
 
             // isObservable filters out non-owned hidden quests for trustedPlayerEdit.
             if (subquest && subquest.isObservable)
@@ -372,7 +372,8 @@ export default class Enrich
       {
          return {
             ...task,
-            name: TextEditor.enrichHTML(DOMPurify.sanitize(task.name))
+            // name: TextEditor.enrichHTML(DOMPurify.sanitize(task.name))
+            name: TextEditor.enrichHTML(this._eventbus.triggerSync('tql:dompurify:sanitize', task.name))
          };
       });
 
@@ -396,7 +397,8 @@ export default class Enrich
          const itemLink = type === 'item' && !canEdit && !canPlayerDrag && !item.locked;
 
          return {
-            name: TextEditor.enrichHTML(DOMPurify.sanitize(item.data.name)),
+            // name: TextEditor.enrichHTML(DOMPurify.sanitize(item.data.name)),
+            name: TextEditor.enrichHTML(this._eventbus.triggerSync('tql:dompurify:sanitize', item.data.name)),
             img: item.data.img,
             type,
             hidden: item.hidden,
@@ -429,6 +431,18 @@ export default class Enrich
       }
 
       return data;
+   }
+
+   static onPluginLoad(ev)
+   {
+      this._eventbus = ev.eventbus;
+
+      const opts = { guard: true };
+
+      ev.eventbus.on('tql:enrich:giver:from:quest', this.giverFromQuest, this, opts);
+      ev.eventbus.on('tql:enrich:giver:from:uuid', this.giverFromUUID, this, opts);
+      ev.eventbus.on('tql:enrich:status:actions', this.statusActions, this, opts);
+      ev.eventbus.on('tql:enrich:quest', this.quest, this, opts);
    }
 }
 

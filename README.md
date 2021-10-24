@@ -10,7 +10,7 @@
 
 **NOTE** This is a new quest log module which continues from Michael's / TyphonJS' work on the `0.7.x` series of 
 Forien's Quest Log. A whole new UI / tech stack (Svelte + GSAP) and utilization of the TyphonJS plugin manager / 
-eventbus is forthcoming. Many new features are planned for the TyphonJS Quest Log and provides a high performance 
+eventbus is forthcoming. Many new features are planned for the TyphonJS Quest Log providing a high performance 
 quest runtime for Foundry VTT.
 
 When officially launched there will be a migration path for users of Forien's Quest Log to update to the TyphonJS Quest
@@ -102,6 +102,6 @@ TBA
 
 ## License
 
-TyphonJS Quest Log is a module for Foundry VTT by Michael Leahy and is licensed under a [MIT License](https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/LICENSE). List of contributors in [AUTHORS file](https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/AUTHORS).
+TyphonJS Quest Log is a module for Foundry VTT by Michael Leahy and is licensed under the [MPL v2.0 License](https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/LICENSE). List of contributors in [AUTHORS](https://github.com/typhonjs-fvtt/typhonjs-quest-log/blob/master/AUTHORS) file.
 
 This work is licensed under Foundry Virtual Tabletop [EULA - Limited License Agreement for module development from February 17, 2021](https://foundryvtt.com/article/license/).

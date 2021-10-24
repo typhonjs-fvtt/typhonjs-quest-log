@@ -2,7 +2,8 @@ import Quest            from './model/Quest.js';
 import QuestCollection  from './plugins/data/QuestCollection.js';
 import QuestPreview     from './view/preview/QuestPreview.js';
 
-import { eventbus, PluginLoader } from './plugins/PluginManager.js';
+import PluginLoader     from './plugins/PluginLoader.js';
+import { eventbus }     from './plugins/PluginManager.js';
 
 import { constants, jquery, sessionConstants, settings } from './model/constants.js';
 

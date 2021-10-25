@@ -42,8 +42,8 @@ export default class PluginLoader
          },
          // Handles TinyMCE options generation.
          {
-            name: 'tql-system-tinymce',
-            instance: SystemPlugins.TinyMCE
+            name: 'tql-data-tinymce',
+            instance: DataPlugins.TinyMCE
          }
       ]);
    }

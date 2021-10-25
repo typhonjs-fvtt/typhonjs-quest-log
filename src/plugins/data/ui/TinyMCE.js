@@ -161,7 +161,7 @@ export default class TinyMCE
  *
  * @type {string}
  */
-const s_CSS_URL = foundry.utils.getRoute('/modules/typhonjs-quest-log/css/init-tinymce.css');
+const s_CSS_URL = '/modules/typhonjs-quest-log/dist/init-tinymce.css';
 
 /**
  * Defines the fonts available.

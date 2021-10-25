@@ -25,8 +25,7 @@
     "../scripts/greensock/esm/gsap-core.js"
   ],
   "styles": [
-    "./css/init.css",
-    "./dist/temp.css"
+    "./dist/typhonjs-quest-log.css"
   ],
   "languages": [
     {

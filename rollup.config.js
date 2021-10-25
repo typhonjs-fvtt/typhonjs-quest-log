@@ -2,16 +2,13 @@ import path             from 'path';
 
 // The following plugins are for the main source bundle.
 
-// import postcss          from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
+import postcss          from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
 import svelte           from 'rollup-plugin-svelte';
-
-// The following plugins are for the 2nd external bundle pulling in `ansi-colors` from NPM.
-// import commonjs         from '@rollup/plugin-commonjs';     // This converts ansi-colors to ES6 from CJS.
 
 // The following plugins are for the 2nd & 3rd external bundles pulling in modules from NPM.
 import resolve          from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 
-import css              from 'rollup-plugin-css-only';
+// import css              from 'rollup-plugin-css-only';
 
 // This plugin is for importing existing sourcemaps from `unique-names-generator` NPM module. Include it for
 // any external imported source code that has sourcemaps available.
@@ -25,7 +22,7 @@ import { terser }       from 'rollup-plugin-terser';        // Terser is used fo
 // Import config files for Terser and Postcss; refer to respective documentation for more information.
 // We are using `require` here in order to be compliant w/ `fvttdev` for testing purposes.
 import terserConfig  from './terser.config.mjs';
-// import postcssConfig from './postcss.config.mjs';
+import postcssConfig from './postcss.config.mjs';
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
@@ -66,8 +63,8 @@ export default () =>
                dev: true
             }
          }),
-         css({ output: 'temp.css' }),
-         // postcss(postcssConfig),                            // Engages PostCSS for Sass / CSS processing
+         postcss(postcssConfig),                            // Engages PostCSS for Sass / CSS processing
+         // css({ output: 'temp.css' }),
          resolve({
             browser: true,
             dedupe: ['svelte']

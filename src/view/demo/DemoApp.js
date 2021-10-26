@@ -1,6 +1,7 @@
-import Demo from './Demo.svelte';
+import Demo                from './Demo.svelte';
+import SvelteApplication   from '../SvelteApplication.js';
 
-export default class DemoApp extends Application
+export default class DemoApp extends SvelteApplication
 {
    /**
     * Default Application options
@@ -13,22 +14,34 @@ export default class DemoApp extends Application
       return foundry.utils.mergeObject(super.defaultOptions, {
          id: 'demo-app',
          classes: ['demo-app'],
-         template: 'modules/typhonjs-quest-log/templates/demo.html',
          width: 700,
          height: 480,
          minimizable: true,
-         resizable: false,
-         title: 'demo app'
-      });
-   }
-
-   activateListeners(html)
-   {
-      this.component = new Demo({
-         target: html.get(0),
-         props: {
-            test: 'Foundry'
-         },
+         resizable: true,
+         title: 'demo app',
+         svelte: {
+            class: Demo,
+            target: '.window-content',
+            props: {
+               test: 'Foundry'
+            }
+         }
+         // svelte: [
+         //    {
+         //       class: Demo,
+         //       target: '.window-content',
+         //       props: {
+         //          test: 'Foundry'
+         //       }
+         //    },
+         //    {
+         //       class: Demo,
+         //       target: '.window-content',
+         //       props: {
+         //          test: 'Testing'
+         //       }
+         //    }
+         // ]
       });
    }
 }

@@ -4,8 +4,7 @@
 
    beforeUpdate(() =>
    {
-      console.log(`App.svelte - beforeUpdate - 0`);
-      console.log(`App.svelte - beforeUpdate - 1`);
+      console.log(`App.svelte - beforeUpdate`);
    });
 
    onMount(() =>
@@ -21,6 +20,7 @@
    export let test;
 </script>
 
+<div>
 <main
     use:animate={{ type: 'from', duration: 5, opacity: 0, onComplete: () => (desc = true) }}>
     <h1>Hello {test}!</h1>
@@ -32,6 +32,8 @@
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae natus libero quisquam, aliquam quod vel quia necessitatibus? Cupiditate, excepturi nisi. Nam tempora ex numquam voluptatum minima similique sequi, fugit placeat!
     </p>
 {/if}
+</div>
+
 <style>
     main {
         text-align: center;

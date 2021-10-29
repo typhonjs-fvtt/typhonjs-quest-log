@@ -1,3 +1,5 @@
+import { writable }     from 'svelte/store';
+
 import Quest            from '../../../model/Quest.js';
 import QuestPreviewShim from './QuestPreviewShim.js';
 
@@ -33,6 +35,14 @@ const s_QUESTS_COLLECT = {
    completed: collect(),
    failed: collect(),
    inactive: collect()
+};
+
+const s_QUESTS_STORE = {
+   active: writable([]),
+   available: writable([]),
+   completed: writable([]),
+   failed: writable([]),
+   inactive: writable([])
 };
 
 /**
@@ -191,6 +201,7 @@ export default class QuestDB
          for (const key of Object.keys(s_QUESTS_MAP))
          {
             s_QUESTS_COLLECT[key] = collect(Array.from(s_QUESTS_MAP[key].values()));
+            s_QUESTS_STORE[key].set(QuestDB.sortCollect({ status: key }).all());
          }
 
          Hooks.callAll(QuestDB.hooks.addedAllQuestEntries);
@@ -544,7 +555,7 @@ export default class QuestDB
             case questStatus.inactive:
                return s_QUESTS_COLLECT[questStatus.inactive].filter(filterInactive || filter);
             default:
-               console.error(`Forien Quest Log - QuestDB - filterCollect - unknown status: ${status}`);
+               console.error(`TyphonJS Quest Log - QuestDB - filterCollect - unknown status: ${status}`);
                return void 0;
          }
       }
@@ -646,6 +657,37 @@ export default class QuestDB
    static getQuestEntry(questId)
    {
       return s_GET_QUEST_ENTRY(questId);
+   }
+
+   static getStore({ status = void 0 } = {})
+   {
+      if (typeof status === 'string')
+      {
+         switch (status)
+         {
+            case questStatus.active:
+               return s_QUESTS_STORE[questStatus.active];
+            case questStatus.available:
+               return s_QUESTS_STORE[questStatus.available];
+            case questStatus.completed:
+               return s_QUESTS_STORE[questStatus.completed];
+            case questStatus.failed:
+               return s_QUESTS_STORE[questStatus.failed];
+            case questStatus.inactive:
+               return s_QUESTS_STORE[questStatus.inactive];
+            default:
+               console.error(`TyphonJS Quest Log - QuestDB - getStore - unknown status: ${status}`);
+               return void 0;
+         }
+      }
+
+      return {
+         active: s_QUESTS_STORE[questStatus.active],
+         available: s_QUESTS_STORE[questStatus.available],
+         completed: s_QUESTS_STORE[questStatus.completed],
+         failed: s_QUESTS_STORE[questStatus.failed],
+         inactive: s_QUESTS_STORE[questStatus.inactive]
+      };
    }
 
    /**
@@ -765,7 +807,7 @@ export default class QuestDB
             case questStatus.inactive:
                return s_QUESTS_COLLECT[questStatus.inactive].sort(sortInactive);
             default:
-               console.error(`Forien Quest Log - QuestDB - sortCollect - unknown status: ${status}`);
+               console.error(`TyphonJS Quest Log - QuestDB - sortCollect - unknown status: ${status}`);
                return void 0;
          }
       }
@@ -799,6 +841,7 @@ export default class QuestDB
       ev.eventbus.on('tql:questdb:quest:delete', this.deleteQuest, this, opts);
       ev.eventbus.on('tql:questdb:quest:get', this.getQuest, this, opts);
       ev.eventbus.on('tql:questdb:quest:entry:get', this.getQuestEntry, this, opts);
+      ev.eventbus.on('tql:questdb:store:get', this.getStore, this, opts);
       ev.eventbus.on('tql:questdb:init', this.init, this, opts);
       ev.eventbus.on('tql:questdb:iterator:entries', this.iteratorEntries, this, opts);
       ev.eventbus.on('tql:questdb:iterator:quests', this.iteratorQuests, this, opts);
@@ -1270,6 +1313,7 @@ const s_SET_QUEST_ENTRY = (entry, generate = true) =>
       if (s_QUESTS_MAP[currentStatus].delete(entry.id) && generate)
       {
          s_QUESTS_COLLECT[currentStatus] = collect(Array.from(s_QUESTS_MAP[currentStatus].values()));
+         s_QUESTS_STORE[currentStatus].set(QuestDB.sortCollect({ status: currentStatus }).all());
       }
    }
 
@@ -1287,6 +1331,7 @@ const s_SET_QUEST_ENTRY = (entry, generate = true) =>
    if (generate)
    {
       s_QUESTS_COLLECT[entry.status] = collect(Array.from(s_QUESTS_MAP[entry.status].values()));
+      s_QUESTS_STORE[entry.status].set(QuestDB.sortCollect({ status: entry.status }).all());
    }
 };
 

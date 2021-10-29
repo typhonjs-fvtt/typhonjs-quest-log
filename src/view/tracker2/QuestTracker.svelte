@@ -1,6 +1,7 @@
 <script>
    import { HeaderButton }       from '@typhonjs-fvtt/svelte';
-   import { sessionConstants }   from '../../model/constants.js';
+
+   import { questStatus, sessionConstants }   from '../../model/constants.js';
 
    import { beforeUpdate, onMount, onDestroy, setContext } from 'svelte';
 
@@ -17,6 +18,8 @@
 
       storeTrackerShowPrimary = _foundryApp._eventbus.triggerSync('tql:storage:session:store:get',
        sessionConstants.trackerShowPrimary);
+
+      storeQuests = _foundryApp._eventbus.triggerSync('tql:questdb:store:get', { status: questStatus.active });
    });
 
    onDestroy(() =>
@@ -26,12 +29,19 @@
 
    setContext('getApp', () => _foundryApp);
 
+   let storeQuests;
    let storeTrackerShowPrimary;
 
    let headerButtons = [];
    let trackerShowPrimary = false
+   let quests = [];
 
    export let _foundryApp;
+
+   $: if (storeQuests)
+   {
+      quests = $storeQuests;
+   }
 
    $: if (storeTrackerShowPrimary)
    {
@@ -49,7 +59,9 @@
    {#if trackerShowPrimary}
       Test content - showPrimary: true
    {:else}
-      Test content - showPrimary: false
+      {#each quests as questEntry (questEntry.quest.id)}
+         <p>{questEntry.quest.name}</p>
+      {/each}
    {/if}
    </section>
 </div>

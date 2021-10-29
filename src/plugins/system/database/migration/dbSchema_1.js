@@ -60,14 +60,14 @@ export default async function(eventbus)
          else
          {
             // Must delete any no conforming journal entries. This likely never occurs.
-            console.log(game.i18n.format('ForienQuestLog.Migration.CouldNotMigrate', { name: entry.data.name }));
+            console.log(game.i18n.format('TyphonJSQuestLog.Migration.CouldNotMigrate', { name: entry.data.name }));
             await entry.delete();
          }
       }
       catch (err)
       {
          // Must delete any journal entries / quests that fail the migration process.
-         console.log(game.i18n.format('ForienQuestLog.Migration.CouldNotMigrate', { name: entry.data.name }));
+         console.log(game.i18n.format('TyphonJSQuestLog.Migration.CouldNotMigrate', { name: entry.data.name }));
          await entry.delete();
       }
    }

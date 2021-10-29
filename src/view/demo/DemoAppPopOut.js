@@ -1,5 +1,6 @@
-import DemoPopOut          from './DemoPopOut.svelte';
-import SvelteApplication   from '../SvelteApplication.js';
+import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+
+import DemoPopOut             from './DemoPopOut.svelte';
 
 export default class DemoAppPopOut extends SvelteApplication
 {

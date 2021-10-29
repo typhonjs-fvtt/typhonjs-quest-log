@@ -5,6 +5,9 @@ export default {
    },
 
    mangle: {
+      keep_classnames: true,
+      keep_fnames: true,
+      keep_fargs: true,
       toplevel: true
    },
 

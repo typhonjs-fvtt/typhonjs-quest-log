@@ -9,8 +9,10 @@
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
   "dependencies": {
+    "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt/svelte",
     "collect.js": "^4.28.0",
-    "dompurify": "^2.3.0"
+    "dompurify": "^2.3.0",
+    "svelte": "^3"
   },
   "devDependencies": {
     "@itsjamie/esdoc-core": "^0.3",

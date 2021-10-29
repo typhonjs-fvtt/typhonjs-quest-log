@@ -1,8 +1,14 @@
-import HandlerTracker   from './HandlerTracker.js';
-import TQLContextMenu   from '../TQLContextMenu.js';
-import collect          from '../../../external/collect.js';
+import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
-import { constants, jquery, questStatus, sessionConstants, settings } from '../../model/constants.js';
+import QuestTracker           from './QuestTracker.svelte';
+
+import HandlerTracker         from '../tracker/HandlerTracker.js';
+
+import TQLContextMenu         from '../TQLContextMenu.js';
+
+import ButtonShowPrimary      from './ButtonShowPrimary.js';
+
+import { constants, jquery, settings } from '../../model/constants.js';
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -18,16 +24,7 @@ const s_DEFAULT_WIDTH = 296;
  */
 const s_DEFAULT_POSITION = { top: 80, width: s_DEFAULT_WIDTH };
 
-/**
- * Provides the quest tracker which provides an overview of active quests and objectives which can be opened / closed
- * to show all objectives for a given quest. The folder / open state is stored in {@link sessionStorage}.
- *
- * In the {@link QuestTracker.getData} method {@link QuestTracker.prepareQuests} is invoked which gets all sorted
- * {@link questStatus.active} via {@link QuestDB.sortCollect}. They are then mapped creating the specific data which is
- * used in the {@link Handlebars} template. In the future this may be cached in a similar way that {@link Quest} data
- * is cached for {@link QuestLog}.
- */
-export default class QuestTracker extends Application
+export default class QuestTrackerApp extends SvelteApplication
 {
    /**
     * @inheritDoc
@@ -81,7 +78,7 @@ export default class QuestTracker extends Application
    }
 
    /**
-    * Default {@link Application} options
+    * Default Application options
     *
     * @returns {object} options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
@@ -90,14 +87,38 @@ export default class QuestTracker extends Application
    {
       return foundry.utils.mergeObject(super.defaultOptions, {
          id: 'quest-tracker',
-         template: 'modules/typhonjs-quest-log/templates/quest-tracker.html',
-         minimizable: false,
          resizable: true,
+         minimizable: true,
          popOut: false,
          width: 300,
          height: 480,
-         title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title')
+         title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
+         svelte: {
+            class: QuestTracker,
+            options: {
+               injectApp: true
+            }
+         }
       });
+   }
+
+   /**
+    * Sets `questTrackerEnable` to false.
+    *
+    * @param {object}   [options] - Optional parameters.
+    *
+    * @param {boolean}  [options.updateSetting=true] - If true then {@link settings.questTrackerEnable} is set to false.
+    *
+    * @returns {Promise<void>}
+    */
+   async close({ updateSetting = true } = {})
+   {
+      await super.close();
+
+      if (updateSetting)
+      {
+         await game.settings.set(constants.moduleName, settings.questTrackerEnable, false);
+      }
    }
 
    /**
@@ -184,53 +205,29 @@ export default class QuestTracker extends Application
       const closeButton = buttons.find((button) => button?.class === 'close');
       if (closeButton) { closeButton.label = void 0; }
 
-      // const primaryState = sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true';
-      const primaryState = this._eventbus.triggerSync('tql:storage:session:item:get',
-       sessionConstants.trackerShowPrimary);
+      const eventbus = this._eventbus.triggerSync('tql:eventbus:secure:get');
 
-      const primaryIcon = primaryState ? 'fas fa-star' : 'far fa-star';
-      const primaryTitle = primaryState ? 'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow' :
-       'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestShow';
-
-      buttons.unshift({
-         title: primaryTitle,
-         class: 'show-primary',
-         icon: primaryIcon
-      });
+      buttons.unshift(new ButtonShowPrimary(eventbus));
 
       return buttons;
    }
 
    /**
-    * Gets the minimum width of this Application.
-    *
-    * @returns {number} Minimum width.
-    */
-   get minWidth() { return this._appExtents.minWidth || 275; }
-
-   /**
-    * Is the QuestTracker pinned to the sidebar.
-    *
-    * @returns {boolean} QuestTracker pinned.
-    */
-   get pinned() { return this._pinned; }
-
-   /**
     * Defines all {@link JQuery} control callbacks with event listeners for click, drag, drop via various CSS selectors.
     *
-    * @param {JQuery}  html - The jQuery instance for the window content of this Application.
+    * @param {JQuery}  element - The jQuery instance for the window content of this Application.
     *
     * @see https://foundryvtt.com/api/FormApplication.html#activateListeners
     */
-   activateListeners(html)
+   onSvelteMount(element)
    {
-      super.activateListeners(html);
+      super.onSvelteMount(element);
 
       const eventbus = this._eventbus;
 
       // Make the window draggable
-      const header = html.find('header');
-      new Draggable(this, html, header[0], this.options.resizable);
+      const header = element.find('header');
+      new Draggable(this, element, header[0], this.options.resizable);
 
       header[0].addEventListener('pointerdown', async (event) =>
        HandlerTracker.headerPointerDown(event, header[0], this));
@@ -238,13 +235,12 @@ export default class QuestTracker extends Application
       header[0].addEventListener('pointerup', async (event) =>
        HandlerTracker.headerPointerUp(event, eventbus, header[0], this));
 
-      html.on(jquery.click, '.header-button.close', void 0, this.close);
+      // element.on(jquery.click, '.header-button.close', void 0, this.close);
 
-      html.on(jquery.click, '.header-button.show-primary i', void 0,
-       () => HandlerTracker.questPrimaryShow(this, eventbus));
+      // element.on(jquery.click, '.header-button.show-primary i', void 0, () => HandlerTracker.questPrimaryShow(this));
 
       // Add context menu.
-      this._contextMenu(html);
+      this._contextMenu(element);
 
       this._eventbus.trigger('tql:utils:jquery:dblclick:create', {
          selector: '#quest-tracker .quest-tracker-header',
@@ -252,9 +248,9 @@ export default class QuestTracker extends Application
          doubleCallback: (event) => HandlerTracker.questOpen(event, eventbus),
       });
 
-      html.on(jquery.click, '.quest-tracker-link', void 0, (event) => HandlerTracker.questOpen(event, eventbus));
+      element.on(jquery.click, '.quest-tracker-link', void 0, (event) => HandlerTracker.questOpen(event, eventbus));
 
-      html.on(jquery.click, '.quest-tracker-task', void 0, async (event) =>
+      element.on(jquery.click, '.quest-tracker-task', void 0, async (event) =>
        await HandlerTracker.questTaskToggle(event, eventbus));
 
       /**
@@ -340,109 +336,6 @@ export default class QuestTracker extends Application
     * @see https://foundryvtt.com/api/Application.html#bringToTop
     */
    bringToTop() {}
-
-   /**
-    * Sets `questTrackerEnable` to false.
-    *
-    * @param {object}   [options] - Optional parameters.
-    *
-    * @param {boolean}  [options.updateSetting=true] - If true then {@link settings.questTrackerEnable} is set to false.
-    *
-    * @returns {Promise<void>}
-    */
-   async close({ updateSetting = true } = {})
-   {
-      await super.close();
-
-      if (updateSetting)
-      {
-         await game.settings.set(constants.moduleName, settings.questTrackerEnable, false);
-      }
-   }
-
-   /**
-    * Parses quest data in {@link QuestTracker.prepareQuests}.
-    *
-    * @override
-    * @inheritDoc
-    * @see https://foundryvtt.com/api/FormApplication.html#getData
-    */
-   async getData(options = {})
-   {
-      // const showOnlyPrimary = sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true';
-      const showOnlyPrimary = this._eventbus.triggerSync('tql:storage:session:item:get',
-       sessionConstants.trackerShowPrimary);
-
-      const primaryQuest = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
-       game.settings.get(constants.moduleName, settings.primaryQuest));
-
-      // Stores the primary quest ID when all in progress quests are shown so that the star icon is drawn for the
-      // primary quest.
-      const primaryQuestId = !showOnlyPrimary && primaryQuest ? primaryQuest.id : '';
-
-      const quests = await this.prepareQuests(showOnlyPrimary, primaryQuest);
-
-      return foundry.utils.mergeObject(super.getData(options), {
-         title: this.options.title,
-         headerButtons: this._getHeaderButtons(),
-         hasQuests: quests.count() > 0,
-         primaryQuestId,
-         quests
-      });
-   }
-
-   /**
-    * Transforms the quest data from sorted active quests. In this case we need to determine which quests can be
-    * manipulated for trusted player edit.
-    *
-    * @param {boolean}           showOnlyPrimary - Shows only the primary quest.
-    *
-    * @param {QuestEntry|void}   primaryQuest - Any currently set primary quest.
-    *
-    * @returns {Promise<Collection<object>>} Sorted active quests.
-    */
-   async prepareQuests(showOnlyPrimary, primaryQuest)
-   {
-      /**
-       * If showOnlyPrimary and the primaryQuest exists then build a Collection with just the primary quest otherwise
-       * get all sorted in progress quests from the QuestDB.
-       *
-       * @type {Collection}
-       */
-      const questEntries = showOnlyPrimary ? collect(primaryQuest ? [primaryQuest] : []) :
-       this._eventbus.triggerSync('tql:questdb:collect:sort', { status: questStatus.active });
-
-      const isGM = game.user.isGM;
-
-      const isTrustedPlayerEdit = this._eventbus.triggerSync('tql:utils:is:trusted:player:edit');
-
-      return questEntries.transform((entry) =>
-      {
-         const q = entry.enrich;
-         // const collapsed = sessionStorage.getItem(`${sessionConstants.trackerFolderState}${q.id}`) === 'false';
-         const collapsed = this._eventbus.triggerSync('tql:storage:session:item:get',
-          `${sessionConstants.trackerFolderState}${q.id}`) === false;
-
-         const tasks = collapsed ? q.data_tasks : [];
-         const subquests = collapsed ? q.data_subquest : [];
-
-         return {
-            id: q.id,
-            canEdit: isGM || (entry.isOwner && isTrustedPlayerEdit),
-            playerEdit: entry.isOwner,
-            source: q.giver,
-            name: q.name,
-            isGM,
-            isHidden: q.isHidden,
-            isInactive: q.isInactive,
-            isPersonal: q.isPersonal,
-            personalActors: q.personalActors,
-            hasObjectives: q.hasObjectives,
-            subquests,
-            tasks
-         };
-      });
-   }
 
    /**
     * Some game systems and custom UI theming modules provide hard overrides on overflow-x / overflow-y styles. Alas we

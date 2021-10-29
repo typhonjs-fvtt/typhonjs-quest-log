@@ -7,8 +7,7 @@ import svelte           from 'rollup-plugin-svelte';
 
 // The following plugins are for the 2nd & 3rd external bundles pulling in modules from NPM.
 import resolve          from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
-
-// import css              from 'rollup-plugin-css-only';
+// import commonjs         from "@rollup/plugin-commonjs";
 
 // This plugin is for importing existing sourcemaps from `unique-names-generator` NPM module. Include it for
 // any external imported source code that has sourcemaps available.
@@ -46,7 +45,7 @@ export default () =>
    return [{
       input: `src${PS}init.js`,
       external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         `/scripts/greensock/esm/all.js`
+         '/scripts/greensock/esm/all.js'
       ],
       output: {
          file: `dist${PS}typhonjs-quest-log.js`,
@@ -61,14 +60,22 @@ export default () =>
                // enable run-time checks when not in production
                // dev: !production
                dev: true
-            }
+            },
+            onwarn: (warning, handler) =>
+            {
+               // Suppress `a11y-missing-attribute` for missing href in <a> links.
+               if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
+
+               // Let Rollup handle all other warnings normally.
+               handler(warning);
+            },
          }),
          postcss(postcssConfig),                            // Engages PostCSS for Sass / CSS processing
-         // css({ output: 'temp.css' }),
          resolve({
             browser: true,
             dedupe: ['svelte']
          }),
+         // commonjs(),
          sourcemaps()
       ]
    }];

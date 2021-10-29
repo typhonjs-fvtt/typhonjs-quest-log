@@ -1,3 +1,5 @@
+import { SessionStorage }  from '@typhonjs-fvtt/svelte/plugins/system';
+
 import * as DataPlugins    from './data/index.js';
 import * as SystemPlugins  from './system/index.js';
 
@@ -10,6 +12,12 @@ export default class PluginLoader
    static foundryInit()
    {
       pluginManager.addAll([
+         // Manages session storage w/ Svelte stores for each session item.
+         {
+            name: 'tql-system-session-storage',
+            instance: SessionStorage,
+            options: { eventPrepend: 'tql' }
+         },
          // Provides utilities, but also preloads Handlebars templates and registers helpers.
          {
             name: 'tql-system-utils',

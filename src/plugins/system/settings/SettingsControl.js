@@ -167,8 +167,10 @@ export default class SettingsControl
    static handle_primaryQuest(value)
    {
       // Any current primary quest.
+      // const currentQuestEntry = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
+      //  sessionStorage.getItem(sessionConstants.currentPrimaryQuest));
       const currentQuestEntry = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
-       sessionStorage.getItem(sessionConstants.currentPrimaryQuest));
+       this._eventbus.triggerSync('tql:storage:session:item:get', sessionConstants.currentPrimaryQuest));
 
       // The new primary quest or none at all if value is an empty string.
       const newQuestEntry = this._eventbus.triggerSync('tql:questdb:quest:entry:get', value);
@@ -200,7 +202,8 @@ export default class SettingsControl
       }
 
       // Store the current primary quest. Either Quest ID or empty string.
-      sessionStorage.setItem(sessionConstants.currentPrimaryQuest, value);
+      // sessionStorage.setItem(sessionConstants.currentPrimaryQuest, value);
+      this._eventbus.triggerSync('tql:storage:session:item:set', sessionConstants.currentPrimaryQuest, value);
 
       // If any quest IDs were stored then update all QuestPreviews after enriching the quest data.
       if (updateQuestIds.length)

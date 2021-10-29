@@ -1,6 +1,8 @@
-import QuestLog      from '../../../view/log/QuestLog.js';
-import QuestPreview  from '../../../view/preview/QuestPreview.js';
-import QuestTracker  from '../../../view/tracker/QuestTracker.js';
+import QuestLog         from '../../../view/log/QuestLog.js';
+import QuestPreview     from '../../../view/preview/QuestPreview.js';
+import QuestTracker     from '../../../view/tracker/QuestTracker.js';
+
+import QuestTrackerApp  from '../../../view/tracker2/QuestTrackerApp.js';
 
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';
@@ -40,7 +42,8 @@ export default class ViewManager
    static async init()
    {
       Apps.questLog = new QuestLog();
-      Apps.questTracker = new QuestTracker();
+      // Apps.questTracker = new QuestTracker();
+      Apps.questTracker = new QuestTrackerApp();
 
       // TODO TEMPORARY!
       const demoApp = new DemoApp();

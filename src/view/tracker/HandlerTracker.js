@@ -83,9 +83,16 @@ export default class HandlerTracker
       const questEntry = eventbus.triggerSync('tql:questdb:quest:entry:get', questId);
       if (questEntry && questEntry.enrich.hasObjectives)
       {
-         const folderState = sessionStorage.getItem(`${sessionConstants.trackerFolderState}${questId}`);
-         const collapsed = folderState !== 'false';
-         sessionStorage.setItem(`${sessionConstants.trackerFolderState}${questId}`, (!collapsed).toString());
+         // const folderState = sessionStorage.getItem(`${sessionConstants.trackerFolderState}${questId}`);
+         const folderState = eventbus.triggerSync('tql:storage:session:item:get',
+          `${sessionConstants.trackerFolderState}${questId}`);
+
+         // const collapsed = folderState !== 'false';
+         const collapsed = folderState !== false;
+
+         // sessionStorage.setItem(`${sessionConstants.trackerFolderState}${questId}`, (!collapsed).toString());
+         eventbus.trigger('tql:storage:session:item:set', `${sessionConstants.trackerFolderState}${questId}`,
+          !collapsed);
 
          questTracker.render();
       }
@@ -96,10 +103,13 @@ export default class HandlerTracker
     *
     * @param {QuestTracker}   questTracker - The QuestTracker.
     */
-   static questPrimaryShow(questTracker)
+   static questPrimaryShow(questTracker, eventbus)
    {
-      const newPrimary = !(sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true');
-      sessionStorage.setItem(sessionConstants.trackerShowPrimary, (newPrimary).toString());
+      // const newPrimary = !(sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true');
+      const newPrimary = !eventbus.triggerSync('tql:storage:session:item:get', sessionConstants.trackerShowPrimary);
+
+      // sessionStorage.setItem(sessionConstants.trackerShowPrimary, (newPrimary).toString());
+      eventbus.trigger('tql:storage:session:item:set', sessionConstants.trackerShowPrimary, newPrimary);
 
       const showPrimaryIcon = $('#quest-tracker .header-button.show-primary i');
       showPrimaryIcon.attr('class', newPrimary ? 'fas fa-star' : 'far fa-star');

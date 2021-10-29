@@ -1,5 +1,6 @@
-import Demo                from './Demo.svelte';
-import SvelteApplication   from '../SvelteApplication.js';
+import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+
+import Demo                   from './Demo.svelte';
 
 export default class DemoApp extends SvelteApplication
 {
@@ -19,29 +20,29 @@ export default class DemoApp extends SvelteApplication
          minimizable: true,
          resizable: true,
          title: 'demo app',
-         svelte: {
-            class: Demo,
-            target: '.window-content',
-            props: {
-               test: 'Foundry'
-            }
-         }
-         // svelte: [
-         //    {
-         //       class: Demo,
-         //       target: '.window-content',
-         //       props: {
-         //          test: 'Foundry'
-         //       }
-         //    },
-         //    {
-         //       class: Demo,
-         //       target: '.window-content',
-         //       props: {
-         //          test: 'Testing'
-         //       }
+         // svelte: {
+         //    class: Demo,
+         //    target: '.window-content',
+         //    props: {
+         //       test: 'Foundry'
          //    }
-         // ]
+         // }
+         svelte: [
+            {
+               class: Demo,
+               target: '.window-content',
+               props: {
+                  test: 'Foundry'
+               }
+            },
+            {
+               class: Demo,
+               target: '.window-content',
+               props: {
+                  test: 'Testing'
+               }
+            }
+         ]
       });
    }
 }

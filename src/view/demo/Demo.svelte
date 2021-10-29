@@ -1,20 +1,20 @@
 <script>
    import { beforeUpdate, onMount, onDestroy }	from 'svelte';
-   import animate                               from '../animate.js';
+   import { animate }                           from '@typhonjs-fvtt/svelte/gsap';
 
    beforeUpdate(() =>
    {
-      console.log(`App.svelte - beforeUpdate`);
+      console.log(`Demo.svelte - beforeUpdate`);
    });
 
    onMount(() =>
    {
-      console.log(`App.svelte - onMount`);
+      console.log(`Demo.svelte - onMount`);
    });
 
    onDestroy(() =>
    {
-      console.log(`App.svelte - onDestroy`);
+      console.log(`Demo.svelte - onDestroy`);
    });
    let desc = false;
    export let test;

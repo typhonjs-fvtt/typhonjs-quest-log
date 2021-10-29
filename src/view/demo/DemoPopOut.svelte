@@ -1,20 +1,19 @@
 <script>
    import { beforeUpdate, onMount, onDestroy }	from 'svelte';
-   import animate                               from '../animate.js';
 
    beforeUpdate(() =>
    {
-      console.log(`App.svelte - beforeUpdate`);
+      console.log(`DemoPopOut.svelte - beforeUpdate`);
    });
 
    onMount(() =>
    {
-      console.log(`App.svelte - onMount - app.options.title:\n${_foundryApp.title}`);
+      console.log(`DemoPopOut.svelte - onMount - app.options.title:\n${_foundryApp.title}`);
    });
 
    onDestroy(() =>
    {
-      console.log(`App.svelte - onDestroy`);
+      console.log(`DemoPopOut.svelte - onDestroy`);
    });
 
    export let _foundryApp;

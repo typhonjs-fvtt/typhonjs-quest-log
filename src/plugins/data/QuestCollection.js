@@ -1,4 +1,4 @@
-import Quest   from '../../model/Quest.js';
+import { constants } from "../../model/constants";
 
 /**
  * Provides a shim to link QuestDB to a Foundry Collection. Instead of storing any data directly the appropriate methods
@@ -15,7 +15,7 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    static get documentName()
    {
-      return Quest.documentName;
+      return constants.questDocumentName;
    }
 
    /**
@@ -25,7 +25,7 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    get documentName()
    {
-      return Quest.documentName;
+      return constants.questDocumentName;
    }
 
    /**
@@ -35,7 +35,7 @@ export default class QuestCollection extends foundry.utils.Collection
     */
    static get instance()
    {
-      return game.collections.get(Quest.documentName);
+      return game.collections.get(constants.questDocumentName);
    }
 
    /**

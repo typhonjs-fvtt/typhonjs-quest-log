@@ -124,11 +124,11 @@ export default class TQLHooks
    static async foundryReady()
    {
       // Add the TQL unique Quest data type to the Foundry core data types.
-      CONST.ENTITY_TYPES?.push(Quest.documentName);
-      CONST.ENTITY_LINK_TYPES?.push(Quest.documentName);
+      CONST.ENTITY_TYPES?.push(constants.questDocumentName);
+      CONST.ENTITY_LINK_TYPES?.push(constants.questDocumentName);
 
       // Add the TQL Quest data type to CONFIG.
-      CONFIG[Quest.documentName] = {
+      CONFIG[constants.questDocumentName] = {
          entityClass: Quest,
          documentClass: Quest,
          collection: QuestCollection,
@@ -145,7 +145,7 @@ export default class TQLHooks
       });
 
       // Add our QuestCollection to the game collections.
-      game.collections.set(Quest.documentName, questCollection);
+      game.collections.set(constants.questDocumentName, questCollection);
 
       // Initialize / add plugins.
       await PluginLoader.foundryReady();
@@ -320,7 +320,7 @@ export default class TQLHooks
       let handled = false;
 
       // Verify if the hotbar drop is data that is handled; either a quest or macro from TQL macro compendium.
-      if (data.type === Quest.documentName || (data.type === 'Macro' && typeof data.pack === 'string' &&
+      if (data.type === constants.questDocumentName || (data.type === 'Macro' && typeof data.pack === 'string' &&
        data.pack.startsWith(constants.moduleName)))
       {
          handled = true;
@@ -335,7 +335,7 @@ export default class TQLHooks
             await TQLHooks.handleMacroHotbarDrop(data, slot);
          }
 
-         if (data.type === Quest.documentName)
+         if (data.type === constants.questDocumentName)
          {
             await TQLHooks.handleQuestHotbarDrop(data, slot);
          }

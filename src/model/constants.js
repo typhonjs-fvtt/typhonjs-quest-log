@@ -4,9 +4,10 @@
  * @type {{flagDB: string, moduleName: string, moduleLabel: string}}
  */
 const constants = {
-   moduleName: 'typhonjs-quest-log',
+   flagDB: 'json',
    moduleLabel: `TyphonJS Quest Log`,
-   flagDB: 'json'
+   moduleName: 'typhonjs-quest-log',
+   questDocumentName: 'Quest'
 };
 
 /**

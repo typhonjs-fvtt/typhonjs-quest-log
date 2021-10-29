@@ -675,7 +675,7 @@ export default class Quest
     */
    static get documentName()
    {
-      return 'Quest';
+      return constants.questDocumentName;
    }
 
    /**
@@ -685,7 +685,7 @@ export default class Quest
     */
    get documentName()
    {
-      return 'Quest';
+      return constants.questDocumentName;
    }
 
    /**

@@ -1,6 +1,6 @@
 import { writable }     from 'svelte/store';
 
-import Quest            from '../../../model/Quest.js';
+import Quest            from './Quest.js';
 import QuestPreviewShim from './QuestPreviewShim.js';
 
 import collect          from '../../../../external/collect.js';

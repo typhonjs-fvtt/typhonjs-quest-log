@@ -1,6 +1,6 @@
 import DBMigration   from './DBMigration.js';
 
-import Quest         from '../../../../model/Quest.js';
+import Quest         from '../Quest.js';
 
 import { constants, questStatus }   from '../../../../constants.js';
 

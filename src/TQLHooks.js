@@ -1,5 +1,6 @@
-import Quest            from './model/Quest.js';
+import Quest            from './plugins/system/database/Quest.js';
 import QuestCollection  from './plugins/data/QuestCollection.js';
+
 import QuestPreview     from './view/preview/QuestPreview.js';
 
 import PluginLoader     from './plugins/PluginLoader.js';
@@ -14,7 +15,6 @@ import { constants, jquery, sessionConstants, settings } from './constants.js';
  * Foundry lifecycle:
  * - `init` - {@link TQLHooks.foundryInit}
  * - `ready` - {@link TQLHooks.foundryReady} - A hook `TyphonJSQuestLog.Lifecycle.ready` is fired after TQL is ready.
- * - `setup` - {@link TQLHooks.foundrySetup}
  *
  * Foundry game hooks:
  * - `collapseSidebar` - {@link FoundryUIManager.collapseSidebar} - Handle tracking state of the sidebar.

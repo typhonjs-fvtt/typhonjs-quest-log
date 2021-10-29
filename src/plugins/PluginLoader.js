@@ -5,7 +5,7 @@ import * as SystemPlugins  from './system/index.js';
 
 import pluginManager       from './PluginManager.js';
 
-import { constants }       from '../model/constants.js';
+import { constants }       from '../constants.js';
 
 export default class PluginLoader
 {

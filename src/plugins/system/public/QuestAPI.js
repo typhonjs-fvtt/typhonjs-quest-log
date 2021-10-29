@@ -1,4 +1,4 @@
-import { constants, questDBHooks, settings } from '../../../model/constants.js';
+import { constants, questDBHooks, settings } from '../../../constants.js';
 
 /**
  * Quest public API. QuestAPI exposes control capabilities publicly. This functionality is gated as necessary depending

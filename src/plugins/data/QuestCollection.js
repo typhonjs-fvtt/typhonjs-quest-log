@@ -1,4 +1,4 @@
-import { constants } from "../../model/constants";
+import { constants } from "../../constants";
 
 /**
  * Provides a shim to link QuestDB to a Foundry Collection. Instead of storing any data directly the appropriate methods

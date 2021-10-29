@@ -3,7 +3,7 @@ import TQLDialog        from '../TQLDialog.js';
 
 import HandlerLog       from './HandlerLog.js';
 
-import { constants, jquery, questStatusI18n, questTabIndex, settings } from '../../model/constants.js';
+import { constants, jquery, questStatusI18n, questTabIndex, settings } from '../../constants.js';
 
 /**
  * Provides the main quest log app which shows the quests separated by status either with bookmark or classic tabs.

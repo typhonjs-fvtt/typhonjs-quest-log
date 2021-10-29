@@ -5,7 +5,7 @@ import QuestPreviewShim from './QuestPreviewShim.js';
 
 import collect          from '../../../../external/collect.js';
 
-import { constants, questDBHooks, questStatus, settings } from '../../../model/constants.js';
+import { constants, questDBHooks, questStatus, settings } from '../../../constants.js';
 
 /**
  * Stores all {@link QuestEntry} instances in a map of Maps. This provides fast retrieval and quick insert / removal

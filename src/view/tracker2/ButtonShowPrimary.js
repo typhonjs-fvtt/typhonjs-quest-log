@@ -1,4 +1,4 @@
-import { sessionConstants }   from '../../model/constants.js';
+import { sessionConstants }   from '../../constants.js';
 
 /**
  * Creates a Foundry {@link ApplicationHeaderButton} supported by `HeaderButton.svelte`.

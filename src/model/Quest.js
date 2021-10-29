@@ -1,6 +1,6 @@
 import { eventbus } from '../plugins/PluginManager.js';
 
-import { constants, questStatus, settings } from './constants.js';
+import { constants, questStatus, settings } from '../constants.js';
 
 /**
  * Stores the sheet class for Quest which is {@link QuestPreview}. This class / sheet is used to render Quest.

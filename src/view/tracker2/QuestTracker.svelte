@@ -1,7 +1,7 @@
 <script>
    import { HeaderButton }       from '@typhonjs-fvtt/svelte';
 
-   import { questStatus, sessionConstants }   from '../../model/constants.js';
+   import { questStatus, sessionConstants }   from '../../constants.js';
 
    import { beforeUpdate, onMount, onDestroy, setContext } from 'svelte';
 

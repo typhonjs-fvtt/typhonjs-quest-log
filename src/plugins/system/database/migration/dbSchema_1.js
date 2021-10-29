@@ -2,7 +2,7 @@ import DBMigration   from './DBMigration.js';
 
 import Quest         from '../../../../model/Quest.js';
 
-import { constants, questStatus }   from '../../../../model/constants.js';
+import { constants, questStatus }   from '../../../../constants.js';
 
 /**
  * Performs DB migration from schema 0 to 1.

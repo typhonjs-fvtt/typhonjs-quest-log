@@ -8,7 +8,7 @@ import TQLContextMenu         from '../TQLContextMenu.js';
 
 import ButtonShowPrimary      from './ButtonShowPrimary.js';
 
-import { constants, jquery, settings } from '../../model/constants.js';
+import { constants, jquery, settings } from '../../constants.js';
 
 /**
  * Provides the default width for the QuestTracker if not defined.

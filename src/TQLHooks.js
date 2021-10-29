@@ -5,7 +5,7 @@ import QuestPreview     from './view/preview/QuestPreview.js';
 import PluginLoader     from './plugins/PluginLoader.js';
 import { eventbus }     from './plugins/PluginManager.js';
 
-import { constants, jquery, sessionConstants, settings } from './model/constants.js';
+import { constants, jquery, sessionConstants, settings } from './constants.js';
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the

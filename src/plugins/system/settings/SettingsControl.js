@@ -1,4 +1,4 @@
-import { constants, questStatus, sessionConstants, settings } from '../../../model/constants.js';
+import { constants, questStatus, sessionConstants, settings } from '../../../constants.js';
 
 /**
  * Defines if logging setting changes to the console occurs.

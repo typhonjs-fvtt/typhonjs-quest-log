@@ -8,7 +8,7 @@ import QuestTrackerApp  from '../../../view/tracker2/QuestTrackerApp.js';
 import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
 
-import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../model/constants.js';
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../constants.js';
 
 /**
  * Locally stores the app instances which are accessible by getter methods.

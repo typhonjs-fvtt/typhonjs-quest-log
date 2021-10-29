@@ -18,7 +18,7 @@
       console.log(`QuestTracker.svelte - onMount - app.options.title:\n${_foundryApp.title}`);
 
       storeTrackerShowPrimary = _foundryApp._eventbus.triggerSync('tql:storage:session:store:get',
-       sessionConstants.trackerShowPrimary);
+       sessionConstants.trackerShowPrimary, false);
    });
 
    onDestroy(() =>

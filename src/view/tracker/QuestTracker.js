@@ -184,9 +184,8 @@ export default class QuestTracker extends Application
       const closeButton = buttons.find((button) => button?.class === 'close');
       if (closeButton) { closeButton.label = void 0; }
 
-      // const primaryState = sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true';
       const primaryState = this._eventbus.triggerSync('tql:storage:session:item:get',
-       sessionConstants.trackerShowPrimary);
+       sessionConstants.trackerShowPrimary, false);
 
       const primaryIcon = primaryState ? 'fas fa-star' : 'far fa-star';
       const primaryTitle = primaryState ? 'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow' :
@@ -369,9 +368,8 @@ export default class QuestTracker extends Application
     */
    async getData(options = {})
    {
-      // const showOnlyPrimary = sessionStorage.getItem(sessionConstants.trackerShowPrimary) === 'true';
       const showOnlyPrimary = this._eventbus.triggerSync('tql:storage:session:item:get',
-       sessionConstants.trackerShowPrimary);
+       sessionConstants.trackerShowPrimary, false);
 
       const primaryQuest = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
        game.settings.get(constants.moduleName, settings.primaryQuest));
@@ -419,12 +417,12 @@ export default class QuestTracker extends Application
       return questEntries.transform((entry) =>
       {
          const q = entry.enrich;
-         // const collapsed = sessionStorage.getItem(`${sessionConstants.trackerFolderState}${q.id}`) === 'false';
-         const collapsed = this._eventbus.triggerSync('tql:storage:session:item:get',
-          `${sessionConstants.trackerFolderState}${q.id}`) === false;
 
-         const tasks = collapsed ? q.data_tasks : [];
-         const subquests = collapsed ? q.data_subquest : [];
+         const opened = this._eventbus.triggerSync('tql:storage:session:item:get',
+          `${sessionConstants.trackerFolderState}${q.id}`, false);
+
+         const tasks = opened ? q.data_tasks : [];
+         const subquests = opened ? q.data_subquest : [];
 
          return {
             id: q.id,

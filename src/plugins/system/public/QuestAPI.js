@@ -92,6 +92,9 @@ export function onPluginLoad(ev)
    ev.eventbus.on('tql:questapi:open', QuestAPI.open, this, opts);
 }
 
+/**
+ * Removes the plugin manager eventbus.
+ */
 export function onPluginUnload()
 {
    s_EVENTBUS = void 0;

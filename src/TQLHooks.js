@@ -155,9 +155,6 @@ export default class TQLHooks
       eventbus.trigger('tql:storage:session:item:set', sessionConstants.currentPrimaryQuest,
        game.settings.get(constants.moduleName, settings.primaryQuest));
 
-      // sessionStorage.setItem(sessionConstants.currentPrimaryQuest,
-      //  game.settings.get(constants.moduleName, settings.primaryQuest));
-
       // Initialize current client based macro images based on current state.
       // await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
       await eventbus.triggerAsync('tql:utils:macro:image:set',
@@ -406,10 +403,7 @@ export default class TQLHooks
          // Handle setting quest tracker primary change.
          if (typeof opts.primary === 'boolean')
          {
-            // sessionStorage.setItem(sessionConstants.trackerShowPrimary, (opts.primary).toString());
-
-            eventbus.trigger('tql:storage:session:item:set', sessionConstants.trackerShowPrimary,
-             (opts.primary).toString());
+            eventbus.trigger('tql:storage:session:item:set', sessionConstants.trackerShowPrimary, opts.primary);
          }
 
          // Select only constraint related parameters.

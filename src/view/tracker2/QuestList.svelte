@@ -3,7 +3,7 @@
 
    import Quest            from './Quest.svelte';
 
-   import { questStatus }  from '../../constants.js';
+   import { questStatus }  from '#constants';
 
    const eventbus = getContext('eventbus')();
 

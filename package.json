@@ -8,6 +8,9 @@
   "contributors": [
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
+  "imports": {
+    "#constants": "./src/constants.js"
+  },
   "dependencies": {
     "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt/svelte",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
@@ -19,6 +22,7 @@
     "@itsjamie/esdoc-core": "^0.3",
     "@itsjamie/esdoc-cli": "^0.3",
     "@itsjamie/esdoc-standard-plugin": "^0.3",
+    "@rollup/plugin-alias": "^3",
     "@rollup/plugin-commonjs": "^19",
     "@rollup/plugin-node-resolve": "^13",
     "@rollup/plugin-virtual": "^2",

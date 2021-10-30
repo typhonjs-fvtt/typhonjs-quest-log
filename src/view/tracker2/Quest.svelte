@@ -1,13 +1,13 @@
 <script>
-   import { fade }      from 'svelte/transition';
+   // import { fade }      from 'svelte/transition';
    // import { animate }   from '@typhonjs-fvtt/svelte/gsap';
-   import { animate }               from './animate.js';
+   // import { animate }               from './animate.js';
 
    import { getContext, onMount }   from 'svelte';
 
    import { createMultiClick }      from '@typhonjs-svelte/lib/handlers';
 
-   import { sessionConstants }      from "../../constants";
+   import { sessionConstants }      from '#constants';
 
    const eventbus = getContext('eventbus')();
 

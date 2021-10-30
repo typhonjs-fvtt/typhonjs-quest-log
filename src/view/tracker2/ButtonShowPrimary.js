@@ -1,4 +1,4 @@
-import { sessionConstants }   from '../../constants.js';
+import { sessionConstants }   from '#constants';
 
 /**
  * Creates a Foundry {@link ApplicationHeaderButton} supported by `HeaderButton.svelte`.
@@ -27,7 +27,5 @@ export default class ButtonShowPrimary
 
       this.title = newPrimary ? 'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow' :
        'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestShow';
-
-      console.log(`onclick this: ${JSON.stringify(this)}`);
    }
 }

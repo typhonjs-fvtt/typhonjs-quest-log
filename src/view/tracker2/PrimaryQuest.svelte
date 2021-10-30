@@ -2,7 +2,9 @@
    import { getContext }         from 'svelte';
    import { localize }           from '@typhonjs-fvtt/svelte/helpers';
 
-   import { sessionConstants }   from "../../constants";
+   import Quest                  from './Quest.svelte';
+
+   import { sessionConstants }   from '#constants';
 
    const eventbus = getContext('eventbus')();
 
@@ -18,7 +20,7 @@
 </script>
 
 {#if questEntry}
-   {questEntry.quest.name}
+   <Quest {questEntry} />
 {:else}
    <div class="no-quests">{localize('TyphonJSQuestLog.QuestTracker.NoPrimary')}</div>
 {/if}

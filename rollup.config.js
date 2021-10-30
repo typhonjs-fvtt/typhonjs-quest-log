@@ -2,21 +2,15 @@ import path             from 'path';
 
 // The following plugins are for the main source bundle.
 
+import alias            from '@rollup/plugin-alias';
 import postcss          from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
-import svelte           from 'rollup-plugin-svelte';
-
-// The following plugins are for the 2nd & 3rd external bundles pulling in modules from NPM.
 import resolve          from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
-// import commonjs         from "@rollup/plugin-commonjs";
+import svelte           from 'rollup-plugin-svelte';
+import { terser }       from 'rollup-plugin-terser';        // Terser is used for minification / mangling
 
-// This plugin is for importing existing sourcemaps from `unique-names-generator` NPM module. Include it for
+// This plugin is for importing existing sourcemaps from NPM modules. Include it for
 // any external imported source code that has sourcemaps available.
 // import sourcemaps       from 'rollup-plugin-sourcemaps';
-
-// Terser is used as an output plugin in both bundles to conditionally minify / mangle the output bundles depending
-// on which NPM script & .env file is referenced.
-
-import { terser }       from 'rollup-plugin-terser';        // Terser is used for minification / mangling
 
 // Import config files for Terser and Postcss; refer to respective documentation for more information.
 // We are using `require` here in order to be compliant w/ `fvttdev` for testing purposes.
@@ -58,6 +52,11 @@ export default () =>
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       },
       plugins: [
+         alias({
+            entries: [
+               { find: '#constants', replacement: './src/constants.js' }
+            ]
+         }),
          svelte({
             compilerOptions: {
                // enable run-time checks when not in production
@@ -78,7 +77,6 @@ export default () =>
             browser: true,
             dedupe: ['svelte']
          }),
-         // commonjs(),
          // sourcemaps()
       ]
    }];

@@ -1,7 +1,12 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+import { ApplicationShell, SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
-import DemoPopOut             from './DemoPopOut.svelte';
+import DemoPopOut                               from './DemoPopOut.svelte';
 
+/**
+ * Simulates a popout Application, but is a non-popout with full control of z-index and not connected to the automatic
+ * closing of apps from `Esc` key. The entire HTML content is rendered by ApplicationShell and another Svelte component
+ * can be mounted for the content area.
+ */
 export default class DemoAppPopOut extends SvelteApplication
 {
    /**
@@ -19,12 +24,11 @@ export default class DemoAppPopOut extends SvelteApplication
          popOut: false,
          width: 300,
          height: 480,
-         title: 'Demo Popout App',
+         title: 'Demo Non-Popout (popout!) app',
          svelte: {
-            class: DemoPopOut,
-            options: {
-               injectApp: true
-            }
+            class: ApplicationShell,
+            options: { injectApp: true, injectEventbus: true },
+            props: { component: DemoPopOut }
          }
       });
    }
@@ -46,6 +50,12 @@ export default class DemoAppPopOut extends SvelteApplication
       new Draggable(this, element, header, this.options.resizable);
    }
 
+   /**
+    * Example of the necessity to override setPosition for non-popout apps as there is an artificial gate at the
+    * beginning of `Application.setPosition`.
+    *
+    * @param {object} pos -
+    */
    setPosition(pos)
    {
       this.options.popOut = true;

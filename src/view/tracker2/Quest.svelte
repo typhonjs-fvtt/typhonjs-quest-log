@@ -1,6 +1,7 @@
 <script>
    import { fade }      from 'svelte/transition';
-   import { animate }   from '@typhonjs-fvtt/svelte/gsap';
+   // import { animate }   from '@typhonjs-fvtt/svelte/gsap';
+   import { animate }               from './animate.js';
 
    import { getContext, onMount }   from 'svelte';
 

@@ -8,22 +8,20 @@
 
    onMount(() =>
    {
-      console.log(`DemoPopOut.svelte - onMount - app.options.title:\n${_foundryApp.title}`);
+      console.log(`DemoPopOut.svelte - onMount`);
    });
 
    onDestroy(() =>
    {
       console.log(`DemoPopOut.svelte - onDestroy`);
    });
-
-   export let _foundryApp;
 </script>
 
-<div id="{_foundryApp.id}" class="tql-app tql-window-app" data-appid="{_foundryApp.appId}">
-   <header class="window-header flexrow">
-      <h4 class="window-title">{_foundryApp.title}</h4>
-   </header>
-   <section class="window-content">
-   Test content!!!
-   </section>
-</div>
+<p>Test content!!!</p>
+
+<style>
+   p {
+      color: white;
+      font-size: 30px;
+   }
+</style>

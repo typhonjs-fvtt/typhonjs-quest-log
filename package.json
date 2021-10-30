@@ -10,6 +10,7 @@
   ],
   "dependencies": {
     "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt/svelte",
+    "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "collect.js": "^4.28.0",
     "dompurify": "^2.3.0",
     "svelte": "^3"

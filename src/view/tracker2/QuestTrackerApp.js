@@ -1,4 +1,4 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+import { ApplicationShell, SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
 import QuestTracker           from './QuestTracker.svelte';
 
@@ -94,10 +94,9 @@ export default class QuestTrackerApp extends SvelteApplication
          height: 480,
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
          svelte: {
-            class: QuestTracker,
-            options: {
-               injectApp: true
-            }
+            class: ApplicationShell,
+            options: { injectApp: true, injectEventbus: true },
+            props: { component: QuestTracker }
          }
       });
    }
@@ -235,18 +234,8 @@ export default class QuestTrackerApp extends SvelteApplication
       header[0].addEventListener('pointerup', async (event) =>
        HandlerTracker.headerPointerUp(event, eventbus, header[0], this));
 
-      // element.on(jquery.click, '.header-button.close', void 0, this.close);
-
-      // element.on(jquery.click, '.header-button.show-primary i', void 0, () => HandlerTracker.questPrimaryShow(this));
-
       // Add context menu.
       this._contextMenu(element);
-
-      this._eventbus.trigger('tql:utils:jquery:dblclick:create', {
-         selector: '#quest-tracker .quest-tracker-header',
-         singleCallback: (event) => HandlerTracker.questClick(event, eventbus, this),
-         doubleCallback: (event) => HandlerTracker.questOpen(event, eventbus),
-      });
 
       element.on(jquery.click, '.quest-tracker-link', void 0, (event) => HandlerTracker.questOpen(event, eventbus));
 

@@ -11,7 +11,7 @@ import resolve          from '@rollup/plugin-node-resolve'; // This resolves NPM
 
 // This plugin is for importing existing sourcemaps from `unique-names-generator` NPM module. Include it for
 // any external imported source code that has sourcemaps available.
-import sourcemaps       from 'rollup-plugin-sourcemaps';
+// import sourcemaps       from 'rollup-plugin-sourcemaps';
 
 // Terser is used as an output plugin in both bundles to conditionally minify / mangle the output bundles depending
 // on which NPM script & .env file is referenced.
@@ -45,11 +45,14 @@ export default () =>
    return [{
       input: `src${PS}init.js`,
       external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         '/scripts/greensock/esm/all.js'
+         'foundry-gsap'
       ],
       output: {
          file: `dist${PS}typhonjs-quest-log.js`,
          format: 'es',
+         paths: {
+            'foundry-gsap': '/scripts/greensock/esm/all.js'
+         },
          plugins: outputPlugins,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
@@ -76,7 +79,7 @@ export default () =>
             dedupe: ['svelte']
          }),
          // commonjs(),
-         sourcemaps()
+         // sourcemaps()
       ]
    }];
 };

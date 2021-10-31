@@ -1,6 +1,6 @@
 import { ApplicationShell, SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
-import DemoPopOut                               from './DemoPopOut.svelte';
+import DemoPopOut from './DemoPopOut.svelte';
 
 /**
  * Simulates a popout Application, but is a non-popout with full control of z-index and not connected to the automatic
@@ -25,11 +25,28 @@ export default class DemoAppPopOut extends SvelteApplication
          width: 300,
          height: 480,
          title: 'Demo Non-Popout (popout!) app',
-         svelte: {
+
+         svelte: {         // Add a single Svelte component to Application Shell.
             class: ApplicationShell,
-            options: { injectApp: true, injectEventbus: true },
-            props: { component: DemoPopOut }
+            children: {
+               class: DemoPopOut
+            },
+            options: { injectApp: true }
          }
+
+         // svelte: {      // Add multiple Svelte components to ApplicationShell.
+         //    class: ApplicationShell,
+         //    children: [
+         //       { class: DemoPopOut },
+         //       { class: DemoPopOut }
+         //    ],
+         //    options: { injectApp: true }
+         // }
+
+         // svelte: {         // A warning is posted w/ no children.
+         //    class: ApplicationShell,
+         //    options: { injectApp: true }
+         // }
       });
    }
 

@@ -9,7 +9,7 @@
 
    import { sessionConstants }      from '#constants';
 
-   const eventbus = getContext('eventbus')();
+   const eventbus = getContext('external')().eventbus;
 
    let quest;
    let questId;

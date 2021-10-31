@@ -1,21 +1,24 @@
 <script>
-   import { beforeUpdate, onMount, onDestroy}   from 'svelte';
+   import { beforeUpdate, onMount, onDestroy, getContext } from 'svelte';
    import { animate }                           from '@typhonjs-fvtt/svelte/gsap';
 
    beforeUpdate(() =>
    {
-      console.log(`Demo.svelte - beforeUpdate`);
+      console.log(`DemoShell.svelte - beforeUpdate`);
    });
 
    onMount(() =>
    {
-      console.log(`Demo.svelte - onMount`);
+      console.log(`DemoShell.svelte - onMount - title: ${foundryApp ? foundryApp.title : 'NO TITLE / APP'}`);
+      console.log(`DemoShell.svelte - onMount - external context TEST: ${TEST}`);
    });
 
    onDestroy(() =>
    {
-      console.log(`Demo.svelte - onDestroy`);
+      console.log(`DemoShell.svelte - onDestroy`);
    });
+   const foundryApp = getContext('external')().foundryApp;
+   const TEST = getContext('external')().TEST;
 
    let desc = false;
    export let test;

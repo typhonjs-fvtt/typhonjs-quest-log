@@ -34,23 +34,20 @@
     "cssnano": "^5",
     "eslint": "^8",
     "postcss": "^8",
-    "postcss-cli": "^8",
     "postcss-preset-env": "^6",
     "rollup": "^2",
     "rollup-plugin-postcss": "^4",
     "rollup-plugin-sourcemaps": "^0.6",
     "rollup-plugin-svelte": "^7",
     "rollup-plugin-terser": "^7",
-    "sass": "^1"
+    "sass": "^1",
+    "svelte-preprocess": "^4"
   },
   "scripts": {
     "build-dist": "rollup --config",
     "build-dist-watch": "rollup --watch --config",
-    "build-css-tinymce": "npm run sass && npm run postcss",
     "eslint": "eslint .",
     "esdoc": "esdoc",
-    "sass": "sass ./styles/init-tinymce.scss ./dist/init-tinymce.css",
-    "postcss": "postcss ./dist/init-tinymce.css -p sass -u autoprefixer postcss-preset-env cssnano -m -o ./dist/init-tinymce.css",
     "rollup-external": "rollup --config rollup.config.external.js"
   }
 }

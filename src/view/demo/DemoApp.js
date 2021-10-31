@@ -1,6 +1,7 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+import { ComponentShell, SvelteApplication } from '@typhonjs-fvtt/svelte';
 
-import Demo                   from './Demo.svelte';
+import Demo       from './Demo.svelte';
+import DemoShell  from './DemoShell.svelte';
 
 /**
  * Creates a basic demo popout Application. Foundry renders the outer frame HTML and `.window-content` is the target
@@ -10,6 +11,12 @@ import Demo                   from './Demo.svelte';
  */
 export default class DemoApp extends SvelteApplication
 {
+   constructor(options)
+   {
+      super(options);
+      this._test = 'TESTING CONTEXT';     // Used in advanced ComponentShell demo below.
+   }
+
    /**
     * Default Application options
     *
@@ -26,29 +33,74 @@ export default class DemoApp extends SvelteApplication
          minimizable: true,
          resizable: true,
          title: 'demo app',
-         // svelte: {
-         //    class: Demo,
-         //    target: '.window-content',
-         //    props: {
-         //       test: 'Foundry'
-         //    }
-         // }
-         svelte: [      // You can also mount multiple components.
-            {
-               class: Demo,
-               target: '.window-content',
-               props: {
-                  test: 'Foundry'
-               }
-            },
-            {
-               class: Demo,
-               target: '.window-content',
-               props: {
-                  test: 'Testing'
-               }
+
+         svelte: {      // Mount a single Svelte component
+            class: Demo,
+            target: '.window-content',
+            props: {
+               test: 'Foundry'
             }
-         ]
+         }
+
+         // svelte: [      // You can also mount multiple components.
+         //    {
+         //       class: Demo,
+         //       target: '.window-content',
+         //       props: {
+         //          test: 'Foundry'
+         //       }
+         //    },
+         //    {
+         //       class: Demo,
+         //       target: '.window-content',
+         //       props: {
+         //          test: 'Testing'
+         //       }
+         //    }
+         // ]
+
+         // svelte: {      // ComponentShell will inject a context with the Foundry app reference.
+         //    class: ComponentShell,
+         //    target: '.window-content',
+         //
+         //    // Advanced: For ApplicationShell / ComponentShell you can define a context function which is invoked with
+         //    // `this` being the Foundry application to set context parameters at runtime.
+         //    context: function() { return { TEST: this._test }; },
+         //
+         //    children: {
+         //       class: DemoShell,
+         //       props: {
+         //          test: 'context'
+         //       }
+         //    },
+         //    options: { injectApp: true }
+         // }
+
+         // svelte: {      // You can also inject multiple children with ComponentShell.
+         //    class: ComponentShell,
+         //    target: '.window-content',
+         //    children: [
+         //       {
+         //          class: DemoShell,
+         //          props: {
+         //             test: 'Foundry'
+         //          }
+         //       },
+         //       {
+         //          class: DemoShell,
+         //          props: {
+         //             test: 'Test'
+         //          }
+         //       }
+         //    ],
+         //    options: { injectApp: true }
+         // }
+
+         // svelte: {      // ComponentShell posts a warning if no children added.
+         //    class: ComponentShell,
+         //    target: '.window-content',
+         //    options: { injectApp: true }
+         // }
       });
    }
 

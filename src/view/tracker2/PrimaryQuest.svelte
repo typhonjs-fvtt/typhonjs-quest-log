@@ -6,7 +6,7 @@
 
    import { sessionConstants }   from '#constants';
 
-   const eventbus = getContext('eventbus')();
+   const eventbus = getContext('external')().eventbus;
 
    let currentPrimaryQuest = eventbus.triggerSync('tql:storage:session:store:get',
     sessionConstants.currentPrimaryQuest);

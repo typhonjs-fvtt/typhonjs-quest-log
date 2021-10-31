@@ -3,7 +3,7 @@ import { writable }     from 'svelte/store';
 import Quest            from './Quest.js';
 import QuestPreviewShim from './QuestPreviewShim.js';
 
-import collect          from '../../../../external/collect.js';
+import collect          from '../../../npm/collect.js';
 
 import { constants, questDBHooks, questStatus, settings } from '../../../constants.js';
 

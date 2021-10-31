@@ -1,5 +1,5 @@
-import { EventbusSecure }  from '../../external/PluginManager.js';
-import PluginManager       from '../../external/PluginManager.js';
+import { EventbusSecure }  from '@typhonjs-plugin/manager';
+import PluginManager       from '@typhonjs-plugin/manager';
 
 const pluginManager = new PluginManager();
 

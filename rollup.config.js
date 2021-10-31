@@ -3,6 +3,7 @@ import path          from 'path';
 // The following plugins are for the main source bundle.
 
 import alias         from '@rollup/plugin-alias';
+import commonjs      from '@rollup/plugin-commonjs';
 import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
 import resolve       from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 import svelte        from 'rollup-plugin-svelte';
@@ -94,6 +95,7 @@ export default () =>
                browser: true,
                dedupe: ['svelte']
             }),
+            commonjs()
             // sourcemaps()
          ]
       },

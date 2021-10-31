@@ -1,6 +1,6 @@
 import HandlerTracker   from './HandlerTracker.js';
 import TQLContextMenu   from '../TQLContextMenu.js';
-import collect          from '../../../external/collect.js';
+import collect          from '../../npm/collect.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '../../constants.js';
 

@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt/svelte",
-    "@typhonjs-plugin/manager": "^0.0.10",
+    "@typhonjs-plugin/manager": "^0.0.11",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "@typhonjs-tinymce/oembed": "github:typhonjs-tinymce/oembed",
     "collect.js": "^4.28.0",

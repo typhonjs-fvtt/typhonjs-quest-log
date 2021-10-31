@@ -1,7 +1,5 @@
 import path          from 'path';
 
-// The following plugins are for the main source bundle.
-
 import alias         from '@rollup/plugin-alias';
 import commonjs      from '@rollup/plugin-commonjs';
 import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
@@ -21,7 +19,7 @@ import virtual       from '@rollup/plugin-virtual';
 import terserConfig  from './terser.config.mjs';
 import postcssConfig from './postcss.config.mjs';
 
-const s_COMPRESS = true;
+const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
 
 const postcssMain = postcssConfig({

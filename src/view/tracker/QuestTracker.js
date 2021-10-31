@@ -185,7 +185,7 @@ export default class QuestTracker extends Application
       if (closeButton) { closeButton.label = void 0; }
 
       const primaryState = this._eventbus.triggerSync('tql:storage:session:item:get',
-       sessionConstants.trackerShowPrimary, false);
+       sessionConstants.trackerShowPrimary);
 
       const primaryIcon = primaryState ? 'fas fa-star' : 'far fa-star';
       const primaryTitle = primaryState ? 'TyphonJSQuestLog.QuestTracker.Tooltips.PrimaryQuestUnshow' :
@@ -369,7 +369,7 @@ export default class QuestTracker extends Application
    async getData(options = {})
    {
       const showOnlyPrimary = this._eventbus.triggerSync('tql:storage:session:item:get',
-       sessionConstants.trackerShowPrimary, false);
+       sessionConstants.trackerShowPrimary);
 
       const primaryQuest = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
        game.settings.get(constants.moduleName, settings.primaryQuest));
@@ -419,7 +419,7 @@ export default class QuestTracker extends Application
          const q = entry.enrich;
 
          const opened = this._eventbus.triggerSync('tql:storage:session:item:get',
-          `${sessionConstants.trackerFolderState}${q.id}`, false);
+          `${sessionConstants.trackerFolderState}${q.id}`);
 
          const tasks = opened ? q.data_tasks : [];
          const subquests = opened ? q.data_subquest : [];

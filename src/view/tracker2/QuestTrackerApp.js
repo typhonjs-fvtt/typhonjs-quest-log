@@ -1,11 +1,7 @@
-// import {
-//    ApplicationShell,
-//    SvelteApplication }        from '@typhonjs-fvtt/svelte';
-
-import AppShell               from './AppShell.svelte';
-import SvelteApplication      from '../svelte/SvelteApplication.js';
+import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
 import QuestTracker           from './QuestTracker.svelte';
+import QuestTrackerShell      from './QuestTrackerShell.svelte';
 
 import HandlerTracker         from '../tracker/HandlerTracker.js';
 
@@ -101,7 +97,7 @@ export default class QuestTrackerApp extends SvelteApplication
          height: game.settings.get(constants.moduleName, settings.questTrackerResizable) ? 'auto' : 480,
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
          svelte: {
-            class: AppShell,
+            class: QuestTrackerShell,
             children: { class: QuestTracker },
             options: { injectApp: true, injectEventbus: true },
          }
@@ -218,8 +214,12 @@ export default class QuestTrackerApp extends SvelteApplication
       return buttons;
    }
 
-   // Handles showing / hiding
-   _handleSettingWindowResize(value)
+   /**
+    * Handles showing / hiding the resize element.
+    *
+    * @param {boolean}  value - Current value of {@link TQLSettings.questTrackerResizable}.
+    */
+   #handleSettingWindowResize(value)
    {
       /**
        * Stores the state of {@link TQLSettings.questTrackerResizable}.
@@ -290,7 +290,7 @@ export default class QuestTrackerApp extends SvelteApplication
       };
 
       // this._windowResizable = game.settings.get(constants.moduleName, settings.questTrackerResizable);
-      this._handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
+      this.#handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
    }
 
    /**
@@ -308,7 +308,119 @@ export default class QuestTrackerApp extends SvelteApplication
       }
    }
 
-   superSetPosition({ left, top, width, height, scale } = {})
+   /**
+    * Some game systems and custom UI theming modules provide hard overrides on overflow-x / overflow-y styles. Alas we
+    * need to set these for '.window-content' to 'visible' which will cause an issue for very long tables. Thus we must
+    * manually set the table max-heights based on the position / height of the {@link Application}.
+    *
+    * @param {object}               [opts] - Optional parameters.
+    *
+    * @param {number|null}          [opts.left] - The left offset position in pixels.
+    *
+    * @param {number|null}          [opts.top] - The top offset position in pixels.
+    *
+    * @param {number|null}          [opts.width] - The application width in pixels.
+    *
+    * @param {number|string|null}   [opts.height] - The application height in pixels.
+    *
+    * @param {number|null}          [opts.scale] - The application scale as a numeric factor where 1.0 is default.
+    *
+    * @param {boolean}              [opts.override] - Forces any manual pinned setting to take effect.
+    *
+    * @param {boolean}              [opts.pinned] - Sets the pinned state.
+    *
+    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
+    * The updated position object for the application containing the new values.
+    */
+   setPosition({ override, pinned = this._pinned, ...opts } = {})
+   {
+      // Potentially force override any pinned state. This is done from TQLHooks.openQuestTracker.
+      if (typeof override === 'boolean')
+      {
+         if (pinned)
+         {
+            this._pinned = true;
+            this._inPinDropRect = true;
+            game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
+            this._eventbus.trigger('tql:foundryuimanager:update:tracker');
+            return opts; // Early out as updateTracker above calls setPosition again.
+         }
+         else
+         {
+            this._pinned = false;
+            this._inPinDropRect = false;
+            game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
+         }
+      }
+
+      const initialWidth = this.position.width;
+      const initialHeight = this.position.height;
+
+      if (pinned)
+      {
+         if (typeof opts.left === 'number') { opts.left = this.position.left; }
+         if (typeof opts.top === 'number') { opts.top = this.position.top; }
+         if (typeof opts.width === 'number') { opts.width = this.position.width; }
+      }
+
+      // Must set popOut temporarily to true as there is a gate in `Application.setPosition`.
+      const currentPosition = this.#setPositionMod(opts);
+
+      // Pin width / height to min / max styles if defined.
+      if (currentPosition.width < this._appExtents.minWidth) { currentPosition.width = this._appExtents.minWidth; }
+      if (currentPosition.width > this._appExtents.maxWidth) { currentPosition.width = this._appExtents.maxWidth; }
+      if (currentPosition.height < this._appExtents.minHeight) { currentPosition.height = this._appExtents.minHeight; }
+      if (currentPosition.height > this._appExtents.maxHeight) { currentPosition.height = this._appExtents.maxHeight; }
+
+      const el = this.element[0];
+
+      currentPosition.resizeWidth = initialWidth < currentPosition.width;
+      currentPosition.resizeHeight = initialHeight < currentPosition.height;
+
+      // Mutates `checkPosition` to set maximum left position. Must do this calculation after `super.setPosition`
+      // as in some cases `super.setPosition` will override the changes of `FoundryUIManager.checkPosition`.
+      const currentInPinDropRect = this._inPinDropRect;
+      this._inPinDropRect = this._eventbus.triggerSync('tql:foundryuimanager:check:position', currentPosition);
+
+      // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
+      // has changed.
+      if (!this._pinned && this._dragHeader && currentInPinDropRect !== this._inPinDropRect)
+      {
+         this.element.css('animation', this._inPinDropRect ? 'tql-jiggle 0.3s infinite' : '');
+      }
+
+      el.style.top = `${currentPosition.top}px`;
+      el.style.left = `${currentPosition.left}px`;
+      el.style.width = `${currentPosition.width}px`;
+
+      // Only set height if resizable.
+      if (this._windowResizable) { el.style.height = `${currentPosition.height}px`; }
+
+      s_SAVE_POSITION(currentPosition);
+
+      return currentPosition;
+   }
+
+   /**
+    * Modified Application `setPosition` to support QuestTrackerApp for switchable resizable window.
+    * Set the application position and store its new location.
+    *
+    * @param {object} opts                      Optional parameters.
+    *
+    * @param {number|null} opts.left            The left offset position in pixels
+    *
+    * @param {number|null} opts.top             The top offset position in pixels
+    *
+    * @param {number|null} opts.width           The application width in pixels
+    *
+    * @param {number|string|null} opts.height   The application height in pixels
+    *
+    * @param {number|null} opts.scale           The application scale as a numeric factor where 1.0 is default
+    *
+    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
+    * The updated position object for the application containing the new values
+    */
+   #setPositionMod({ left, top, width, height, scale } = {})
    {
       const el = this.element[0];
       const currentPosition = this.position;
@@ -374,133 +486,21 @@ export default class QuestTrackerApp extends SvelteApplication
       return currentPosition;
    }
 
-   /**
-    * Some game systems and custom UI theming modules provide hard overrides on overflow-x / overflow-y styles. Alas we
-    * need to set these for '.window-content' to 'visible' which will cause an issue for very long tables. Thus we must
-    * manually set the table max-heights based on the position / height of the {@link Application}.
-    *
-    * @param {object}               [opts] - Optional parameters.
-    *
-    * @param {number|null}          [opts.left] - The left offset position in pixels.
-    *
-    * @param {number|null}          [opts.top] - The top offset position in pixels.
-    *
-    * @param {number|null}          [opts.width] - The application width in pixels.
-    *
-    * @param {number|string|null}   [opts.height] - The application height in pixels.
-    *
-    * @param {number|null}          [opts.scale] - The application scale as a numeric factor where 1.0 is default.
-    *
-    * @param {boolean}              [opts.override] - Forces any manual pinned setting to take effect.
-    *
-    * @param {boolean}              [opts.pinned] - Sets the pinned state.
-    *
-    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
-    * The updated position object for the application containing the new values.
-    */
-   setPosition({ override, pinned = this._pinned, ...opts } = {})
-   {
-      // Potentially force override any pinned state. This is done from TQLHooks.openQuestTracker.
-      if (typeof override === 'boolean')
-      {
-         if (pinned)
-         {
-            this._pinned = true;
-            this._inPinDropRect = true;
-            game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-            this._eventbus.trigger('tql:foundryuimanager:update:tracker');
-            return opts; // Early out as updateTracker above calls setPosition again.
-         }
-         else
-         {
-            this._pinned = false;
-            this._inPinDropRect = false;
-            game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
-         }
-      }
-
-      const initialWidth = this.position.width;
-      const initialHeight = this.position.height;
-
-      if (pinned)
-      {
-         if (typeof opts.left === 'number') { opts.left = this.position.left; }
-         if (typeof opts.top === 'number') { opts.top = this.position.top; }
-         if (typeof opts.width === 'number') { opts.width = this.position.width; }
-      }
-
-      // Must set popOut temporarily to true as there is a gate in `Application.setPosition`.
-      const currentPosition = this.superSetPosition(opts);
-
-      // Pin width / height to min / max styles if defined.
-      if (currentPosition.width < this._appExtents.minWidth) { currentPosition.width = this._appExtents.minWidth; }
-      if (currentPosition.width > this._appExtents.maxWidth) { currentPosition.width = this._appExtents.maxWidth; }
-      if (currentPosition.height < this._appExtents.minHeight) { currentPosition.height = this._appExtents.minHeight; }
-      if (currentPosition.height > this._appExtents.maxHeight) { currentPosition.height = this._appExtents.maxHeight; }
-
-      const el = this.element[0];
-
-      currentPosition.resizeWidth = initialWidth < currentPosition.width;
-      currentPosition.resizeHeight = initialHeight < currentPosition.height;
-
-      // Mutates `checkPosition` to set maximum left position. Must do this calculation after `super.setPosition`
-      // as in some cases `super.setPosition` will override the changes of `FoundryUIManager.checkPosition`.
-      const currentInPinDropRect = this._inPinDropRect;
-      this._inPinDropRect = this._eventbus.triggerSync('tql:foundryuimanager:check:position', currentPosition);
-
-      // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
-      // has changed.
-      if (!this._pinned && this._dragHeader && currentInPinDropRect !== this._inPinDropRect)
-      {
-         this.element.css('animation', this._inPinDropRect ? 'tql-jiggle 0.3s infinite' : '');
-      }
-
-      el.style.top = `${currentPosition.top}px`;
-      el.style.left = `${currentPosition.left}px`;
-      el.style.width = `${currentPosition.width}px`;
-
-      if (this._windowResizable)
-      {
-         el.style.height = `${currentPosition.height}px`;
-      }
-
-      // TODO: SWITCH TO DEBOUNCE
-      if (currentPosition && currentPosition.width && currentPosition.height)
-      {
-         if (_timeoutPosition)
-         {
-            clearTimeout(_timeoutPosition);
-         }
-
-         _timeoutPosition = setTimeout(() =>
-         {
-            game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify(currentPosition));
-         }, s_TIMEOUT_POSITION);
-      }
-
-      return currentPosition;
-   }
-
    onPluginLoad(ev)
    {
       this._eventbus = ev.eventbus;
 
-      ev.eventbus.on(`tql:settings:change:${settings.questTrackerResizable}`, this._handleSettingWindowResize, this);
+      ev.eventbus.on(`tql:settings:change:${settings.questTrackerResizable}`, this.#handleSettingWindowResize, this);
    }
 }
 
 /**
- * Defines the timeout length to gate saving position to settings.
+ * Provides a debounced function to save position to {@link TQLSettings.questTrackerPosition}.
  *
- * @type {number}
+ * @type {(function(object): void)}
  */
-const s_TIMEOUT_POSITION = 1000;
-
-/**
- * Stores the last call to setTimeout for {@link QuestTracker.setPosition} changes, so that they can be cancelled as
- * new updates arrive gating the calls to saving position to settings.
- *
- * @type {number}
- * @private
- */
-let _timeoutPosition = void 0;
+const s_SAVE_POSITION = foundry.utils.debounce((currentPosition) =>
+{
+   console.log(currentPosition);
+   game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify(currentPosition));
+}, 1000);

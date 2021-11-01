@@ -4,7 +4,7 @@ import HandlerAny             from './HandlerAny.js';
 import HandlerDetails         from './HandlerDetails.js';
 import HandlerManage          from './HandlerManage.js';
 
-import { constants, jquery, settings }  from '../../constants.js';
+import { constants, jquery, settings }  from '#constants';
 
 // TODO: Temporarily importing the plugin manager eventbus
 import { eventbus }           from '../../plugins/PluginManager.js';

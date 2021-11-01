@@ -1,4 +1,4 @@
-import { constants, settings } from '../../../constants.js';
+import { constants, settings } from '#constants';
 
 /**
  * Defines the note controls which are added to the left-hand Foundry menu / UI. `onClick` callbacks are

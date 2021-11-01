@@ -6,7 +6,7 @@ import QuestPreview     from './view/preview/QuestPreview.js';
 import PluginLoader     from './plugins/PluginLoader.js';
 import { eventbus }     from './plugins/PluginManager.js';
 
-import { constants, jquery, sessionConstants, settings } from './constants.js';
+import { constants, jquery, sessionConstants, settings } from '#constants';
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -167,12 +167,16 @@ export default class TQLHooks
          await libThemer?.api?.registerTheme('/modules/typhonjs-quest-log/assets/themes/lib-themer/tql.json');
       }
 
+      // TODO REMOVE: for testing - lists events registered
       // const data = eventbus.triggerSync('plugins:get:plugin:events').sort(
       //  (el1, el2) => el1.plugin.localeCompare(el2.plugin));
       // console.log(`PluginManager events:\n${JSON.stringify(data, null, 3)}`);
 
       // Fire our own lifecycle event to inform any other modules that depend on TQL QuestDB.
       Hooks.callAll('TyphonJSQuestLog.Lifecycle.ready');
+
+      // TODO REMOVE: for temporary testing
+      Hooks.call('TyphonJSQuestLog.Open.QuestLog', { top: 1200 });
    }
 
    /**

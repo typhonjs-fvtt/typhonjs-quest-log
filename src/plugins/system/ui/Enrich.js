@@ -1,4 +1,4 @@
-import { constants, questStatus, questStatusI18n, settings } from '../../../constants.js';
+import { constants, questStatus, questStatusI18n, settings } from '#constants';
 
 /**
  * Enrich populates content with a lot of additional data that doesn't necessarily have to be saved

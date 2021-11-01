@@ -4,7 +4,7 @@ import QuestTracker     from '../../../view/tracker/QuestTracker.js';
 
 import QuestTrackerApp  from '../../../view/tracker2/QuestTrackerApp.js';
 
-import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../constants.js';
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '#constants';
 
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';

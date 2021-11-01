@@ -1,4 +1,4 @@
-import { constants, jquery, settings } from '../../constants.js';
+import { constants, jquery, settings } from '#constants';
 
 /**
  * The hidden TQL quests folder name.

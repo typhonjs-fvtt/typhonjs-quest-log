@@ -1,4 +1,4 @@
-import { constants, settings } from '../../../constants.js';
+import { constants, settings } from '#constants';
 
 /**
  * The default location for the QuestTracker

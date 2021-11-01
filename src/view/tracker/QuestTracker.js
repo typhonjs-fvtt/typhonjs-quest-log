@@ -2,7 +2,7 @@ import HandlerTracker   from './HandlerTracker.js';
 import TQLContextMenu   from '../TQLContextMenu.js';
 import collect          from '../../npm/collect.js';
 
-import { constants, jquery, questStatus, sessionConstants, settings } from '../../constants.js';
+import { constants, jquery, questStatus, sessionConstants, settings } from '#constants';
 
 /**
  * Provides the default width for the QuestTracker if not defined.

@@ -1,4 +1,4 @@
-import { constants, sessionConstants, settings } from '../../constants.js';
+import { constants, sessionConstants, settings } from '#constants';
 
 /**
  * Provides all {@link JQuery} and {@link PointerEvent} callbacks for the {@link QuestTracker}.

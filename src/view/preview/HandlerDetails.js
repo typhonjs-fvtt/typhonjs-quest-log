@@ -1,6 +1,6 @@
 import TQLDialog  from '../TQLDialog.js';
 
-import { constants, jquery, settings } from '../../constants.js';
+import { constants, jquery, settings } from '#constants';
 
 /**
  * Provides all {@link JQuery} callbacks for the `details` tab.

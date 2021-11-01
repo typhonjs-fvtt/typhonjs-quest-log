@@ -69,15 +69,15 @@ export default class PluginLoader
             name: 'tql-system-database-migration',
             instance: SystemPlugins.DBMigration
          },
-         // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
-         {
-            name: 'tql-system-questdb',
-            instance: SystemPlugins.QuestDB
-         },
          // Initialize all main GUI views.
          {
             name: 'tql-system-viewmanager',
             instance: SystemPlugins.ViewManager
+         },
+         // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
+         {
+            name: 'tql-system-questdb',
+            instance: SystemPlugins.QuestDB
          },
          // Start watching sidebar updates.
          {

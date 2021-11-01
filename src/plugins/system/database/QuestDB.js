@@ -202,6 +202,8 @@ export default class QuestDB
          {
             s_QUESTS_COLLECT[key] = collect(Array.from(s_QUESTS_MAP[key].values()));
             s_QUESTS_STORE[key].set(QuestDB.sortCollect({ status: key }).all());
+
+            s_EVENTBUS.trigger(`tql:questdb:quest:count:${key}`, s_QUESTS_COLLECT[key].count());
          }
 
          Hooks.callAll(QuestDB.hooks.addedAllQuestEntries);
@@ -763,6 +765,12 @@ export default class QuestDB
       s_QUESTS_COLLECT[questStatus.failed] = collect();
       s_QUESTS_COLLECT[questStatus.inactive] = collect();
 
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${questStatus.active}`, 0);
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${questStatus.available}`, 0);
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${questStatus.completed}`, 0);
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${questStatus.failed}`, 0);
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${questStatus.inactive}`, 0);
+
       Hooks.callAll(QuestDB.hooks.removedAllQuestEntries);
    }
 
@@ -1288,6 +1296,8 @@ const s_REMOVE_QUEST_ENTRY = (questId, generate = true) =>
    if (result && generate)
    {
       s_QUESTS_COLLECT[currentStatus] = collect(Array.from(s_QUESTS_MAP[currentStatus].values()));
+
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${currentStatus}`, s_QUESTS_COLLECT[currentStatus].count());
    }
 
    return result;
@@ -1314,6 +1324,8 @@ const s_SET_QUEST_ENTRY = (entry, generate = true) =>
       {
          s_QUESTS_COLLECT[currentStatus] = collect(Array.from(s_QUESTS_MAP[currentStatus].values()));
          s_QUESTS_STORE[currentStatus].set(QuestDB.sortCollect({ status: currentStatus }).all());
+
+         s_EVENTBUS.trigger(`tql:questdb:quest:count:${currentStatus}`, s_QUESTS_COLLECT[currentStatus].count());
       }
    }
 
@@ -1332,6 +1344,8 @@ const s_SET_QUEST_ENTRY = (entry, generate = true) =>
    {
       s_QUESTS_COLLECT[entry.status] = collect(Array.from(s_QUESTS_MAP[entry.status].values()));
       s_QUESTS_STORE[entry.status].set(QuestDB.sortCollect({ status: entry.status }).all());
+
+      s_EVENTBUS.trigger(`tql:questdb:quest:count:${entry.status}`, s_QUESTS_COLLECT[entry.status].count());
    }
 };
 

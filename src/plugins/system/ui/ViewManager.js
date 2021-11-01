@@ -74,8 +74,6 @@ export default class ViewManager
       }
       catch (err) { /**/ }
 
-      ViewManager.renderOrCloseQuestTracker();
-
       // Whenever a QuestPreview closes and matches any tracked app that is adding a new quest set it to undefined.
       Hooks.on('closeQuestPreview', s_QUEST_PREVIEW_CLOSED);
       Hooks.on('renderQuestPreview', s_QUEST_PREVIEW_RENDER);
@@ -190,6 +188,7 @@ export default class ViewManager
    {
       if (ViewManager.questLog.rendered) { ViewManager.questLog.render(force, options); }
 
+      // TODO REMOVE
       if (!s_NEW_QUEST_TRACKER)
       {
          ViewManager.renderOrCloseQuestTracker({ updateSetting: false });
@@ -216,12 +215,15 @@ export default class ViewManager
    {
       if (ViewManager.isQuestTrackerVisible())
       {
-         ViewManager.questTracker.render(true, { focus: false });
+         if (!ViewManager.questTracker.rendered) { ViewManager.questTracker.render(true, { focus: false }); }
       }
       else
       {
          // Necessary to check rendered state as the setting is set to false in the close method.
-         if (ViewManager.questTracker.rendered) { ViewManager.questTracker.close(options); }
+         if (ViewManager.questTracker.rendered)
+         {
+            ViewManager.questTracker.close({ ...options, updateSetting: false });
+         }
       }
    }
 
@@ -318,6 +320,9 @@ export default class ViewManager
        opts);
       ev.eventbus.on('tql:viewmanager:quest:tracker:get', () => this.questTracker, this, opts);
       ev.eventbus.on('tql:viewmanager:verify:quest:can:add', this.verifyQuestCanAdd, this, opts);
+
+
+      ev.eventbus.on(`tql:questdb:quest:count:${questStatus.active}`, this.renderOrCloseQuestTracker, this);
    }
 }
 

@@ -95,7 +95,13 @@ export default class FoundryUIManager
       const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
 
       // Make sure the tracker is rendered or rendering.
-      if (!tracker.rendered && Application.RENDER_STATES.RENDERING !== tracker._state) { return; }
+      switch (tracker._state)
+      {
+         case Application.RENDER_STATES.RENDERED:
+         case Application.RENDER_STATES.RENDERING:
+            break;
+         default: return;
+      }
 
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
 

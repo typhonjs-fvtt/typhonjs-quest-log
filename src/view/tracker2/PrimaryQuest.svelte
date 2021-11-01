@@ -22,6 +22,6 @@
 {#if questEntry}
    <Quest {questEntry} />
 {:else}
-   <div class="no-quests">{localize('TyphonJSQuestLog.QuestTracker.NoPrimary')}</div>
+   <div class=no-quests>{localize('TyphonJSQuestLog.QuestTracker.NoPrimary')}</div>
 {/if}
 

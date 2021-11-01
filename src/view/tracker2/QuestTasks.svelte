@@ -24,6 +24,7 @@
       unsubscribe = storeShowObjectives.subscribe(() => animationLatch++);
    }
 
+   // Provide a latched animation so slide down is only activated on a click and not when component is shown.
    const animation = (node, options) => animationLatch > 0 ? slide(node, options) : void 0;
 </script>
 
@@ -32,15 +33,15 @@
        in:animation|local={{duration: 200, easing: quintInOut}}
        out:slide|local={{duration: 200, easing: quintInOut}}
    >
-      <li class="quest-tracker-task">
-         <!--            <div class="task><span class="{{state}}"></span></div>-->
-         <div class="task"><span>- Objectives</span></div>
+      <li class=quest-tracker-task>
+         <!--            <div class=task><span class={{state}}></span></div>-->
+         <div class=task><span>- Objectives</span></div>
       </li>
-      <li class="quest-tracker-task">
-         <div class="task"><span>- Objectives</span></div>
+      <li class=quest-tracker-task>
+         <div class=task><span>- Objectives</span></div>
       </li>
-      <li class="quest-tracker-task">
-         <div class="task"><span>- Objectives</span></div>
+      <li class=quest-tracker-task>
+         <div class=task><span>- Objectives</span></div>
       </li>
    </ul>
 {/if}

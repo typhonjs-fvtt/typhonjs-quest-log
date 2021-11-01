@@ -3,7 +3,7 @@
    import { slide }              from 'svelte/transition';
    import { quintOut }           from 'svelte/easing';
 
-   import { slideFade }          from './slideFade.js';
+   // import { slideFade }          from './slideFade.js';
 
    import { createMultiClick }   from '@typhonjs-svelte/lib/handlers';
 
@@ -38,15 +38,14 @@
       hidden = questEntry.isHidden || questEntry.isInactive;
    }
 </script>
-<div class="quest"
+<div class=quest
    transition:slide|local={{ duration: 600, easing: quintOut}}
 >
-   <div class="title" id="{hidden ? 'hidden' : ''}">
-      <div class="quest-tracker-header"
-         on:click|preventDefault = {handleClick}>
+   <div class=title id={hidden ? 'hidden' : ''}>
+      <div class=quest-tracker-header on:click|preventDefault={handleClick}>
          <a>{quest.name}</a>
       </div>
-      <span class="quest-tracker-span"></span>
+      <span class=quest-tracker-span></span>
       <!-- insert icons here -->
    </div>
    <QuestTasks {questEntry} />

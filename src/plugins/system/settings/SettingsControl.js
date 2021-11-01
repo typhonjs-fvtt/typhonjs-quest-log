@@ -237,6 +237,7 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
    }
 
+   // TODO CONSIDER HAVING FoundryUIManager listen directly for this change.
    static handle_questTrackerPinned()
    {
       // The quest tracker pinned state has changed so update any Foundry UI management.

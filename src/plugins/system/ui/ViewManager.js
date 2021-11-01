@@ -4,11 +4,12 @@ import QuestTracker     from '../../../view/tracker/QuestTracker.js';
 
 import QuestTrackerApp  from '../../../view/tracker2/QuestTrackerApp.js';
 
+import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../constants.js';
+
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
-
-import { constants, questDBHooks, questStatus, questStatusI18n, settings } from '../../../constants.js';
+const s_NEW_QUEST_TRACKER = true;
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -42,13 +43,11 @@ export default class ViewManager
    static async init()
    {
       Apps.questLog = new QuestLog();
-      // Apps.questTracker = new QuestTracker();
-      Apps.questTracker = new QuestTrackerApp();
+      Apps.questTracker = s_NEW_QUEST_TRACKER ? new QuestTrackerApp() : new QuestTracker();
 
       // TODO TEMPORARY!
       const demoApp = new DemoApp();
       const demoAppPopOut = new DemoAppPopOut();
-
       Hooks.on('TQL.DemoApp.close', () => demoApp.close());
       Hooks.on('TQL.DemoApp.render', () => { demoApp.render(true); });
       Hooks.on('TQL.DemoAppPopOut.close', () => demoAppPopOut.close());
@@ -191,7 +190,10 @@ export default class ViewManager
    {
       if (ViewManager.questLog.rendered) { ViewManager.questLog.render(force, options); }
 
-      ViewManager.renderOrCloseQuestTracker({ updateSetting: false });
+      if (!s_NEW_QUEST_TRACKER)
+      {
+         ViewManager.renderOrCloseQuestTracker({ updateSetting: false });
+      }
 
       if (questPreview)
       {

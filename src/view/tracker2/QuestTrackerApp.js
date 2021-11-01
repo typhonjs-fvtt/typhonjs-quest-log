@@ -1,6 +1,9 @@
-import {
-   ApplicationShell,
-   SvelteApplication }        from '@typhonjs-fvtt/svelte';
+// import {
+//    ApplicationShell,
+//    SvelteApplication }        from '@typhonjs-fvtt/svelte';
+
+import AppShell               from './AppShell.svelte';
+import SvelteApplication      from '../svelte/SvelteApplication.js';
 
 import QuestTracker           from './QuestTracker.svelte';
 
@@ -10,7 +13,7 @@ import TQLContextMenu         from '../TQLContextMenu.js';
 
 import ButtonShowPrimary      from './ButtonShowPrimary.js';
 
-import { constants, jquery, settings } from '#constants';
+import { constants, settings } from '#constants';
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -77,6 +80,8 @@ export default class QuestTrackerApp extends SvelteApplication
        * @package
        */
       this._inPinDropRect = false;
+
+      this._windowResizable = game.settings.get(constants.moduleName, settings.questTrackerResizable);
    }
 
    /**
@@ -93,10 +98,10 @@ export default class QuestTrackerApp extends SvelteApplication
          minimizable: true,
          popOut: false,
          width: 300,
-         height: 480,
+         height: game.settings.get(constants.moduleName, settings.questTrackerResizable) ? 'auto' : 480,
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
          svelte: {
-            class: ApplicationShell,
+            class: AppShell,
             children: { class: QuestTracker },
             options: { injectApp: true, injectEventbus: true },
          }
@@ -213,6 +218,37 @@ export default class QuestTrackerApp extends SvelteApplication
       return buttons;
    }
 
+   // Handles showing / hiding
+   _handleSettingWindowResize(value)
+   {
+      /**
+       * Stores the state of {@link TQLSettings.questTrackerResizable}.
+       *
+       * @type {boolean}
+       * @private
+       */
+      this._windowResizable = value;
+
+      // Early out if there is no root element.
+      if (this.element === null || this.element === void 0 || this.element[0] === void 0) { return; }
+
+      const elemResizeHandle = $('#quest-tracker .window-resizable-handle');
+
+      if (this._windowResizable)
+      {
+         elemResizeHandle.show();
+         this.element.css('min-height', this._appExtents.minHeight);
+      }
+      else
+      {
+         const elemWindowHeader = $('#quest-tracker .window-header');
+
+         elemResizeHandle.hide();
+         this.element.css('min-height', elemWindowHeader[0].scrollHeight);
+         this.element[0].style.height = 'auto';
+      }
+   }
+
    /**
     * Defines all {@link JQuery} control callbacks with event listeners for click, drag, drop via various CSS selectors.
     *
@@ -239,32 +275,6 @@ export default class QuestTrackerApp extends SvelteApplication
       // Add context menu.
       this._contextMenu(element);
 
-      element.on(jquery.click, '.quest-tracker-link', void 0, (event) => HandlerTracker.questOpen(event, eventbus));
-
-      element.on(jquery.click, '.quest-tracker-task', void 0, async (event) =>
-       await HandlerTracker.questTaskToggle(event, eventbus));
-
-      /**
-       * @type {JQuery} The window header element.
-       *
-       * @private
-       */
-      this._elemWindowHeader = $('#quest-tracker .window-header');
-
-      /**
-       * @type {JQuery} The window content element.
-       *
-       * @private
-       */
-      this._elemWindowContent = $('#quest-tracker .window-content');
-
-      /**
-       * @type {JQuery} The window resize handle.
-       *
-       * @private
-       */
-      this._elemResizeHandle = $('#quest-tracker .window-resizable-handle');
-
       /**
        * Stores the app / window extents from styles.
        *
@@ -279,44 +289,8 @@ export default class QuestTrackerApp extends SvelteApplication
          maxHeight: parseInt(this.element.css('max-height'))
       };
 
-      /**
-       * Stores the state of {@link TQLSettings.questTrackerResizable}.
-       *
-       * @type {boolean}
-       * @private
-       */
-      this._windowResizable = game.settings.get(constants.moduleName, settings.questTrackerResizable);
-
-      if (this._windowResizable)
-      {
-         this._elemResizeHandle.show();
-         this.element.css('min-height', this._appExtents.minHeight);
-      }
-      else
-      {
-         this._elemResizeHandle.hide();
-         this.element.css('min-height', this._elemWindowHeader[0].scrollHeight);
-
-         // A bit of a hack. We need to call the Application setPosition now to make sure the element parameters
-         // are correctly set as the exact height for the element is calculated in this.setPosition which is called
-         // by Application right after this method completes.
-         // Must set popOut temporarily to true as there is a gate in `Application.setPosition`.
-         this.options.popOut = true;
-         super.setPosition(this.position);
-         this.options.popOut = false;
-      }
-
-      /**
-       * Stores whether the scroll bar is active.
-       *
-       * @type {boolean}
-       *
-       * @private
-       */
-      this._scrollbarActive = this._elemWindowContent[0].scrollHeight > this._elemWindowContent[0].clientHeight;
-
-      // Set current scrollbar active state and potentially set 'point-events' to 'auto'.
-      if (this._scrollbarActive) { this.element.css('pointer-events', 'auto'); }
+      // this._windowResizable = game.settings.get(constants.moduleName, settings.questTrackerResizable);
+      this._handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
    }
 
    /**
@@ -326,7 +300,79 @@ export default class QuestTrackerApp extends SvelteApplication
     * @inheritDoc
     * @see https://foundryvtt.com/api/Application.html#bringToTop
     */
-   bringToTop() {}
+   bringToTop()
+   {
+      if (!this._windowResizable)
+      {
+         this.element[0].style.height = 'auto';
+      }
+   }
+
+   superSetPosition({ left, top, width, height, scale } = {})
+   {
+      const el = this.element[0];
+      const currentPosition = this.position;
+      const styles = window.getComputedStyle(el);
+
+      // Update width if an explicit value is passed, or if no width value is set on the element
+      if (!el.style.width || width)
+      {
+         const tarW = width || el.offsetWidth;
+         const minW = parseInt(styles.minWidth) || MIN_WINDOW_WIDTH;
+         const maxW = el.style.maxWidth || window.innerWidth;
+         currentPosition.width = width = Math.clamped(tarW, minW, maxW);
+         el.style.width = `${width}px`;
+         if ((width + currentPosition.left) > window.innerWidth) { left = currentPosition.left; }
+      }
+      width = el.offsetWidth;
+
+      // Update height if an explicit value is passed, or if no height value is set on the element
+      if (!el.style.height || height)
+      {
+         const tarH = height || (el.offsetHeight + 1);
+         const minH = parseInt(styles.minHeight) || MIN_WINDOW_HEIGHT;
+         const maxH = el.style.maxHeight || window.innerHeight;
+         currentPosition.height = height = Math.clamped(tarH, minH, maxH);
+
+         // MOD: Don't change height if not resizable!
+         if (this._windowResizable)
+         {
+            el.style.height = `${height}px`;
+         }
+
+         if ((height + currentPosition.top) > window.innerHeight + 1) { top = currentPosition.top - 1; }
+      }
+      height = el.offsetHeight;
+
+      // Update Left
+      if ((!el.style.left) || Number.isFinite(left))
+      {
+         const tarL = Number.isFinite(left) ? left : (window.innerWidth - width) / 2;
+         const maxL = Math.max(window.innerWidth - width, 0);
+         currentPosition.left = left = Math.clamped(tarL, 0, maxL);
+         el.style.left = `${left}px`;
+      }
+
+      // Update Top
+      if ((!el.style.top) || Number.isFinite(top))
+      {
+         const tarT = Number.isFinite(top) ? top : (window.innerHeight - height) / 2;
+         const maxT = Math.max(window.innerHeight - height, 0);
+         currentPosition.top = top = Math.clamped(tarT, 0, maxT);
+         el.style.top = `${currentPosition.top}px`;
+      }
+
+      // Update Scale
+      if (scale)
+      {
+         currentPosition.scale = Math.max(scale, 0);
+         if (scale === 1) { el.style.transform = ""; }
+         else { el.style.transform = `scale(${scale})`; }
+      }
+
+      // Return the updated position object
+      return currentPosition;
+   }
 
    /**
     * Some game systems and custom UI theming modules provide hard overrides on overflow-x / overflow-y styles. Alas we
@@ -384,15 +430,7 @@ export default class QuestTrackerApp extends SvelteApplication
       }
 
       // Must set popOut temporarily to true as there is a gate in `Application.setPosition`.
-      this.options.popOut = true;
-      const currentPosition = super.setPosition(opts);
-      this.options.popOut = false;
-
-      if (!this._windowResizable)
-      {
-         // Add the extra `2` for small format (1080P and below screen size).
-         currentPosition.height = this._elemWindowHeader[0].scrollHeight + this._elemWindowContent[0].scrollHeight + 2;
-      }
+      const currentPosition = this.superSetPosition(opts);
 
       // Pin width / height to min / max styles if defined.
       if (currentPosition.width < this._appExtents.minWidth) { currentPosition.width = this._appExtents.minWidth; }
@@ -420,16 +458,13 @@ export default class QuestTrackerApp extends SvelteApplication
       el.style.top = `${currentPosition.top}px`;
       el.style.left = `${currentPosition.left}px`;
       el.style.width = `${currentPosition.width}px`;
-      el.style.height = `${currentPosition.height}px`;
 
-      const scrollbarActive = this._elemWindowContent[0].scrollHeight > this._elemWindowContent[0].clientHeight;
-
-      if (scrollbarActive !== this._scrollbarActive)
+      if (this._windowResizable)
       {
-         this._scrollbarActive = scrollbarActive;
-         this.element.css('pointer-events', scrollbarActive ? 'auto' : 'none');
+         el.style.height = `${currentPosition.height}px`;
       }
 
+      // TODO: SWITCH TO DEBOUNCE
       if (currentPosition && currentPosition.width && currentPosition.height)
       {
          if (_timeoutPosition)
@@ -449,6 +484,8 @@ export default class QuestTrackerApp extends SvelteApplication
    onPluginLoad(ev)
    {
       this._eventbus = ev.eventbus;
+
+      ev.eventbus.on(`tql:settings:change:${settings.questTrackerResizable}`, this._handleSettingWindowResize, this);
    }
 }
 

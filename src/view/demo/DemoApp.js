@@ -1,4 +1,7 @@
-import { ComponentShell, SvelteApplication } from '@typhonjs-fvtt/svelte';
+// import { ComponentShell, SvelteApplication } from '@typhonjs-fvtt/svelte';
+
+import SvelteApplication   from "../svelte/SvelteApplication.js";
+import ComponentShell      from "../svelte/ComponentShell.svelte";
 
 import Demo       from './Demo.svelte';
 import DemoShell  from './DemoShell.svelte';
@@ -34,13 +37,13 @@ export default class DemoApp extends SvelteApplication
          resizable: true,
          title: 'demo app',
 
-         svelte: {      // Mount a single Svelte component
-            class: Demo,
-            target: '.window-content',
-            props: {
-               test: 'Foundry'
-            }
-         }
+         // svelte: {      // Mount a single Svelte component
+         //    class: Demo,
+         //    target: '.window-content',
+         //    props: {
+         //       test: 'Foundry'
+         //    }
+         // }
 
          // svelte: [      // You can also mount multiple components.
          //    {
@@ -96,11 +99,11 @@ export default class DemoApp extends SvelteApplication
          //    options: { injectApp: true }
          // }
 
-         // svelte: {      // ComponentShell posts a warning if no children added.
-         //    class: ComponentShell,
-         //    target: '.window-content',
-         //    options: { injectApp: true }
-         // }
+         svelte: {      // ComponentShell posts a warning if no children added.
+            class: ComponentShell,
+            target: '.window-content',
+            options: { injectApp: true }
+         }
       });
    }
 

@@ -1,21 +1,21 @@
 <script>
-   // import { fade }      from 'svelte/transition';
-   // import { animate }   from '@typhonjs-fvtt/svelte/gsap';
-   // import { animate }               from './animate.js';
+   import { getContext }         from 'svelte';
+   import { slide }              from 'svelte/transition';
+   import { quintOut }           from 'svelte/easing';
 
-   import { getContext, onMount }   from 'svelte';
+   import { slideFade }          from './slideFade.js';
 
-   import { createMultiClick }      from '@typhonjs-svelte/lib/handlers';
+   import { createMultiClick }   from '@typhonjs-svelte/lib/handlers';
 
-   import { sessionConstants }      from '#constants';
+   import QuestTasks             from './QuestTasks.svelte';
+
+   import { sessionConstants }   from '#constants';
 
    const eventbus = getContext('external')().eventbus;
 
    let quest;
    let questId;
    let hidden = false;
-
-   let storeShowObjectives;
 
    export let questEntry;
 
@@ -25,16 +25,10 @@
     * @type {(function(): void)}
     */
    const handleClick = createMultiClick({
-      single: () => eventbus.trigger('tql:storage:session:item:boolean:swap',
+      single: () => eventbus.triggerSync('tql:storage:session:item:boolean:swap',
        `${sessionConstants.trackerFolderState}${questId}`),
 
       double: () => eventbus.trigger('tql:questapi:open', { questId })
-   });
-
-   onMount(() =>
-   {
-      storeShowObjectives = eventbus.triggerSync('tql:storage:session:store:get',
-       `${sessionConstants.trackerFolderState}${questId}`, false);
    });
 
    $: if(questEntry)
@@ -44,8 +38,9 @@
       hidden = questEntry.isHidden || questEntry.isInactive;
    }
 </script>
-
-<div class="quest">
+<div class="quest"
+   transition:slide|local={{ duration: 600, easing: quintOut}}
+>
    <div class="title" id="{hidden ? 'hidden' : ''}">
       <div class="quest-tracker-header"
          on:click|preventDefault = {handleClick}>
@@ -54,15 +49,5 @@
       <span class="quest-tracker-span"></span>
       <!-- insert icons here -->
    </div>
-   {#if $storeShowObjectives}
-      <ul class="tasks">
-         <li class="quest-tracker-task">
-<!--            <div class="task><span class="{{state}}"></span></div>-->
-            <div class="task"><span>- Objectives</span></div>
-         </li>
-      </ul>
-   {/if}
+   <QuestTasks {questEntry} />
 </div>
-
-<!-- in:animate={{ type: 'from', duration: 2, opacity: 0 }}-->
-<!-- out:fade>-->

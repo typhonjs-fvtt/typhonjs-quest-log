@@ -37,13 +37,13 @@ export default class DemoApp extends SvelteApplication
          resizable: true,
          title: 'demo app',
 
-         // svelte: {      // Mount a single Svelte component
-         //    class: Demo,
-         //    target: '.window-content',
-         //    props: {
-         //       test: 'Foundry'
-         //    }
-         // }
+         svelte: {      // Mount a single Svelte component
+            class: Demo,
+            target: '.window-content',
+            props: {
+               test: 'Foundry'
+            }
+         }
 
          // svelte: [      // You can also mount multiple components.
          //    {
@@ -62,7 +62,7 @@ export default class DemoApp extends SvelteApplication
          //    }
          // ]
 
-         // svelte: {      // ComponentShell will inject a context with the Foundry app reference.
+         // svelte: {      // ComponentShell can inject a context with the Foundry app reference.
          //    class: ComponentShell,
          //    target: '.window-content',
          //
@@ -99,11 +99,11 @@ export default class DemoApp extends SvelteApplication
          //    options: { injectApp: true }
          // }
 
-         svelte: {      // ComponentShell posts a warning if no children added.
-            class: ComponentShell,
-            target: '.window-content',
-            options: { injectApp: true }
-         }
+         // svelte: {      // ComponentShell posts a warning if no children added.
+         //    class: ComponentShell,
+         //    target: '.window-content',
+         //    options: { injectApp: true }
+         // }
       });
    }
 

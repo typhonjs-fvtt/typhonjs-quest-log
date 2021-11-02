@@ -1,7 +1,7 @@
 <script>
    import { getContext, onDestroy } from 'svelte';
-   import { quintInOut }            from "svelte/easing";
-   import { slide }                 from 'svelte/transition';
+   import { quintIn, quintOut }     from "svelte/easing";
+   import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
 
    import { sessionConstants }      from '#constants';
 
@@ -25,14 +25,13 @@
    }
 
    // Provide a latched animation so slide down is only activated on a click and not when component is shown.
-   const animation = (node, options) => animationLatch > 0 ? slide(node, options) : void 0;
+   const animation = (node, options) => animationLatch > 0 ? slideFade(node, options) : void 0;
 </script>
 
 {#if $storeShowObjectives}
    <ul class=tasks
-       in:animation|local={{duration: 200, easing: quintInOut}}
-       out:slide|local={{duration: 200, easing: quintInOut}}
-   >
+      in:animation|local={{duration: 350, easing: quintIn}}
+      out:slideFade|local={{duration: 350, easing: quintOut}}>
       <li class=quest-tracker-task>
          <!--            <div class=task><span class={{state}}></span></div>-->
          <div class=task><span>- Objectives</span></div>

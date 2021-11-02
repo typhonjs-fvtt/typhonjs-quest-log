@@ -1,7 +1,4 @@
-// import { ComponentShell, SvelteApplication } from '@typhonjs-fvtt/svelte';
-
-import SvelteApplication   from "../svelte/SvelteApplication.js";
-import ComponentShell      from "../svelte/ComponentShell.svelte";
+import { ComponentShell, SvelteApplication } from '@typhonjs-fvtt/svelte';
 
 import Demo       from './Demo.svelte';
 import DemoShell  from './DemoShell.svelte';

@@ -1,11 +1,9 @@
 <script>
    import { getContext }         from 'svelte';
-   import { slide }              from 'svelte/transition';
    import { quintOut }           from 'svelte/easing';
 
-   // import { slideFade }          from './slideFade.js';
-
-   import { createMultiClick }   from '@typhonjs-svelte/lib/handlers';
+   import { slideFade }          from '@typhonjs-fvtt/svelte/transition';
+   import { createMultiClick }   from '@typhonjs-fvtt/svelte/handler';
 
    import QuestTasks             from './QuestTasks.svelte';
 
@@ -39,7 +37,7 @@
    }
 </script>
 <div class=quest
-   transition:slide|local={{ duration: 600, easing: quintOut}}
+   transition:slideFade|local={{ duration: 400, easing: quintOut}}
 >
    <div class=title id={hidden ? 'hidden' : ''}>
       <div class=quest-tracker-header on:click|preventDefault={handleClick}>

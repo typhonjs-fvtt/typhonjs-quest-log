@@ -1,4 +1,4 @@
-import { SessionStorage }  from '@typhonjs-svelte/lib/plugins/system';
+import { SessionStorage }  from '@typhonjs-fvtt/svelte/plugins/system';
 
 import * as DataPlugins    from './data/index.js';
 import * as SystemPlugins  from './system/index.js';

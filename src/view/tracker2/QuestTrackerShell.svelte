@@ -3,6 +3,8 @@
 
    import { ApplicationHeader, Container }   from '@typhonjs-fvtt/svelte';
 
+   import MainContainer                      from './MainContainer.svelte';
+
    import { sessionConstants }               from '#constants';
 
    export let context;
@@ -13,7 +15,6 @@
    setContext('getElementContent', () => content);
    setContext('getElementRoot', () => root);
 
-   const children = getContext('external')().children;
    const foundryApp = getContext('external')().foundryApp;
 
    const storeTrackerShowBackground = getContext('external')().eventbus.triggerSync('tql:storage:session:store:get',
@@ -50,6 +51,6 @@
 <div id={foundryApp.id} class="typhonjs-app typhonjs-window-app" data-appid={foundryApp.appId} bind:this={root}>
    <ApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
    <section class=window-content bind:this={content} bind:clientHeight={contentHeight}>
-      <Container {children} />
+      <MainContainer />
    </section>
 </div>

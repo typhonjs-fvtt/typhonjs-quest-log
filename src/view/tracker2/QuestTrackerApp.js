@@ -1,6 +1,5 @@
 import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
-import QuestTracker           from './QuestTracker.svelte';
 import QuestTrackerShell      from './QuestTrackerShell.svelte';
 
 import TQLContextMenu         from '../TQLContextMenu.js';
@@ -102,7 +101,6 @@ export default class QuestTrackerApp extends SvelteApplication
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
          svelte: {
             class: QuestTrackerShell,
-            children: { class: QuestTracker },
             options: { injectApp: true, injectEventbus: true },
          }
       });

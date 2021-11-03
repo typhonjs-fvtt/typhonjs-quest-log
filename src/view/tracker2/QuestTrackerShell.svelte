@@ -13,13 +13,14 @@
    setContext('getElementContent', () => content);
    setContext('getElementRoot', () => root);
 
-   let children = getContext('external')().children;
-   let foundryApp = getContext('external')().foundryApp;
+   const children = getContext('external')().children;
+   const foundryApp = getContext('external')().foundryApp;
+
+   const storeTrackerShowBackground = getContext('external')().eventbus.triggerSync('tql:storage:session:store:get',
+    sessionConstants.trackerShowBackground, false);
 
    let contentHeight;
    let scrollActivated = false;
-
-   let storeTrackerShowBackground;
 
    // A customized ApplicationShell is used to monitor the clientHeight and compare against the scrollHeight to
    // determine if the scrollbar is visible. This allows the QuestTracker to pass mouse events through to elements
@@ -38,13 +39,6 @@
    $: if (root) { root.style.pointerEvents = scrollActivated ? 'auto' : 'none'; }
 
    // ------
-
-   // This next reactive segment sets up a session storage store for the show background header button.
-   $: if (context)
-   {
-      storeTrackerShowBackground = context.eventbus.triggerSync('tql:storage:session:store:get',
-       sessionConstants.trackerShowBackground, false);
-   }
 
    // Depending on the storeTrackerShowBackground boolean state add or remove the `no-background` class.
    $: if (root && storeTrackerShowBackground)

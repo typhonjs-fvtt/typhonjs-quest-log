@@ -90,6 +90,7 @@ const questTabIndex = {
 const sessionConstants = {
    currentPrimaryQuest: 'typhonjs.questlog.currentPrimaryQuest',
    trackerFolderState: 'typhonjs.questtracker.folderState-',
+   trackerShowBackground: 'typhonjs.questtracker.showBackground',
    trackerShowPrimary: 'typhonjs.questtracker.showPrimary'
 };
 

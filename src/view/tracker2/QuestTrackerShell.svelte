@@ -3,6 +3,8 @@
 
    import { ApplicationHeader, Container }   from '@typhonjs-fvtt/svelte';
 
+   import { sessionConstants }               from '#constants';
+
    export let context;
 
    let content, root;
@@ -17,6 +19,8 @@
    let contentHeight;
    let scrollActivated = false;
 
+   let storeTrackerShowBackground;
+
    // A customized ApplicationShell is used to monitor the clientHeight and compare against the scrollHeight to
    // determine if the scrollbar is visible. This allows the QuestTracker to pass mouse events through to elements
    // below the QuestTracker when scroll bars are not present.
@@ -30,8 +34,21 @@
    $: if (content) { throttle(contentHeight); }
 
    // Set the `pointer-events` CSS attribute when scrollActivated changes.
-   $: if (root) {
-      root.style.pointerEvents = scrollActivated ? 'auto' : 'none';
+   $: if (root) { root.style.pointerEvents = scrollActivated ? 'auto' : 'none'; }
+
+   // ------
+
+   // This next reactive segment sets up a session storage store for the show background.
+   $: if (context) {
+      storeTrackerShowBackground = context.eventbus.triggerSync('tql:storage:session:store:get',
+       sessionConstants.trackerShowBackground, false);
+   }
+
+   // Depending on the storeTrackerShowBackground boolean state set none to style background / box-shadow.
+   $: if (root && storeTrackerShowBackground)
+   {
+      root.style.background = $storeTrackerShowBackground ? null : 'none';
+      root.style.boxShadow = $storeTrackerShowBackground ? null : 'none';
    }
 </script>
 

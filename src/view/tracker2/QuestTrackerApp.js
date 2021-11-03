@@ -1,12 +1,14 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+import { SvelteApplication }     from '@typhonjs-fvtt/svelte';
 
-import QuestTrackerShell      from './QuestTrackerShell.svelte';
+import QuestTrackerShell         from './QuestTrackerShell.svelte';
 
-import TQLContextMenu         from '../TQLContextMenu.js';
+import TQLContextMenu            from '../TQLContextMenu.js';
 
-import createHeaderButtons    from './createHeaderButtons.js';
+import createHeaderButtons       from './createHeaderButtons.js';
 
-import { constants, settings } from '#constants';
+import { constants, settings }   from '#constants';
+
+import TJSContextMenu         from "./context/TJSContextMenu.svelte";
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -101,6 +103,8 @@ export default class QuestTrackerApp extends SvelteApplication
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
          svelte: {
             class: QuestTrackerShell,
+            intro: true,
+            context: new Map([['TESTING', 'TESTING YO']]),
             options: { injectApp: true, injectEventbus: true },
          }
       });
@@ -320,6 +324,12 @@ export default class QuestTrackerApp extends SvelteApplication
       // Use pointer events to make sure accurate drag & drop is detected especially when mouse outside window bounds.
       header[0].addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header[0]));
       header[0].addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header[0]));
+
+      document.body.addEventListener('contextmenu', (event) =>
+      {
+         new TJSContextMenu({ target: document.body, intro: true, props: { x: event.pageX, y: event.pageY } });
+         console.log(`!!!!! HERE`);
+      });
 
       // TODO FIGURE OUT SVELTE WAY OF RUNNING A CONTEXT MENU
       // Add context menu.

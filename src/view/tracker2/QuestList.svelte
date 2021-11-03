@@ -5,7 +5,7 @@
 
    import { questStatus }  from '#constants';
 
-   let storeQuests = getContext('external')().eventbus.triggerSync('tql:questdb:store:get',
+   let storeQuests = getContext('external').eventbus.triggerSync('tql:questdb:store:get',
     { status: questStatus.active });
 </script>
 <div class=quests>

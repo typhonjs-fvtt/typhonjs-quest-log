@@ -1,11 +1,11 @@
 <script>
    import { getContext, onDestroy } from 'svelte';
-   import { quintIn, quintOut }     from "svelte/easing";
+   import { quintIn, quintOut }     from 'svelte/easing';
    import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
 
    import { sessionConstants }      from '#constants';
 
-   const eventbus = getContext('external')().eventbus;
+   const eventbus = getContext('external').eventbus;
 
    let storeShowObjectives;
    let animationLatch = -1;

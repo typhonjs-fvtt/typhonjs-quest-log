@@ -59,7 +59,7 @@ export default class DemoApp extends SvelteApplication
          //    }
          // ]
 
-         // svelte: {      // ComponentShell can inject a context with the Foundry app reference.
+         // svelte: {
          //    class: ComponentShell,
          //    target: '.window-content',
          //
@@ -99,7 +99,6 @@ export default class DemoApp extends SvelteApplication
          // svelte: {      // ComponentShell posts a warning if no children added.
          //    class: ComponentShell,
          //    target: '.window-content',
-         //    options: { injectApp: true }
          // }
       });
    }

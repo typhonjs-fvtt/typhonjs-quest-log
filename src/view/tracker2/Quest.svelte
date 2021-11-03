@@ -9,7 +9,7 @@
 
    import { sessionConstants }   from '#constants';
 
-   const eventbus = getContext('external')().eventbus;
+   const eventbus = getContext('external').eventbus;
 
    let quest;
    let questId;
@@ -29,6 +29,11 @@
       double: () => eventbus.trigger('tql:questapi:open', { questId })
    });
 
+   function handleContext(event)
+   {
+      console.log(event.currentTarget)
+   }
+
    $: if(questEntry)
    {
       quest = questEntry.quest;
@@ -40,7 +45,7 @@
    transition:slideFade|local={{ duration: 400, easing: quintOut}}
 >
    <div class=title id={hidden ? 'hidden' : ''}>
-      <div class=quest-tracker-header on:click|preventDefault={handleClick}>
+      <div class=quest-tracker-header on:click|preventDefault={handleClick} on:contextmenu|preventDefault={handleContext}>
          <a>{quest.name}</a>
       </div>
       <span class=quest-tracker-span></span>

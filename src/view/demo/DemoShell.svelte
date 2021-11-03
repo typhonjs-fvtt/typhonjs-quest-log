@@ -17,8 +17,9 @@
    {
       console.log(`DemoShell.svelte - onDestroy`);
    });
-   const foundryApp = getContext('external')().foundryApp;
-   const TEST = getContext('external')().TEST;
+
+   const foundryApp = getContext('external').foundryApp;
+   const TEST = getContext('external').TEST;
 
    let desc = false;
    export let test;

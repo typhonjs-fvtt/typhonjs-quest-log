@@ -6,7 +6,7 @@
 
    import { sessionConstants }   from '#constants';
 
-   let storeTrackerShowPrimary = getContext('external')().eventbus.triggerSync('tql:storage:session:store:get',
+   let storeTrackerShowPrimary = getContext('external').eventbus.triggerSync('tql:storage:session:store:get',
     sessionConstants.trackerShowPrimary, false);
 </script>
 <svelte:component this={$storeTrackerShowPrimary ? PrimaryQuest : QuestList} />

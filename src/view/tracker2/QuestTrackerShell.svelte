@@ -1,23 +1,19 @@
 <script>
-   import { getContext, setContext }         from "svelte";
+   import { getContext, setContext }   from 'svelte';
+   import { ApplicationHeader }        from '@typhonjs-fvtt/svelte';
 
-   import { ApplicationHeader, Container }   from '@typhonjs-fvtt/svelte';
+   import MainContainer                from './MainContainer.svelte';
 
-   import MainContainer                      from './MainContainer.svelte';
-
-   import { sessionConstants }               from '#constants';
-
-   export let context;
+   import { sessionConstants }         from '#constants';
 
    let content, root;
 
-   setContext('external', () => context);
    setContext('getElementContent', () => content);
    setContext('getElementRoot', () => root);
 
-   const foundryApp = getContext('external')().foundryApp;
+   const foundryApp = getContext('external').foundryApp;
 
-   const storeTrackerShowBackground = getContext('external')().eventbus.triggerSync('tql:storage:session:store:get',
+   const storeTrackerShowBackground = getContext('external').eventbus.triggerSync('tql:storage:session:store:get',
     sessionConstants.trackerShowBackground, false);
 
    let contentHeight;

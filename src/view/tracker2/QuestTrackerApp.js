@@ -4,7 +4,7 @@ import QuestTrackerShell      from './QuestTrackerShell.svelte';
 
 import TQLContextMenu         from '../TQLContextMenu.js';
 
-import * as HeaderButtons     from './HeaderButtons.js';
+import createHeaderButtons    from './createHeaderButtons.js';
 
 import { constants, settings } from '#constants';
 
@@ -223,12 +223,7 @@ export default class QuestTrackerApp extends SvelteApplication
       const closeButton = buttons.find((button) => button?.class === 'close');
       if (closeButton) { closeButton.label = void 0; }
 
-      const eventbus = this._eventbus.triggerSync('tql:eventbus:secure:get');
-
-      buttons.unshift(new HeaderButtons.ShowPrimary(eventbus));
-      buttons.unshift(new HeaderButtons.ShowBackground(eventbus, this.element));
-
-      return buttons;
+      return [...createHeaderButtons(this._eventbus), ...buttons];
    }
 
    /**

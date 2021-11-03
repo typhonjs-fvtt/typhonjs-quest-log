@@ -26,7 +26,8 @@
    // below the QuestTracker when scroll bars are not present.
 
    // Throttle the scrollbar activated checks.
-   const throttle = foundry.utils.debounce(() => {
+   const throttle = foundry.utils.debounce(() =>
+   {
       scrollActivated = content.clientHeight < content.scrollHeight;
    }, 400);
 
@@ -38,17 +39,17 @@
 
    // ------
 
-   // This next reactive segment sets up a session storage store for the show background.
-   $: if (context) {
+   // This next reactive segment sets up a session storage store for the show background header button.
+   $: if (context)
+   {
       storeTrackerShowBackground = context.eventbus.triggerSync('tql:storage:session:store:get',
        sessionConstants.trackerShowBackground, false);
    }
 
-   // Depending on the storeTrackerShowBackground boolean state set none to style background / box-shadow.
+   // Depending on the storeTrackerShowBackground boolean state add or remove the `no-background` class.
    $: if (root && storeTrackerShowBackground)
    {
-      root.style.background = $storeTrackerShowBackground ? null : 'none';
-      root.style.boxShadow = $storeTrackerShowBackground ? null : 'none';
+      root.classList[$storeTrackerShowBackground ? 'remove' : 'add']('no-background');
    }
 </script>
 

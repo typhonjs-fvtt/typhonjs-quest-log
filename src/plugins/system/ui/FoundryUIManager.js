@@ -18,6 +18,9 @@ export default class FoundryUIManager
       Hooks.on('renderSceneNavigation', FoundryUIManager.updateTrackerPinned.bind(this));
       Hooks.on('renderQuestTracker', s_QUEST_TRACKER_RENDERED);
 
+      // TODO REMOVE: temporary while new QuestTracker is being made.
+      Hooks.on('renderQuestTrackerApp', s_QUEST_TRACKER_RENDERED);
+
       sidebar.currentCollapsed = ui?.sidebar?._collapsed || false;
       s_STORE_STATE();
 

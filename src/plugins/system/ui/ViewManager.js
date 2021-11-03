@@ -14,7 +14,7 @@ const s_NEW_QUEST_TRACKER = true;
 /**
  * Locally stores the app instances which are accessible by getter methods.
  *
- * @type {{questLog: QuestLog, questPreview: Map<string, QuestPreview>, questTracker: QuestTracker}}
+ * @type {{questLog: QuestLog, questPreview: Map<string, QuestPreview>, questTracker: QuestTrackerApp}}
  *
  * @see {@link ViewManager.questLog}
  * @see {@link ViewManager.questPreview}
@@ -105,7 +105,7 @@ export default class ViewManager
    static get questPreview() { return Apps.questPreview; }
 
    /**
-    * @returns {QuestTracker} Returns the quest tracker overlap app. This app is accessible when module setting
+    * @returns {QuestTrackerApp} Returns the quest tracker overlap app. This app is accessible when module setting
     *                         {@link TQLSettings.questTrackerEnable} is enabled.
     */
    static get questTracker() { return Apps.questTracker; }

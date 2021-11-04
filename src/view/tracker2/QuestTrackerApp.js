@@ -1,14 +1,9 @@
 import { SvelteApplication }     from '@typhonjs-fvtt/svelte';
 
+import createHeaderButtons       from './createHeaderButtons.js';
 import QuestTrackerShell         from './QuestTrackerShell.svelte';
 
-import TQLContextMenu            from '../TQLContextMenu.js';
-
-import createHeaderButtons       from './createHeaderButtons.js';
-
 import { constants, settings }   from '#constants';
-
-import TJSContextMenu         from "./context/TJSContextMenu.svelte";
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -26,6 +21,13 @@ const s_DEFAULT_POSITION = { top: 80, width: s_DEFAULT_WIDTH };
 
 export default class QuestTrackerApp extends SvelteApplication
 {
+   /**
+    * Stores CSS attributes for min / max width and height.
+    *
+    * @type {object}
+    */
+   #appExtents;
+
    /**
     * Stores whether the header is being dragged.
     *
@@ -82,7 +84,6 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          this.position = s_DEFAULT_POSITION;
       }
-
    }
 
    /**
@@ -104,7 +105,6 @@ export default class QuestTrackerApp extends SvelteApplication
          svelte: {
             class: QuestTrackerShell,
             intro: true,
-            context: new Map([['TESTING', 'TESTING YO']]),
             options: { injectApp: true, injectEventbus: true },
          }
       });
@@ -115,7 +115,7 @@ export default class QuestTrackerApp extends SvelteApplication
     *
     * @returns {number} Minimum width.
     */
-   get minWidth() { return this._appExtents.minWidth || 275; }
+   get minWidth() { return this.#appExtents.minWidth || 275; }
 
    /**
     * Is the QuestTracker pinned to the sidebar.
@@ -141,73 +141,6 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          await game.settings.set(constants.moduleName, settings.questTrackerEnable, false);
       }
-   }
-
-   /**
-    * Create the context menu. There are two separate context menus for the active / in progress tab and all other tabs.
-    *
-    * @param {JQuery}   html - JQuery element for this application.
-    *
-    * @private
-    */
-   _contextMenu(html)
-   {
-      const menuItemCopyLink = {
-         name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyEntityLink',
-         icon: '<i class="fas fa-link"></i>',
-         callback: (menu) =>
-         {
-            const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-            const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-            const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard',
-             `@Quest[${quest.id}]{${quest.name}}`);
-
-            if (quest && success)
-            {
-               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
-            }
-         }
-      };
-
-      /**
-       * @type {object[]}
-       */
-      const menuItems = [menuItemCopyLink];
-
-      if (game.user.isGM)
-      {
-         menuItems.push({
-            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyQuestID',
-            icon: '<i class="fas fa-key"></i>',
-            callback: (menu) =>
-            {
-               const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-               const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard', quest.id);
-
-               if (quest && success)
-               {
-                  ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
-               }
-            }
-         });
-
-         menuItems.push({
-            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.PrimaryQuest',
-            icon: '<i class="fas fa-star"></i>',
-            callback: (menu) =>
-            {
-               const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-               if (quest) { this._eventbus.trigger('tql:socket:set:quest:primary', { quest }); }
-            }
-         });
-      }
-
-      new TQLContextMenu(html, '.quest-tracker-header', menuItems);
    }
 
    /**
@@ -253,7 +186,7 @@ export default class QuestTrackerApp extends SvelteApplication
       if (this.#windowResizable)
       {
          elemResizeHandle.show();
-         this.element.css('min-height', this._appExtents.minHeight);
+         this.element.css('min-height', this.#appExtents.minHeight);
       }
       else
       {
@@ -325,16 +258,6 @@ export default class QuestTrackerApp extends SvelteApplication
       header[0].addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header[0]));
       header[0].addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header[0]));
 
-      document.body.addEventListener('contextmenu', (event) =>
-      {
-         new TJSContextMenu({ target: document.body, intro: true, props: { x: event.pageX, y: event.pageY } });
-         console.log(`!!!!! HERE`);
-      });
-
-      // TODO FIGURE OUT SVELTE WAY OF RUNNING A CONTEXT MENU
-      // Add context menu.
-      this._contextMenu(element);
-
       /**
        * Stores the app / window extents from styles.
        *
@@ -342,7 +265,7 @@ export default class QuestTrackerApp extends SvelteApplication
        *
        * @private
        */
-      this._appExtents = {
+      this.#appExtents = {
          minWidth: parseInt(this.element.css('min-width')),
          maxWidth: parseInt(this.element.css('max-width')),
          minHeight: parseInt(this.element.css('min-height')),
@@ -353,7 +276,7 @@ export default class QuestTrackerApp extends SvelteApplication
    }
 
    /**
-    * Override default Application `bringToTop` to stop adjustment of z-index.
+    * Override default Application `bringToTop` to stop adjustment of z-index and set height to auto if not resizable.
     *
     * @override
     * @inheritDoc
@@ -361,10 +284,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    bringToTop()
    {
-      if (!this.#windowResizable)
-      {
-         this.element[0].style.height = 'auto';
-      }
+      if (!this.#windowResizable) { this.element[0].style.height = 'auto'; }
    }
 
    /**
@@ -426,10 +346,10 @@ export default class QuestTrackerApp extends SvelteApplication
       const currentPosition = this.#setPositionMod(opts);
 
       // Pin width / height to min / max styles if defined.
-      if (currentPosition.width < this._appExtents.minWidth) { currentPosition.width = this._appExtents.minWidth; }
-      if (currentPosition.width > this._appExtents.maxWidth) { currentPosition.width = this._appExtents.maxWidth; }
-      if (currentPosition.height < this._appExtents.minHeight) { currentPosition.height = this._appExtents.minHeight; }
-      if (currentPosition.height > this._appExtents.maxHeight) { currentPosition.height = this._appExtents.maxHeight; }
+      if (currentPosition.width < this.#appExtents.minWidth) { currentPosition.width = this.#appExtents.minWidth; }
+      if (currentPosition.width > this.#appExtents.maxWidth) { currentPosition.width = this.#appExtents.maxWidth; }
+      if (currentPosition.height < this.#appExtents.minHeight) { currentPosition.height = this.#appExtents.minHeight; }
+      if (currentPosition.height > this.#appExtents.maxHeight) { currentPosition.height = this.#appExtents.maxHeight; }
 
       const el = this.element[0];
 

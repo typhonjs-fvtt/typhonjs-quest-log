@@ -2,8 +2,11 @@
    import { getContext }         from 'svelte';
    import { quintOut }           from 'svelte/easing';
 
+   import { TJSMenu }            from '@typhonjs-fvtt/svelte';
    import { slideFade }          from '@typhonjs-fvtt/svelte/transition';
    import { createMultiClick }   from '@typhonjs-fvtt/svelte/handler';
+
+   import createMenuItems        from './createMenuItems.js';
 
    import QuestTasks             from './QuestTasks.svelte';
 
@@ -31,7 +34,8 @@
 
    function handleContext(event)
    {
-      console.log(event.currentTarget)
+      TJSMenu.createContext({ id: 'tjs-quest-menu', x: event.pageX, y: event.pageY, items: createMenuItems({
+       questId, name: quest.name, eventbus })});
    }
 
    $: if(questEntry)
@@ -41,9 +45,7 @@
       hidden = questEntry.isHidden || questEntry.isInactive;
    }
 </script>
-<div class=quest
-   transition:slideFade|local={{ duration: 400, easing: quintOut}}
->
+<div class=quest transition:slideFade|local={{ duration: 400, easing: quintOut}}>
    <div class=title id={hidden ? 'hidden' : ''}>
       <div class=quest-tracker-header on:click|preventDefault={handleClick} on:contextmenu|preventDefault={handleContext}>
          <a>{quest.name}</a>

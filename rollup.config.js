@@ -1,5 +1,3 @@
-import path          from 'path';
-
 import alias         from '@rollup/plugin-alias';
 import commonjs      from '@rollup/plugin-commonjs';
 import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
@@ -21,6 +19,7 @@ import postcssConfig from './postcss.config.mjs';
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
+const s_PRODUCTION = true;
 
 const postcssMain = postcssConfig({
    extract: 'typhonjs-quest-log.css',
@@ -47,17 +46,14 @@ export default () =>
    // Defines whether source maps are generated / loaded from the .env file.
    const sourcemap = s_SOURCEMAPS;
 
-   // Shortcuts
-   const PS = path.sep;
-
    return [
       {
-         input: `src${PS}init.js`,
+         input: `src/init.js`,
          external: [                                  // Suppresses the warning and excludes ansi-colors from the
             'foundry-gsap'
          ],
          output: {
-            file: `dist${PS}typhonjs-quest-log.js`,
+            file: `dist/typhonjs-quest-log.js`,
             format: 'es',
             paths: {
                'foundry-gsap': '/scripts/greensock/esm/all.js'
@@ -75,8 +71,7 @@ export default () =>
             svelte({
                compilerOptions: {
                   // enable run-time checks when not in production
-                  // dev: !production
-                  dev: true
+                  dev: !s_PRODUCTION
                },
                preprocess: preprocess(),
                onwarn: (warning, handler) =>
@@ -88,7 +83,7 @@ export default () =>
                   handler(warning);
                },
             }),
-            postcss(postcssMain),                            // Engages PostCSS for Sass / CSS processing
+            postcss(postcssMain),
             resolve({
                browser: true,
                dedupe: ['svelte']
@@ -97,7 +92,7 @@ export default () =>
             // sourcemaps()
          ]
       },
-      {
+      {  // A 2nd virtual bundle to process TinyMCE CSS separately.
          input: 'pack',
          output: {
             format: 'es',
@@ -108,7 +103,7 @@ export default () =>
             virtual({
                pack: `import './styles/init-tinymce.scss';`
             }),
-            postcss(postcssTinyMCE),                            // Engages PostCSS for Sass / CSS processing
+            postcss(postcssTinyMCE),
          ]
       }
    ];

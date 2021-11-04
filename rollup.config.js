@@ -47,7 +47,7 @@ export default () =>
    const sourcemap = s_SOURCEMAPS;
 
    return [
-      {
+      {  // The main module bundle
          input: `src/init.js`,
          external: [                                  // Suppresses the warning and excludes ansi-colors from the
             'foundry-gsap'

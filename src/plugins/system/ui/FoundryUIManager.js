@@ -1,5 +1,7 @@
 import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
+import { settings }  from '#constants';
+
 /**
  * Manages the state of the Foundry UI elements including the {@link Hotbar}, {@link SceneNavigation} and
  * {@link Sidebar} providing management of the {@link QuestTracker}. Controls pinning the QuestTracker to the sidebar
@@ -186,6 +188,12 @@ export default class FoundryUIManager
       ev.eventbus.on('tql:foundryuimanager:check:position', this.checkPosition, this, opts);
       ev.eventbus.on('tql:foundryuimanager:update:tracker', this.updateTracker, this, opts);
       ev.eventbus.on('tql:foundryuimanager:update:tracker:pinned', this.updateTrackerPinned, this, opts);
+
+      // Respond to settings change when questTrackerPinned is true update the tracker to snap.
+      ev.eventbus.on(`tql:settings:change:${settings.questTrackerPinned}`, (value) =>
+      {
+         if (value) { this.updateTracker(); }
+      });
    }
 
    static onPluginUnload()

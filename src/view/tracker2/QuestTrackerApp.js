@@ -233,9 +233,6 @@ export default class QuestTrackerApp extends SvelteApplication
          this.#pinned = true;
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
          this.element.css('animation', '');
-
-         // TODO REPLACE WITH MODULE SETTING EVENT REGISTRATION IN FoundryUIManager.
-         this._eventbus.trigger('tql:foundryuimanager:update:tracker');
       }
    }
 

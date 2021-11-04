@@ -185,6 +185,17 @@ export default class QuestTrackerApp extends SvelteApplication
 
       if (this.#windowResizable)
       {
+         // When resizable is set to true set the current position to the stored position. This allows the position
+         // variable to be updated to the last auto height set position.
+         try
+         {
+            this.position = JSON.parse(game.settings.get(constants.moduleName, settings.questTrackerPosition));
+         }
+         catch (err)
+         {
+            console.log(`TyphonJSQuestLog - QuestTracker - #handleSettingWindowResize - error: ${err.message}`);
+         }
+
          elemResizeHandle.show();
          this.element.css('min-height', this.#appExtents.minHeight);
       }
@@ -193,7 +204,10 @@ export default class QuestTrackerApp extends SvelteApplication
          const elemWindowHeader = $('#quest-tracker .window-header');
 
          elemResizeHandle.hide();
+
          this.element.css('min-height', elemWindowHeader[0].scrollHeight);
+
+         // Set height to auto. This will cause QuestTrackerShell to save the new position.
          this.element[0].style.height = 'auto';
       }
    }
@@ -329,6 +343,8 @@ export default class QuestTrackerApp extends SvelteApplication
          }
       }
 
+      const initialTop = this.position.top;
+      const initialLeft = this.position.left;
       const initialWidth = this.position.width;
       const initialHeight = this.position.height;
 
@@ -372,7 +388,14 @@ export default class QuestTrackerApp extends SvelteApplication
       // Only set height if resizable.
       if (this.#windowResizable) { el.style.height = `${currentPosition.height}px`; }
 
-      s_SAVE_POSITION(currentPosition);
+      // Note: the root position is saved to `settings.questTrackerPosition` in QuestTrackerShell when any
+      // height position changes are made to handle when #windowResizable is false / height is set to `auto`.
+
+      // top / left position changes need to be saved here.
+      if (initialTop !== currentPosition.top || initialLeft !== currentPosition.left)
+      {
+         s_SAVE_POSITION(currentPosition);
+      }
 
       return currentPosition;
    }

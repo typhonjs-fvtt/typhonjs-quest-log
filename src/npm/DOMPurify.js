@@ -20,7 +20,7 @@ DOMPurify.addHook('uponSanitizeElement', (node, data) =>
 // FORCE_BODY allows 'style' tags to be entered into TinyMCE code editor.
 DOMPurify.sanitizeWithVideo = (dirty) =>
 {
-   return DOMPurify.sanitize(dirty,{
+   return DOMPurify.sanitize(dirty, {
       ADD_TAGS: ['iframe'],
       ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'],
       FORCE_BODY: true

@@ -1,4 +1,4 @@
-import QuestTracker  from '../../../view/tracker/QuestTracker.js';
+// import QuestTracker  from '../../../view/tracker/QuestTracker.js';
 
 import { settings }  from '#constants';
 
@@ -314,7 +314,10 @@ const hotbar = {
  */
 function s_QUEST_TRACKER_RENDERED(app)
 {
-   if (app instanceof QuestTracker) { FoundryUIManager.updateTracker(); }
+   // TODO UNCOMMENT AFTER NEW QUEST TRACKER IS FINISHED
+   // if (app instanceof QuestTracker) { FoundryUIManager.updateTracker(); }
+
+   FoundryUIManager.updateTracker();
 }
 
 /**

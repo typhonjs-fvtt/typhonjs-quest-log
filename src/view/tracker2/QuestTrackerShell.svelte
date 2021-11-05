@@ -36,13 +36,16 @@
       // Potentially change the local latch for scroll bars active.
       scrollActivated = content.clientHeight < content.scrollHeight;
 
-      // Save position of the root on any root or client change.
-      game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify({
-         top: parseInt(root.style.top, 10),
-         left: parseInt(root.style.left, 10),
-         width: root.clientWidth,
-         height: root.clientHeight
-      }));
+      // Save position of the root on any root or client change when quest tracker isn't resizable / auto-mode.
+      if (!game.settings.get(constants.moduleName, settings.questTrackerResizable))
+      {
+         game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify({
+            top: parseInt(root.style.top, 10),
+            left: parseInt(root.style.left, 10),
+            width: root.clientWidth,
+            height: root.clientHeight
+         }));
+      }
    }, 400);
 
    // When heightChanged which is binded to the root & content clientHeight changes execute throttle function.

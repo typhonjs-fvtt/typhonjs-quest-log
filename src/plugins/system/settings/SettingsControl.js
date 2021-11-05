@@ -218,7 +218,7 @@ export default class SettingsControl
       }
    }
 
-   static handle_questTrackerEnable(value)
+   static handle_questTrackerEnabled(value)
    {
       // Potentially Post notification that the quest tracker is enabled, but not visible as there are no active
       // quests.
@@ -232,7 +232,7 @@ export default class SettingsControl
       }
 
       // Swap macro image based on current state. No need to await.
-      this._eventbus.trigger('tql:utils:macro:image:set', settings.questTrackerEnable, value);
+      this._eventbus.trigger('tql:utils:macro:image:set', settings.questTrackerEnabled, value);
 
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
    }

@@ -46,7 +46,7 @@ const noteControls = [
       title: 'TyphonJSQuestLog.QuestTracker.Title',
       icon: 'fas fa-tasks',
       visible: true,
-      onClick: async () => { await game.settings.set(constants.moduleName, settings.questTrackerEnable, true); },
+      onClick: async () => { await game.settings.set(constants.moduleName, settings.questTrackerEnabled, true); },
       button: true
    }
 ];

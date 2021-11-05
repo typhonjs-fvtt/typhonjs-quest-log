@@ -125,11 +125,11 @@ export default class QuestTrackerApp extends SvelteApplication
    get pinned() { return this.#pinned; }
 
    /**
-    * Sets `questTrackerEnable` to false.
+    * Sets `questTrackerEnabled` to false.
     *
     * @param {object}   [options] - Optional parameters.
     *
-    * @param {boolean}  [options.updateSetting=true] - If true then {@link settings.questTrackerEnable} is set to false.
+    * @param {boolean}  [options.updateSetting=true] - If true then {@link settings.questTrackerEnabled} is set to false.
     *
     * @returns {Promise<void>}
     */
@@ -139,7 +139,7 @@ export default class QuestTrackerApp extends SvelteApplication
 
       if (updateSetting)
       {
-         await game.settings.set(constants.moduleName, settings.questTrackerEnable, false);
+         await game.settings.set(constants.moduleName, settings.questTrackerEnabled, false);
       }
    }
 

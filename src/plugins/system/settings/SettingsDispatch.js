@@ -233,15 +233,15 @@ export default class SettingsDispatch
          }
       });
 
-      game.settings.register(constants.moduleName, settings.questTrackerEnable, {
+      game.settings.register(constants.moduleName, settings.questTrackerEnabled, {
          scope: scope.client,
          config: false,
          default: false,
          type: Boolean,
          onChange: (value) =>
          {
-            this._eventbus.trigger(`tql:settings:change:any`, { setting: settings.questTrackerEnable, value });
-            this._eventbus.trigger(`tql:settings:change:${settings.questTrackerEnable}`, value);
+            this._eventbus.trigger(`tql:settings:change:any`, { setting: settings.questTrackerEnabled, value });
+            this._eventbus.trigger(`tql:settings:change:${settings.questTrackerEnabled}`, value);
          }
       });
 

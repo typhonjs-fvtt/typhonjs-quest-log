@@ -110,7 +110,7 @@ const settings = {
    navStyle: 'navStyle',
    notifyRewardDrop: 'notifyRewardDrop',
    primaryQuest: 'primaryQuest',
-   questTrackerEnable: 'questTrackerEnable',
+   questTrackerEnabled: 'questTrackerEnabled',
    questTrackerPinned: 'questTrackerPinned',
    questTrackerPosition: 'questTrackerPosition',
    questTrackerResizable: 'questTrackerResizable',
@@ -165,7 +165,7 @@ export {
  *
  * @property {string}   primaryQuest - Stores the quest ID of a quest that is the current primary quest.
  *
- * @property {string}   questTrackerEnable - Enables the quest tracker.
+ * @property {string}   questTrackerEnabled - Enables the quest tracker.
  *
  * @property {string}   questTrackerPinned - Is the QuestTracker pinned to the side bar.
  *

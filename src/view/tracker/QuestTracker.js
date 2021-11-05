@@ -290,11 +290,11 @@ export default class QuestTracker extends Application
    bringToTop() {}
 
    /**
-    * Sets `questTrackerEnable` to false.
+    * Sets `questTrackerEnabled` to false.
     *
     * @param {object}   [options] - Optional parameters.
     *
-    * @param {boolean}  [options.updateSetting=true] - If true then {@link settings.questTrackerEnable} is set to false.
+    * @param {boolean}  [options.updateSetting=true] - If true then {@link settings.questTrackerEnabled} is set to false.
     *
     * @returns {Promise<void>}
     */
@@ -304,7 +304,7 @@ export default class QuestTracker extends Application
 
       if (updateSetting)
       {
-         await game.settings.set(constants.moduleName, settings.questTrackerEnable, false);
+         await game.settings.set(constants.moduleName, settings.questTrackerEnabled, false);
       }
    }
 

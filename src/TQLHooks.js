@@ -156,9 +156,9 @@ export default class TQLHooks
        game.settings.get(constants.moduleName, settings.primaryQuest));
 
       // Initialize current client based macro images based on current state.
-      // await Utils.setMacroImage([settings.questTrackerEnable, settings.questTrackerResizable]);
+      // await Utils.setMacroImage([settings.questTrackerEnabled, settings.questTrackerResizable]);
       await eventbus.triggerAsync('tql:utils:macro:image:set',
-       [settings.questTrackerEnable, settings.questTrackerResizable]);
+       [settings.questTrackerEnabled, settings.questTrackerResizable]);
 
       // Support for LibThemer; add TQL options to LibThemer.
       const libThemer = game.modules.get('lib-themer');
@@ -400,7 +400,7 @@ export default class TQLHooks
    {
       if (!game.user.isGM && game.settings.get(constants.moduleName, settings.hideTQLFromPlayers)) { return; }
 
-      await game.settings.set(constants.moduleName, settings.questTrackerEnable, true);
+      await game.settings.set(constants.moduleName, settings.questTrackerEnabled, true);
 
       if (typeof opts === 'object')
       {

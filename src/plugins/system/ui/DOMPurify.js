@@ -1,4 +1,4 @@
-import DOMPurify from '../../../npm/DOMPurify.js';
+import DOMPurify from '#DOMPurify';
 
 export default class DOMPurifyPlugin
 {

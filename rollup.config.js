@@ -65,7 +65,9 @@ export default () =>
          plugins: [
             alias({
                entries: [
-                  { find: '#constants', replacement: './src/constants.js' }
+                  { find: '#collect', replacement: './src/npm/collect.js' },
+                  { find: '#constants', replacement: './src/constants.js' },
+                  { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
                ]
             }),
             svelte({

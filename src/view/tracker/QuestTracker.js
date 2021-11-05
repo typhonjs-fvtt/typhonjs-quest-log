@@ -1,5 +1,5 @@
 import { TJSMenu }      from '@typhonjs-fvtt/svelte';
-import collect          from '../../npm/collect.js';
+import collect          from '#collect';
 
 import HandlerTracker   from './HandlerTracker.js';
 import createMenuItems  from './createMenuItems.js';

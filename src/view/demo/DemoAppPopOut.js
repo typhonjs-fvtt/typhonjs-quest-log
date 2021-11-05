@@ -36,7 +36,7 @@ export default class DemoAppPopOut extends SvelteApplication
          }
 
          // svelte: {      // Add multiple Svelte components to ApplicationShell.
-         //    class: ApplicationShell,
+         //    class: TJSApplicationShell,
          //    children: [
          //       { class: DemoPopOut },
          //       { class: DemoPopOut }
@@ -45,7 +45,7 @@ export default class DemoAppPopOut extends SvelteApplication
          // }
 
          // svelte: {         // A warning is posted w/ no children.
-         //    class: ApplicationShell,
+         //    class: TJSApplicationShell,
          //    options: { injectApp: true }
          // }
       });

@@ -1,6 +1,8 @@
-import TQLContextMenu   from '../TQLContextMenu.js';
 import TQLDialog        from '../TQLDialog.js';
 
+import { TJSMenu }      from '@typhonjs-fvtt/svelte';
+
+import createMenuItems  from './createMenuItems.js';
 import HandlerLog       from './HandlerLog.js';
 
 import { constants, jquery, questStatusI18n, questTabIndex, settings } from '#constants';
@@ -95,7 +97,39 @@ export default class QuestLog extends Application
 
       html.on(jquery.click, '.actions.quest-status i.move', (event) => HandlerLog.questStatusSet(event, eventbus));
 
-      this._contextMenu(html);
+      html.on('contextmenu', '.tab:not([data-tab="active"]) .drag-quest', (event) =>
+      {
+         const questId = $(event.target).closest('.drag-quest')?.data('quest-id');
+         const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
+
+         if (quest)
+         {
+            TJSMenu.createContext({
+               duration: 200,
+               id: 'tjs-quest-menu',
+               x: event.pageX,
+               y: event.pageY,
+               items: createMenuItems({ questId, name: quest.name, eventbus: this._eventbus, activeTab: false })
+            });
+         }
+      });
+
+      html.on('contextmenu', '.tab[data-tab="active"] .drag-quest', (event) =>
+      {
+         const questId = $(event.target).closest('.drag-quest')?.data('quest-id');
+         const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
+
+         if (quest)
+         {
+            TJSMenu.createContext({
+               duration: 200,
+               id: 'tjs-quest-menu',
+               x: event.pageX,
+               y: event.pageY,
+               items: createMenuItems({ questId, name: quest.name, eventbus: this._eventbus, activeTab: true })
+            });
+         }
+      });
    }
 
    /**
@@ -108,86 +142,6 @@ export default class QuestLog extends Application
    {
       TQLDialog.closeDialogs({ isQuestLog: true });
       return super.close(options);
-   }
-
-   /**
-    * Create the context menu. There are two separate context menus for the active / in progress tab and all other tabs.
-    *
-    * @param {JQuery}   html - JQuery element for this application.
-    *
-    * @private
-    */
-   _contextMenu(html)
-   {
-      const menuItemCopyLink = {
-         name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyEntityLink',
-         icon: '<i class="fas fa-link"></i>',
-         callback: (menu) =>
-         {
-            const questId = $(menu)?.closest('.drag-quest')?.data('quest-id');
-            const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-            const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard',
-             `@Quest[${quest.id}]{${quest.name}}`);
-
-            if (quest && success)
-            {
-               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
-            }
-         }
-      };
-
-      /**
-       * @type {object[]}
-       */
-      const menuItemsOther = [menuItemCopyLink];
-
-      /**
-       * @type {object[]}
-       */
-      const menuItemsActive = [menuItemCopyLink];
-
-      if (game.user.isGM)
-      {
-         const menuItemQuestID = {
-            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyQuestID',
-            icon: '<i class="fas fa-key"></i>',
-            callback: (menu) =>
-            {
-               const questId = $(menu)?.closest('.drag-quest')?.data('quest-id');
-               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-               const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard', quest.id);
-
-               if (quest && success)
-               {
-                  ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
-               }
-            }
-         };
-
-         menuItemsActive.push(menuItemQuestID);
-         menuItemsOther.push(menuItemQuestID);
-
-         menuItemsActive.push({
-            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.PrimaryQuest',
-            icon: '<i class="fas fa-star"></i>',
-            callback: (menu) =>
-            {
-               const questId = $(menu)?.closest('.drag-quest')?.data('quest-id');
-               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-               if (quest)
-               {
-                  this._eventbus.trigger('tql:socket:set:quest:primary', { quest });
-               }
-            }
-         });
-      }
-
-      // Must show two different context menus as only the active / in progress tab potentially has the menu option to
-      // allow the GM to set the primary quest.
-      new TQLContextMenu(html, '.tab:not([data-tab="active"]) .drag-quest', menuItemsOther);
-      new TQLContextMenu(html, '.tab[data-tab="active"] .drag-quest', menuItemsActive);
    }
 
    /**

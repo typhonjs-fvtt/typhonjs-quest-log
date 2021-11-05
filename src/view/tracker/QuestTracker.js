@@ -1,6 +1,8 @@
-import HandlerTracker   from './HandlerTracker.js';
-import TQLContextMenu   from '../TQLContextMenu.js';
+import { TJSMenu }      from '@typhonjs-fvtt/svelte';
 import collect          from '../../npm/collect.js';
+
+import HandlerTracker   from './HandlerTracker.js';
+import createMenuItems  from './createMenuItems.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '#constants';
 
@@ -101,73 +103,6 @@ export default class QuestTracker extends Application
    }
 
    /**
-    * Create the context menu. There are two separate context menus for the active / in progress tab and all other tabs.
-    *
-    * @param {JQuery}   html - JQuery element for this application.
-    *
-    * @private
-    */
-   _contextMenu(html)
-   {
-      const menuItemCopyLink = {
-         name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyEntityLink',
-         icon: '<i class="fas fa-link"></i>',
-         callback: (menu) =>
-         {
-            const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-            const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-            const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard',
-             `@Quest[${quest.id}]{${quest.name}}`);
-
-            if (quest && success)
-            {
-               ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.LinkCopied'));
-            }
-         }
-      };
-
-      /**
-       * @type {object[]}
-       */
-      const menuItems = [menuItemCopyLink];
-
-      if (game.user.isGM)
-      {
-         menuItems.push({
-            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyQuestID',
-            icon: '<i class="fas fa-key"></i>',
-            callback: (menu) =>
-            {
-               const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-               const success = this._eventbus.triggerSync('tql:utils:copy:text:to:clipboard', quest.id);
-
-               if (quest && success)
-               {
-                  ui.notifications.info(game.i18n.format('TyphonJSQuestLog.Notifications.QuestIDCopied'));
-               }
-            }
-         });
-
-         menuItems.push({
-            name: 'TyphonJSQuestLog.QuestLog.ContextMenu.PrimaryQuest',
-            icon: '<i class="fas fa-star"></i>',
-            callback: (menu) =>
-            {
-               const questId = $(menu)?.closest('.quest-tracker-header')?.data('quest-id');
-               const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
-
-               if (quest) { this._eventbus.trigger('tql:socket:set:quest:primary', { quest }); }
-            }
-         });
-      }
-
-      new TQLContextMenu(html, '.quest-tracker-header', menuItems);
-   }
-
-   /**
     * Specify the set of config buttons which should appear in the Application header. Buttons should be returned as an
     * Array of objects.
     *
@@ -242,8 +177,22 @@ export default class QuestTracker extends Application
       html.on(jquery.click, '.header-button.show-primary i', void 0,
        () => HandlerTracker.questPrimaryShow(this, eventbus));
 
-      // Add context menu.
-      this._contextMenu(html);
+      html.on('contextmenu', '.quest-tracker-header', (event) =>
+      {
+         const questId = $(event.target).closest('.quest-tracker-header')?.data('quest-id');
+         const quest = this._eventbus.triggerSync('tql:questdb:quest:get', questId);
+
+         if (quest)
+         {
+            TJSMenu.createContext({
+               duration: 200,
+               id: 'tjs-quest-menu',
+               x: event.pageX,
+               y: event.pageY,
+               items: createMenuItems({ questId, name: quest.name, eventbus: this._eventbus, activeTab: true })
+            });
+         }
+      });
 
       this._eventbus.trigger('tql:utils:jquery:dblclick:create', {
          selector: '#quest-tracker .quest-tracker-header',

@@ -1,6 +1,7 @@
 <script>
    import { getContext, setContext }   from 'svelte';
-   import { ApplicationHeader }        from '@typhonjs-fvtt/svelte';
+
+   import { TJSApplicationHeader }     from '@typhonjs-fvtt/svelte/component';
 
    import MainContainer                from './MainContainer.svelte';
 
@@ -63,7 +64,7 @@
 </script>
 
 <div id={foundryApp.id} class="typhonjs-app typhonjs-window-app" data-appid={foundryApp.appId} bind:clientHeight={heightChanged} bind:this={root}>
-   <ApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
+   <TJSApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
    <section class=window-content bind:this={content} bind:clientHeight={heightChanged}>
       <MainContainer />
    </section>

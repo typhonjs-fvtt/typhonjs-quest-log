@@ -1,7 +1,8 @@
-import { ComponentShell, SvelteApplication } from '@typhonjs-fvtt/svelte';
+import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+import { TJSComponentShell }  from '@typhonjs-fvtt/svelte/component';
 
-import Demo       from './Demo.svelte';
-import DemoShell  from './DemoShell.svelte';
+import Demo                   from './Demo.svelte';
+import DemoShell              from './DemoShell.svelte';
 
 /**
  * Creates a basic demo popout Application. Foundry renders the outer frame HTML and `.window-content` is the target
@@ -60,7 +61,7 @@ export default class DemoApp extends SvelteApplication
          // ]
 
          // svelte: {
-         //    class: ComponentShell,
+         //    class: TJSComponentShell,
          //    target: '.window-content',
          //
          //    // Advanced: For ApplicationShell / ComponentShell you can define a context function which is invoked with
@@ -77,7 +78,7 @@ export default class DemoApp extends SvelteApplication
          // }
 
          // svelte: {      // You can also inject multiple children with ComponentShell.
-         //    class: ComponentShell,
+         //    class: TJSComponentShell,
          //    target: '.window-content',
          //    children: [
          //       {
@@ -97,7 +98,7 @@ export default class DemoApp extends SvelteApplication
          // }
 
          // svelte: {      // ComponentShell posts a warning if no children added.
-         //    class: ComponentShell,
+         //    class: TJSComponentShell,
          //    target: '.window-content',
          // }
       });

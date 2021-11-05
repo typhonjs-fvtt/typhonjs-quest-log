@@ -9,7 +9,7 @@ import { constants, questDBHooks, questStatus, questStatusI18n, settings } from 
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
-const s_NEW_QUEST_TRACKER = true;
+const s_NEW_QUEST_TRACKER = false;
 
 /**
  * Locally stores the app instances which are accessible by getter methods.

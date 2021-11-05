@@ -17,6 +17,7 @@ const constants = {
  */
 const jquery = {
    click: 'click',
+   contextmenu: 'contextmenu',
    dblclick: 'dblclick',
    dragenter: 'dragenter',
    dragstart: 'dragstart',

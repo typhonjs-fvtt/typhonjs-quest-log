@@ -9,9 +9,11 @@
  *
  * @param {Eventbus} opts.eventbus - The Plugin manager eventbus.
  *
+ * @param {boolean}  [opts.activeTab=false] - Indicates this is the active quest tab.
+ *
  * @returns {object[]} An array of menu items for TJSMenu.
  */
-export default function createMenuItems({ questId, name, eventbus })
+export default function createMenuItems({ questId, name, eventbus, activeTab = false })
 {
    const menuItemCopyLink = {
       label: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyEntityLink',
@@ -32,7 +34,7 @@ export default function createMenuItems({ questId, name, eventbus })
     */
    const menuItems = [menuItemCopyLink];
 
-   if (game.user.isGM)
+   if (game.user.isTrusted)
    {
       menuItems.push({
          label: 'TyphonJSQuestLog.QuestLog.ContextMenu.CopyQuestID',
@@ -47,7 +49,10 @@ export default function createMenuItems({ questId, name, eventbus })
             }
          }
       });
+   }
 
+   if (game.user.isGM && activeTab)
+   {
       menuItems.push({
          label: 'TyphonJSQuestLog.QuestLog.ContextMenu.PrimaryQuest',
          icon: 'fas fa-star',

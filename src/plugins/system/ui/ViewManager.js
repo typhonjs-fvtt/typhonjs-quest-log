@@ -306,7 +306,7 @@ export default class ViewManager
       ev.eventbus.on('tql:viewmanager:notifications:warn', this.notifications.warn, s_NOTIFICATIONS, opts);
       ev.eventbus.on('tql:viewmanager:close:all', this.closeAll, this, opts);
       ev.eventbus.on('tql:viewmanager:is:quest:tracker:visible', this.isQuestTrackerVisible, this, opts);
-      ev.eventbus.on('tql:viewmanager:refresh:quest:preview', this.refreshQuestPreview, this, opts);
+      ev.eventbus.on('tql:viewmanager:quest:preview:refresh', this.refreshQuestPreview, this, opts);
       ev.eventbus.on('tql:viewmanager:render:all', this.renderAll, this, opts);
       ev.eventbus.on('tql:viewmanager:render:or:close:quest:tracker', this.renderOrCloseQuestTracker, this, opts);
       ev.eventbus.on('tql:viewmanager:quest:added', this.questAdded, this, opts);

@@ -198,7 +198,7 @@ export default class Socket
     */
    static refreshQuestPreview({ questId, updateLog = true, ...options })
    {
-      s_EVENTBUS.trigger('tql:viewmanager:refresh:quest:preview', questId, options);
+      s_EVENTBUS.trigger('tql:viewmanager:quest:preview:refresh', questId, options);
 
       // Send a socket message for remote clients to render.
       game.socket.emit(s_EVENT_NAME, {

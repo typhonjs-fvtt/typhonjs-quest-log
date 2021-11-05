@@ -15,7 +15,7 @@
    const foundryApp = getContext('external').foundryApp;
 
    const storeTrackerShowBackground = getContext('external').eventbus.triggerSync('tql:storage:session:store:get',
-    sessionConstants.trackerShowBackground, false);
+    sessionConstants.trackerShowBackground, true);
 
    // Stores height changes between root / content elements and is used as a latch to calculate scroll bar activation
    // and saving the current root position into module settings for `questTrackerPosition`.

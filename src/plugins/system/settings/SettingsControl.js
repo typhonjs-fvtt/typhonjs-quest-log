@@ -206,7 +206,7 @@ export default class SettingsControl
       if (updateQuestIds.length)
       {
          this._eventbus.trigger('tql:questdb:enrich:quests', ...updateQuestIds);
-         this._eventbus.trigger('tql:viewmanager:refresh:quest:preview', updateQuestIds);
+         this._eventbus.trigger('tql:viewmanager:quest:preview:refresh', updateQuestIds);
          this._eventbus.trigger('tql:viewmanager:render:all', { force: true });
       }
 

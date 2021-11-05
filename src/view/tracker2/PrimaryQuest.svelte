@@ -20,7 +20,7 @@
 </script>
 
 {#if questEntry}
-   <Quest {questEntry} />
+   <div class=quests><Quest {questEntry} /></div>
 {:else}
    <div class=no-quests>{localize('TyphonJSQuestLog.QuestTracker.NoPrimary')}</div>
 {/if}

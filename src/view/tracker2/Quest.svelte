@@ -34,8 +34,13 @@
 
    function handleContext(event)
    {
-      TJSMenu.createContext({ id: 'tjs-quest-menu', x: event.pageX, y: event.pageY, items: createMenuItems({
-       questId, name: quest.name, eventbus })});
+      TJSMenu.createContext({
+         duration: 200,
+         id: 'tjs-quest-menu',
+         x: event.pageX,
+         y: event.pageY,
+         items: createMenuItems({questId, name: quest.name, eventbus })
+      });
    }
 
    $: if(questEntry)

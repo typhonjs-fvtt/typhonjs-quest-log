@@ -19,12 +19,26 @@ export class SvelteApplication extends Application
    #svelteComponents = [];
 
    /**
+    * Stores the target element which may not necessarily be the main element.
+    *
+    * @type {JQuery}
+    */
+   #targetElement = null;
+
+   /**
     * @inheritDoc
     */
    constructor(options)
    {
       super(options);
    }
+
+   /**
+    * Returns the target element or main element if no target defined.
+    *
+    * @returns {JQuery} Target element.
+    */
+   get targetElement() { return this.#targetElement; }
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
@@ -56,7 +70,7 @@ export class SvelteApplication extends Application
        *
        * @type {JQuery}
        */
-      const el = this._targetElement;
+      const el = this.#targetElement;
       if (!el) { return this._state = states.CLOSED; }
 
       el.css({ minHeight: 0 });
@@ -78,42 +92,41 @@ export class SvelteApplication extends Application
          Hooks.call(`close${cls.name}`, this, el);
       }
 
-      // Animate closing the element
-      return new Promise((resolve) =>
+      // Await on JQuery to slide up the main element.
+      await new Promise((resolve) => { el.slideUp(200, () => resolve()); });
+
+      // Stores the Promises returned from running outro transitions and destroying each Svelte component.
+      const svelteDestroyPromises = [];
+
+      // Manually invoke the destroy callbacks for all Svelte components.
+      for (const entry of this.#svelteComponents)
       {
-         el.slideUp(200, async () =>
+         // Use `outroAndDestroy` to run outro transitions before destroying.
+         svelteDestroyPromises.push(outroAndDestroy(entry.component));
+
+         // If any proxy eventbus has been added then remove all event registrations from the component.
+         const eventbus = entry.config.eventbus;
+         if (typeof eventbus === 'object' && typeof eventbus.off === 'function')
          {
-            // Manually invoke the destroy callbacks for all Svelte components.
-            for (const entry of this.#svelteComponents)
-            {
-console.log(`SvelteApplication - close - before Svelte comp destroy`);
-               // entry.component?.$destroy();
+            eventbus.off();
+            entry.config.eventbus = void 0;
+         }
+      }
 
-               // await outroAndDestroy(entry.component);
-               outroAndDestroy(entry.component);
-console.log(`SvelteApplication - close - after Svelte comp destroy`);
+      this.#svelteComponents = [];
 
-               const eventbus = entry.config.eventbus;
-               if (typeof eventbus === 'object' && typeof eventbus.off === 'function')
-               {
-                  eventbus.off();
-                  entry.config.eventbus = void 0;
-               }
-            }
+      // Await all Svelte components to destroy.
+      await Promise.all(svelteDestroyPromises);
 
-            this.#svelteComponents = [];
+      el.remove();
 
-            // el.remove();
-
-            // Clean up data
-            this._element = null;
-            delete ui.windows[this.appId];
-            this._minimized = false;
-            this._scrollPositions = null;
-            this._state = states.CLOSED;
-            resolve();
-         });
-      });
+      // Clean up data
+      this._element = null;
+      this.#targetElement = null;
+      delete ui.windows[this.appId];
+      this._minimized = false;
+      this._scrollPositions = null;
+      this._state = states.CLOSED;
    }
 
    /**
@@ -123,7 +136,7 @@ console.log(`SvelteApplication - close - after Svelte comp destroy`);
     *
     * @returns {object} The loaded Svelte config + component.
     */
-   getSvelteComponent(index)
+   getSvelteData(index)
    {
       return this.#svelteComponents[index];
    }
@@ -162,14 +175,8 @@ console.log(`SvelteApplication - close - after Svelte comp destroy`);
          throw new TypeError(`SvelteApplication - _injectHTML - this.options.svelte not an array or object.`);
       }
 
-console.log(`SvelteApplication - _injectHTML - html:`);
-console.log(html);
-
-      // // Detect if this is a synthesized DocumentFragment.
-      const isDocumentFragment = html.length && html[0] instanceof DocumentFragment && html[0].firstElementChild;
-      //
-      // // Store first child element if DocumentFragment.
-      // const newElement = isDocumentFragment ? $(html[0].firstElementChild) : void 0;
+      // Detect if this is a synthesized DocumentFragment.
+      const isDocumentFragment = html.length && html[0] instanceof DocumentFragment;
 
       super._injectHTML(html);
 
@@ -186,12 +193,14 @@ console.log(html);
          }
       }
 
-      this._targetElement = typeof this.options.targetSelector === 'string' ?
-       this._element.find(this.options.targetSelector) : this._element;
+      // Potentially retrieve a specific target element if `selectorTarget` is defined otherwise make the target the
+      // main element.
+      this.#targetElement = typeof this.options.selectorTarget === 'string' ?
+       this._element.find(this.options.selectorTarget) : this._element;
 
-      if (this._targetElement === void 0)
+      if (this.#targetElement === null || this.#targetElement === void 0)
       {
-         throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.targetElement}' not found.`);
+         throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
       this.onSvelteMount(this.element);
@@ -259,8 +268,6 @@ function s_LOAD_CONFIG(app, html, config)
 
    const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
    const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
-   const hasTemplate = typeof app.template === 'string';
-   const hasTarget = typeof config.target === 'string';
 
    if (typeof config.class !== 'function')
    {
@@ -268,38 +275,40 @@ function s_LOAD_CONFIG(app, html, config)
        `SvelteApplication - s_LOAD_CONFIG - class not a constructor for config:\n${JSON.stringify(config)}.`);
    }
 
-   if (hasTemplate && !hasTarget)
+   if (typeof app.template === 'string' && typeof config.target !== 'string')
    {
-      throw new TypeError(`SvelteApplication - s_LOAD_CONFIG - target selector not a string for config:\n${
-       JSON.stringify(config)}`);
+      throw new TypeError(
+       `SvelteApplication - s_LOAD_CONFIG - Template defined and target selector not a string for config:\n${
+        JSON.stringify(config)}`);
    }
 
-   // If a target selector is defined then find it in the JQuery `html` otherwise create an empty fragment.
-   const target = hasTarget ? html.find(config.target).get(0) : document.createDocumentFragment();
+   let target;
 
-   // let target;
-   //
-   // if (config.target instanceof HTMLElement)
-   // {
-   //    target = config.target;
-   // }
-   // else if (typeof config.target === 'string')
-   // {
-   //    target = html.find(config.target).get(0);
-   // }
-   // else
-   // {
-   //    target = document.createDocumentFragment();
-   // }
-
-console.log(`SvelteApplication - s_LOAD_CONFIG - 0`);
-console.log(target);
+   if (config.target instanceof HTMLElement)       // A specific HTMLElement to append Svelte component.
+   {
+      target = config.target;
+   }
+   else if (typeof config.target === 'string')     // A string target defines a selector to find in existing HTML.
+   {
+      target = html.find(config.target).get(0);
+   }
+   else                                            // No target defined, create a document fragment.
+   {
+      target = document.createDocumentFragment();
+   }
 
    if (target === void 0)
    {
       throw new Error(
        `SvelteApplication - s_LOAD_CONFIG - could not find target selector: ${config.target} for config:\n${
         JSON.stringify(config)}`);
+   }
+
+   if (target instanceof HTMLElement && typeof svelteOptions.selectorElement !== 'string')
+   {
+      throw new Error(
+       `SvelteApplication - s_LOAD_CONFIG - HTMLElement target and 'selectorElement' is not defined for config:\n${
+         JSON.stringify(config)}`);
    }
 
    const SvelteComponent = config.class;
@@ -312,6 +321,7 @@ console.log(target);
 
    const svelteConfig = { ...config, target  };
 
+   // Delete extra Svelte options.
    delete svelteConfig.options;
 
    let externalContext = {};
@@ -387,9 +397,6 @@ console.log(target);
         new Map([['external', externalContext]]);
    }
 
-console.log(`SvelteApplication - s_LOAD_CONFIG - 1 - svelteConfig`);
-console.log(svelteConfig);
-// svelteConfig.target = document.body;
    // Create the Svelte component.
    const component = new SvelteComponent(svelteConfig);
 
@@ -398,18 +405,25 @@ console.log(svelteConfig);
 
    let element;
 
-   // Detect if target is a synthesized DocumentFragment with an child element.
+   // Detect if target is a synthesized DocumentFragment with an child element. Child elements will be present
+   // if the Svelte component mounts and renders initial content into the document fragment.
    if (target instanceof DocumentFragment && target.firstElementChild)
    {
       element = target.firstElementChild;
-   }
-
-   const loadData = { config: svelteConfig, component, element };
-
-   if (!hasTarget)
-   {
       html.append(target);
    }
+   else if (target instanceof HTMLElement)
+   {
+      // The target is an HTMLElement so find the Application element from `selectorElement` option.
+      element = target.querySelector(svelteOptions.selectorElement);
 
-   return loadData;
+      if (element === null || element === void 0)
+      {
+         throw new Error(
+          `SvelteApplication - s_LOAD_CONFIG - HTMLElement target - could not find 'selectorElement' for config:\n${
+           JSON.stringify(config)}`);
+      }
+   }
+
+   return { config: svelteConfig, component, element };
 }

@@ -105,7 +105,12 @@ export default class QuestTrackerApp extends SvelteApplication
          svelte: {
             class: QuestTrackerShell,
             intro: true,
-            options: { injectApp: true, injectEventbus: true },
+            target: document.body,
+            options: {
+               injectApp: true,
+               injectEventbus: true,
+               selectorElement: '#quest-tracker.typhonjs-app'
+            }
          }
       });
    }
@@ -178,10 +183,12 @@ export default class QuestTrackerApp extends SvelteApplication
        */
       this.#windowResizable = value;
 
-      // Early out if there is no root element.
-      if (this.element === null || this.element === void 0 || this.element[0] === void 0) { return; }
+      // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
+      if (this.targetElement === null || this.targetElement === void 0 || this.targetElement[0] === void 0) { return; }
 
-      const elemResizeHandle = $('#quest-tracker .window-resizable-handle');
+      const targetElement = this.targetElement[0];
+
+      const elemResizeHandle = targetElement.querySelector('#quest-tracker .window-resizable-handle');
 
       if (this.#windowResizable)
       {
@@ -196,19 +203,19 @@ export default class QuestTrackerApp extends SvelteApplication
             console.log(`TyphonJSQuestLog - QuestTracker - #handleSettingWindowResize - error: ${err.message}`);
          }
 
-         elemResizeHandle.show();
-         this.element.css('min-height', this.#appExtents.minHeight);
+         elemResizeHandle.style.display = 'block';
+         targetElement.style.minHeight = this.#appExtents.minHeight;
       }
       else
       {
-         const elemWindowHeader = $('#quest-tracker .window-header');
+         const elemWindowHeader = targetElement.querySelector('#quest-tracker .window-header');
 
-         elemResizeHandle.hide();
+         elemResizeHandle.style.display = 'none';
 
-         this.element.css('min-height', elemWindowHeader[0].scrollHeight);
+         targetElement.style.minHeight = elemWindowHeader.scrollHeight;
 
          // Set height to auto. This will cause QuestTrackerShell to save the new position.
-         this.element[0].style.height = 'auto';
+         targetElement.style.height = 'auto';
       }
    }
    /**
@@ -246,7 +253,7 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          this.#pinned = true;
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-         this.element.css('animation', '');
+         this.targetElement[0].style.animation = '';
       }
    }
 
@@ -257,17 +264,15 @@ export default class QuestTrackerApp extends SvelteApplication
     *
     * @see https://foundryvtt.com/api/FormApplication.html#activateListeners
     */
-   onSvelteMount(element)
+   onSvelteMount({ targetElement })
    {
-      super.onSvelteMount(element);
-
       // Make the window draggable
-      const header = element.find('header');
-      new Draggable(this, element, header[0], this.options.resizable);
+      const header = targetElement.querySelector('header');
+      new Draggable(this, $(targetElement), header, this.options.resizable);
 
       // Use pointer events to make sure accurate drag & drop is detected especially when mouse outside window bounds.
-      header[0].addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header[0]));
-      header[0].addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header[0]));
+      header.addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header));
+      header.addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header));
 
       /**
        * Stores the app / window extents from styles.
@@ -277,10 +282,10 @@ export default class QuestTrackerApp extends SvelteApplication
        * @private
        */
       this.#appExtents = {
-         minWidth: parseInt(this.element.css('min-width')),
-         maxWidth: parseInt(this.element.css('max-width')),
-         minHeight: parseInt(this.element.css('min-height')),
-         maxHeight: parseInt(this.element.css('max-height'))
+         minWidth: parseInt(targetElement.style.minWidth),
+         maxWidth: parseInt(targetElement.style.maxWidth),
+         minHeight: parseInt(targetElement.style.minHeight),
+         maxHeight: parseInt(targetElement.style.maxHeight)
       };
 
       this.#handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
@@ -295,7 +300,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    bringToTop()
    {
-      if (!this.#windowResizable) { this.element[0].style.height = 'auto'; }
+      if (!this.#windowResizable) { this.targetElement[0].style.height = 'auto'; }
    }
 
    /**
@@ -314,6 +319,10 @@ export default class QuestTrackerApp extends SvelteApplication
     * @param {number|string|null}   [opts.height] - The application height in pixels.
     *
     * @param {number|null}          [opts.scale] - The application scale as a numeric factor where 1.0 is default.
+    *
+    * @param {boolean}              [opts.noHeight] - When true no element height is modified.
+    *
+    * @param {boolean}              [opts.noWidth] - When true no element Width is modified.
     *
     * @param {boolean}              [opts.override] - Forces any manual pinned setting to take effect.
     *
@@ -355,8 +364,10 @@ export default class QuestTrackerApp extends SvelteApplication
          if (typeof opts.width === 'number') { opts.width = this.position.width; }
       }
 
-      // Must set popOut temporarily to true as there is a gate in `Application.setPosition`.
-      const currentPosition = this.#setPositionMod(opts);
+      // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps and
+      // takes a `noHeight` / `noWidth` parameters to alter setting height / width.
+      opts.noHeight = !this.#windowResizable;
+      const currentPosition = super.setPosition(opts);
 
       // Pin width / height to min / max styles if defined.
       if (currentPosition.width < this.#appExtents.minWidth) { currentPosition.width = this.#appExtents.minWidth; }
@@ -364,7 +375,7 @@ export default class QuestTrackerApp extends SvelteApplication
       if (currentPosition.height < this.#appExtents.minHeight) { currentPosition.height = this.#appExtents.minHeight; }
       if (currentPosition.height > this.#appExtents.maxHeight) { currentPosition.height = this.#appExtents.maxHeight; }
 
-      const el = this.element[0];
+      const el = this.targetElement[0];
 
       currentPosition.resizeWidth = initialWidth < currentPosition.width;
       currentPosition.resizeHeight = initialHeight < currentPosition.height;
@@ -378,7 +389,7 @@ export default class QuestTrackerApp extends SvelteApplication
       // has changed.
       if (!this.#pinned && this.#dragHeader && currentInPinDropRect !== this.#inPinDropRect)
       {
-         this.element.css('animation', this.#inPinDropRect ? 'tql-jiggle 0.3s infinite' : '');
+         el.style.animation = this.#inPinDropRect ? 'tql-jiggle 0.3s infinite' : '';
       }
 
       el.style.top = `${currentPosition.top}px`;
@@ -397,91 +408,6 @@ export default class QuestTrackerApp extends SvelteApplication
          s_SAVE_POSITION(currentPosition);
       }
 
-      return currentPosition;
-   }
-
-   /**
-    * Modified Application `setPosition` to support QuestTrackerApp for switchable resizable window.
-    * Set the application position and store its new location.
-    *
-    * @param {object} opts                      Optional parameters.
-    *
-    * @param {number|null} opts.left            The left offset position in pixels
-    *
-    * @param {number|null} opts.top             The top offset position in pixels
-    *
-    * @param {number|null} opts.width           The application width in pixels
-    *
-    * @param {number|string|null} opts.height   The application height in pixels
-    *
-    * @param {number|null} opts.scale           The application scale as a numeric factor where 1.0 is default
-    *
-    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
-    * The updated position object for the application containing the new values
-    */
-   #setPositionMod({ left, top, width, height, scale } = {})
-   {
-      const el = this.element[0];
-      const currentPosition = this.position;
-      const styles = window.getComputedStyle(el);
-
-      // Update width if an explicit value is passed, or if no width value is set on the element
-      if (!el.style.width || width)
-      {
-         const tarW = width || el.offsetWidth;
-         const minW = parseInt(styles.minWidth) || MIN_WINDOW_WIDTH;
-         const maxW = el.style.maxWidth || window.innerWidth;
-         currentPosition.width = width = Math.clamped(tarW, minW, maxW);
-         el.style.width = `${width}px`;
-         if ((width + currentPosition.left) > window.innerWidth) { left = currentPosition.left; }
-      }
-      width = el.offsetWidth;
-
-      // Update height if an explicit value is passed, or if no height value is set on the element
-      if (!el.style.height || height)
-      {
-         const tarH = height || (el.offsetHeight + 1);
-         const minH = parseInt(styles.minHeight) || MIN_WINDOW_HEIGHT;
-         const maxH = el.style.maxHeight || window.innerHeight;
-         currentPosition.height = height = Math.clamped(tarH, minH, maxH);
-
-         // MOD: Don't change height if not resizable!
-         if (this.#windowResizable)
-         {
-            el.style.height = `${height}px`;
-         }
-
-         if ((height + currentPosition.top) > window.innerHeight + 1) { top = currentPosition.top - 1; }
-      }
-      height = el.offsetHeight;
-
-      // Update Left
-      if ((!el.style.left) || Number.isFinite(left))
-      {
-         const tarL = Number.isFinite(left) ? left : (window.innerWidth - width) / 2;
-         const maxL = Math.max(window.innerWidth - width, 0);
-         currentPosition.left = left = Math.clamped(tarL, 0, maxL);
-         el.style.left = `${left}px`;
-      }
-
-      // Update Top
-      if ((!el.style.top) || Number.isFinite(top))
-      {
-         const tarT = Number.isFinite(top) ? top : (window.innerHeight - height) / 2;
-         const maxT = Math.max(window.innerHeight - height, 0);
-         currentPosition.top = top = Math.clamped(tarT, 0, maxT);
-         el.style.top = `${currentPosition.top}px`;
-      }
-
-      // Update Scale
-      if (scale)
-      {
-         currentPosition.scale = Math.max(scale, 0);
-         if (scale === 1) { el.style.transform = ""; }
-         else { el.style.transform = `scale(${scale})`; }
-      }
-
-      // Return the updated position object
       return currentPosition;
    }
 

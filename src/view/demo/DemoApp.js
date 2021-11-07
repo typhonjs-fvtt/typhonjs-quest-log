@@ -1,4 +1,5 @@
 import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+
 import { TJSComponentShell }  from '@typhonjs-fvtt/svelte/component';
 
 import Demo                   from './Demo.svelte';
@@ -109,6 +110,5 @@ export default class DemoApp extends SvelteApplication
     */
    onSvelteMount(element) // eslint-disable-line no-unused-vars
    {
-      console.log(`DemoApp - onSvelteMount`);
    }
 }

@@ -176,7 +176,7 @@ export default class TQLHooks
       Hooks.callAll('TyphonJSQuestLog.Lifecycle.ready');
 
       // TODO REMOVE: for temporary testing
-      Hooks.call('TyphonJSQuestLog.Open.QuestLog', { top: 1200 });
+      // Hooks.call('TyphonJSQuestLog.Open.QuestLog', { top: 1200 });
    }
 
    /**

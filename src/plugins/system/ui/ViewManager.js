@@ -11,6 +11,9 @@ import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
 const s_NEW_QUEST_TRACKER = true;
 
+import { TJSDialog } from "../../../view/svelte/dialog/TJSDialog";
+import DialogTest from "../../../view/svelte/dialog/DialogTest.svelte";
+
 /**
  * Locally stores the app instances which are accessible by getter methods.
  *
@@ -51,7 +54,39 @@ export default class ViewManager
       Hooks.on('TQL.DemoApp.close', () => demoApp.close());
       Hooks.on('TQL.DemoApp.render', () => { demoApp.render(true); });
       Hooks.on('TQL.DemoAppPopOut.close', () => demoAppPopOut.close());
-      Hooks.on('TQL.DemoAppPopOut.render', () => { demoAppPopOut.render(true); });
+      // Hooks.on('TQL.DemoAppPopOut.render', () => { demoAppPopOut.render(true); });
+      Hooks.on('TQL.DemoAppPopOut.render', async () =>
+      {
+         // TJSDialog.prompt({
+         //    title: 'TEST DIALOG',
+         //    content: 'Some Content',
+         //    label: 'My Button',
+         //    callback: () => console.log(`!!!! CLICKED BUTTON`)
+         // });
+
+         const data = { value: 0 };
+
+         const result = await TJSDialog.confirm({
+            modal: true,
+            title: 'TEST DIALOG',
+            content: {
+               class: DialogTest,
+               props: { data }
+            },
+            label: 'My Button',
+            yes: () => `CLICKED YES: ${data.value}`,
+            no: () => `CLICKED NO: ${data.value}`
+         });
+
+         // console.log(result);
+
+         // Dialog.prompt({
+         //    title: 'DEFAULT DIALOG',
+         //    content: 'Some Content',
+         //    label: 'My Button',
+         //    callback: () => console.log(`!!!! CLICKED BUTTON`)
+         // });
+      });
 
       await this._eventbus.triggerAsync('plugins:async:add', {
          name: 'tql-view-quest-log',

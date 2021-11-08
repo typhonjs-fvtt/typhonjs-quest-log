@@ -1,4 +1,5 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+// import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
+import { SvelteApplication }  from '../SvelteApplication.js';
 
 import DialogShell            from './DialogShell.svelte';
 

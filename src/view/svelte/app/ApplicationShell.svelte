@@ -22,7 +22,7 @@
 
    // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
-   const bindHeightChanged = heightChanged;
+   const bindHeightChanged = !!heightChanged;
 
    setContext('getElementContent', () => elementContent);
    setContext('getElementRoot', () => elementRoot);

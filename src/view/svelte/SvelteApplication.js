@@ -17,7 +17,7 @@ export class SvelteApplication extends Application
     *
     * @type {ApplicationShell|TJSApplicationShell}
     */
-   #applicationShell;
+   #applicationShell = null;
 
    /**
     * Stores SvelteData entries with instantiated Svelte components.
@@ -150,7 +150,9 @@ export class SvelteApplication extends Application
       el.remove();
 
       // Clean up data
+      this.#applicationShell = null;
       this._element = null;
+      this.#elementContent = null;
       this.#elementTarget = null;
       delete ui.windows[this.appId];
       this._minimized = false;
@@ -248,7 +250,7 @@ export class SvelteApplication extends Application
     */
    hasApplicationShell()
    {
-      return this.#applicationShell !== void 0;
+      return this.#applicationShell !== null;
    }
 
    /**
@@ -276,7 +278,7 @@ export class SvelteApplication extends Application
             const svelteData = s_LOAD_CONFIG(this, html, svelteConfig);
             if (isApplicationShell(svelteData.component))
             {
-               if (this.#applicationShell !== void 0)
+               if (this.#applicationShell !== null)
                {
                   throw new Error(
                    `SvelteApplication - _injectHTML - An application shell is already mounted; offending config: 
@@ -295,7 +297,7 @@ export class SvelteApplication extends Application
          if (isApplicationShell(svelteData.component))
          {
             // A sanity check as shouldn't hit this case as only one component is being mounted.
-            if (this.#applicationShell !== void 0)
+            if (this.#applicationShell !== null)
             {
                throw new Error(
                 `SvelteApplication - _injectHTML - An application shell is already mounted; offending config: 

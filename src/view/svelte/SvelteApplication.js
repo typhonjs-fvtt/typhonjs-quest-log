@@ -137,6 +137,47 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * Returns the indexed Svelte component.
+    *
+    * @param {number}   index -
+    *
+    * @returns {object} The loaded Svelte component.
+    */
+   getSvelteComponent(index)
+   {
+      const data = this.#svelteData[index];
+      return typeof data === 'object' ? data?.component : void 0;
+   }
+
+   /**
+    * Returns the Svelte component entries iterator.
+    *
+    * @returns {Generator<(number|*)[], void, *>} Svelte component entries iterator.
+    * @yields
+    */
+   *getSvelteComponentEntries()
+   {
+      for (let cntr = 0; cntr < this.#svelteData.length; cntr++)
+      {
+         yield [cntr, this.#svelteData[cntr].component];
+      }
+   }
+
+   /**
+    * Returns the Svelte component values iterator.
+    *
+    * @returns {Generator<*, void, *>} Svelte component values iterator.
+    * @yields
+    */
+   *getSvelteComponentValues()
+   {
+      for (let cntr = 0; cntr < this.#svelteData.length; cntr++)
+      {
+         yield this.#svelteData[cntr].component;
+      }
+   }
+
+   /**
     * Returns the indexed SvelteData entry.
     *
     * @param {number}   index -

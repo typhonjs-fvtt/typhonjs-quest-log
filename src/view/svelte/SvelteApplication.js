@@ -317,7 +317,13 @@ export class SvelteApplication extends Application
       // Detect if this is a synthesized DocumentFragment.
       const isDocumentFragment = html.length && html[0] instanceof DocumentFragment;
 
-      super._injectHTML(html);
+      // If any of the Svelte components mounted directly targets an HTMLElement then do not inject HTML.
+      let injectHTML = true;
+      for (const svelteData of this.#svelteData)
+      {
+         if (!svelteData.injectHTML) { injectHTML = false; break; }
+      }
+      if (injectHTML) { super._injectHTML(html); }
 
       if (this.hasApplicationShell())
       {
@@ -569,7 +575,7 @@ function s_LOAD_CONFIG(app, html, config)
 
    // Detect if target is a synthesized DocumentFragment with an child element. Child elements will be present
    // if the Svelte component mounts and renders initial content into the document fragment.
-   if (target instanceof DocumentFragment && target.firstElementChild)
+   if (config.target instanceof DocumentFragment && target.firstElementChild)
    {
       if (element === void 0) { element = target.firstElementChild; }
       html.append(target);
@@ -594,9 +600,12 @@ function s_LOAD_CONFIG(app, html, config)
       }
    }
 
-   const result = { config: svelteConfig, component, element };
+   // If the configuration / original target is an HTML element then do not inject HTML.
+   const injectHTML = !(config.target instanceof HTMLElement);
+
+   const result = { config: svelteConfig, component, element, injectHTML };
 
    Object.freeze(result);
 
-   return { config: svelteConfig, component, element };
+   return result;
 }

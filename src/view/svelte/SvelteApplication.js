@@ -32,7 +32,7 @@ export class SvelteApplication extends Application
     *
     * @type {JQuery}
     */
-   #targetElement = null;
+   #elementTarget = null;
 
    /**
     * Stores the content element which is set for application shells.
@@ -67,7 +67,7 @@ export class SvelteApplication extends Application
     *
     * @returns {JQuery} Target element.
     */
-   get targetElement() { return this.#targetElement; }
+   get elementTarget() { return this.#elementTarget; }
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
@@ -99,7 +99,7 @@ export class SvelteApplication extends Application
        *
        * @type {JQuery}
        */
-      const el = this.#targetElement;
+      const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
 
       el[0].style.minHeight = '0';
@@ -151,7 +151,7 @@ export class SvelteApplication extends Application
 
       // Clean up data
       this._element = null;
-      this.#targetElement = null;
+      this.#elementTarget = null;
       delete ui.windows[this.appId];
       this._minimized = false;
       this._scrollPositions = null;
@@ -336,17 +336,17 @@ export class SvelteApplication extends Application
 
       // Potentially retrieve a specific target element if `selectorTarget` is defined otherwise make the target the
       // main element.
-      this.#targetElement = typeof this.options.selectorTarget === 'string' ?
+      this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
        this._element.find(this.options.selectorTarget) : this._element;
 
 
-      if (this.#targetElement === null || this.#targetElement === void 0 || this.#targetElement.length === 0)
+      if (this.#elementTarget === null || this.#elementTarget === void 0 || this.#elementTarget.length === 0)
       {
          throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent !== null ?
-       this.elementContent[0] : void 0, targetElement: this.#targetElement[0] });
+       this.elementContent[0] : void 0, elementTarget: this.#elementTarget[0] });
    }
 
    /**
@@ -358,9 +358,9 @@ export class SvelteApplication extends Application
     *
     * @param {HTMLElement} opts.elementContent - HTMLElement container for content area of application shells.
     *
-    * @param {HTMLElement} opts.targetElement - HTMLElement container for main application target element.
+    * @param {HTMLElement} opts.elementTarget - HTMLElement container for main application target element.
     */
-   onSvelteMount({ element, elementContent, targetElement }) {} // eslint-disable-line no-unused-vars
+   onSvelteMount({ element, elementContent, elementTarget }) {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
@@ -424,7 +424,7 @@ export class SvelteApplication extends Application
     */
    setPosition({ left, top, width, height, scale, noHeight = false, noWidth = false } = {})
    {
-      const el = this.targetElement[0];
+      const el = this.elementTarget[0];
       const currentPosition = this.position;
       const styles = globalThis.getComputedStyle(el);
 

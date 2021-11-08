@@ -81,11 +81,11 @@ export class TJSDialog extends SvelteApplication
       this.data = foundry.utils.mergeObject(this.#data, data);
    }
 
-   onSvelteMount({ targetElement })
+   onSvelteMount({ elementTarget })
    {
       // Make the window draggable
-      const header = targetElement.querySelector('header');
-      new Draggable(this, $(targetElement), header, this.options.resizable);
+      const header = elementTarget.querySelector('header');
+      new Draggable(this, $(elementTarget), header, this.options.resizable);
 
       // TODO REMOVE!
       // setTimeout(() =>

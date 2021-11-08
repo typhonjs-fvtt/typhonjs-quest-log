@@ -184,9 +184,9 @@ export default class QuestTrackerApp extends SvelteApplication
       this.#windowResizable = value;
 
       // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
-      if (this.targetElement === null || this.targetElement === void 0 || this.targetElement[0] === void 0) { return; }
+      if (this.elementTarget === null || this.elementTarget === void 0 || this.elementTarget[0] === void 0) { return; }
 
-      const elementTarget = this.targetElement[0];
+      const elementTarget = this.elementTarget[0];
 
       const elemResizeHandle = elementTarget.querySelector('#quest-tracker .window-resizable-handle');
 
@@ -253,7 +253,7 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          this.#pinned = true;
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-         this.targetElement[0].style.animation = '';
+         this.elementTarget[0].style.animation = '';
       }
    }
 
@@ -264,17 +264,17 @@ export default class QuestTrackerApp extends SvelteApplication
     *
     * @see https://foundryvtt.com/api/FormApplication.html#activateListeners
     */
-   onSvelteMount({ targetElement })
+   onSvelteMount({ elementTarget })
    {
       // Make the window draggable
-      const header = targetElement.querySelector('header');
-      new Draggable(this, [targetElement], header, this.options.resizable);
+      const header = elementTarget.querySelector('header');
+      new Draggable(this, [elementTarget], header, this.options.resizable);
 
       // Use pointer events to make sure accurate drag & drop is detected especially when mouse outside window bounds.
       header.addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header));
       header.addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header));
 
-      const styles = globalThis.getComputedStyle(targetElement);
+      const styles = globalThis.getComputedStyle(elementTarget);
 
       /**
        * Stores the app / window extents from styles.
@@ -302,7 +302,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    bringToTop()
    {
-      if (!this.#windowResizable) { this.targetElement[0].style.height = 'auto'; }
+      if (!this.#windowResizable) { this.elementTarget[0].style.height = 'auto'; }
    }
 
    /**
@@ -377,7 +377,7 @@ export default class QuestTrackerApp extends SvelteApplication
       if (currentPosition.height < this.#appExtents.minHeight) { currentPosition.height = this.#appExtents.minHeight; }
       if (currentPosition.height > this.#appExtents.maxHeight) { currentPosition.height = this.#appExtents.maxHeight; }
 
-      const el = this.targetElement[0];
+      const el = this.elementTarget[0];
 
       currentPosition.resizeWidth = initialWidth < currentPosition.width;
       currentPosition.resizeHeight = initialHeight < currentPosition.height;

@@ -35,12 +35,25 @@ export class SvelteApplication extends Application
    #targetElement = null;
 
    /**
+    * Stores the content element which is set for application shells.
+    *
+    * @type {JQuery}
+    */
+   #elementContent = null;
+
+   /**
     * @inheritDoc
     */
    constructor(options)
    {
       super(options);
    }
+   /**
+    * Returns the content element if an application shell is mounted.
+    *
+    * @returns {JQuery} Content element.
+    */
+   get elementContent() { return this.#elementContent; }
 
    /**
     * Returns the length of the SvelteData entry array.
@@ -304,8 +317,12 @@ export class SvelteApplication extends Application
 
       super._injectHTML(html);
 
-      // Set the element of the app to the first child element in order of Svelte components mounted.
-      if (isDocumentFragment)
+      if (this.hasApplicationShell())
+      {
+         this._element = $(this.#applicationShell.elementRoot);
+         this.#elementContent = $(this.#applicationShell.elementContent);
+      }
+      else if (isDocumentFragment) // Set the element of the app to the first child element in order of Svelte components mounted.
       {
          for (const svelteData of this.#svelteData)
          {
@@ -322,12 +339,14 @@ export class SvelteApplication extends Application
       this.#targetElement = typeof this.options.selectorTarget === 'string' ?
        this._element.find(this.options.selectorTarget) : this._element;
 
+
       if (this.#targetElement === null || this.#targetElement === void 0 || this.#targetElement.length === 0)
       {
          throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
-      this.onSvelteMount({ element: this._element[0], targetElement: this.#targetElement[0] });
+      this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent !== null ?
+       this.elementContent[0] : void 0, targetElement: this.#targetElement[0] });
    }
 
    /**
@@ -337,9 +356,11 @@ export class SvelteApplication extends Application
     *
     * @param {HTMLElement} opts.element - HTMLElement container for main application element.
     *
+    * @param {HTMLElement} opts.elementContent - HTMLElement container for content area of application shells.
+    *
     * @param {HTMLElement} opts.targetElement - HTMLElement container for main application target element.
     */
-   onSvelteMount({ element, targetElement }) {} // eslint-disable-line no-unused-vars
+   onSvelteMount({ element, elementContent, targetElement }) {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
@@ -479,20 +500,10 @@ function s_LOAD_CONFIG(app, html, config)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
 
-   const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
-   const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
-
    if (typeof app.template === 'string' && typeof config.target !== 'string')
    {
       throw new TypeError(
        `SvelteApplication - s_LOAD_CONFIG - Template defined and target selector not a string for config:\n${
-        JSON.stringify(config)}`);
-   }
-
-   if (config.target instanceof HTMLElement && typeof svelteOptions.selectorElement !== 'string')
-   {
-      throw new Error(
-       `SvelteApplication - s_LOAD_CONFIG - HTMLElement target with no 'selectorElement' defined for config:\n${
         JSON.stringify(config)}`);
    }
 
@@ -522,6 +533,9 @@ function s_LOAD_CONFIG(app, html, config)
 
    const svelteConfig = parseSvelteConfig({ ...config, target }, app);
 
+   const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
+   const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
+
    // Potentially inject the Foundry application instance as a Svelte prop.
    if (injectApp)
    {
@@ -545,15 +559,28 @@ function s_LOAD_CONFIG(app, html, config)
 
    let element;
 
+   // We can directly get the root element from components which follow the application store contract.
+   if (isApplicationShell(component))
+   {
+      element = component.elementRoot;
+   }
+
    // Detect if target is a synthesized DocumentFragment with an child element. Child elements will be present
    // if the Svelte component mounts and renders initial content into the document fragment.
    if (target instanceof DocumentFragment && target.firstElementChild)
    {
-      element = target.firstElementChild;
+      if (element === void 0) { element = target.firstElementChild; }
       html.append(target);
    }
-   else if (config.target instanceof HTMLElement)
+   else if (config.target instanceof HTMLElement && element === void 0)
    {
+      if (config.target instanceof HTMLElement && typeof svelteOptions.selectorElement !== 'string')
+      {
+         throw new Error(
+          `SvelteApplication - s_LOAD_CONFIG - HTMLElement target with no 'selectorElement' defined for config:\n${
+           JSON.stringify(config)}`);
+      }
+
       // The target is an HTMLElement so find the Application element from `selectorElement` option.
       element = target.querySelector(svelteOptions.selectorElement);
 

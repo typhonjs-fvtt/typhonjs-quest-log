@@ -16,9 +16,6 @@ export class TJSDialog extends SvelteApplication
       super(options);
 
       this.#data = data;
-
-      // Set selectorElement in the ctor because of the dynamic CSS ID selector.
-      this.options.svelte.options.selectorElement = `#${this.id}.dialog`;
    }
 
    static get defaultOptions()
@@ -32,12 +29,7 @@ export class TJSDialog extends SvelteApplication
             intro: true,
             target: document.body,
             props: function() { return { data: this.#data }; },
-            options: {
-               injectApp: true
-
-               // `selectorElement` is usually required here when target is an HTMLElement; it is set in the
-               // constructor because of the dynamic CSS ID.
-            }
+            options: { injectApp: true }
          }
       });
    }

@@ -110,7 +110,6 @@ export default class QuestTrackerApp extends SvelteApplication
             options: {
                injectApp: true,
                injectEventbus: true,
-               selectorElement: '#quest-tracker.typhonjs-app'
             }
          }
       });
@@ -187,9 +186,9 @@ export default class QuestTrackerApp extends SvelteApplication
       // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
       if (this.targetElement === null || this.targetElement === void 0 || this.targetElement[0] === void 0) { return; }
 
-      const targetElement = this.targetElement[0];
+      const elementTarget = this.targetElement[0];
 
-      const elemResizeHandle = targetElement.querySelector('#quest-tracker .window-resizable-handle');
+      const elemResizeHandle = elementTarget.querySelector('#quest-tracker .window-resizable-handle');
 
       if (this.#windowResizable)
       {
@@ -205,18 +204,18 @@ export default class QuestTrackerApp extends SvelteApplication
          }
 
          elemResizeHandle.style.display = 'block';
-         targetElement.style.minHeight = this.#appExtents.minHeight;
+         elementTarget.style.minHeight = this.#appExtents.minHeight;
       }
       else
       {
-         const elemWindowHeader = targetElement.querySelector('#quest-tracker .window-header');
+         const elemWindowHeader = elementTarget.querySelector('#quest-tracker .window-header');
 
          elemResizeHandle.style.display = 'none';
 
-         targetElement.style.minHeight = elemWindowHeader.scrollHeight;
+         elementTarget.style.minHeight = elemWindowHeader.scrollHeight;
 
          // Set height to auto. This will cause QuestTrackerShell to save the new position.
-         targetElement.style.height = 'auto';
+         elementTarget.style.height = 'auto';
       }
    }
    /**
@@ -261,7 +260,7 @@ export default class QuestTrackerApp extends SvelteApplication
    /**
     * Defines all {@link JQuery} control callbacks with event listeners for click, drag, drop via various CSS selectors.
     *
-    * @param {JQuery}  element - The jQuery instance for the window content of this Application.
+    * @param {HTMLElement}  element - The jQuery instance for the window content of this Application.
     *
     * @see https://foundryvtt.com/api/FormApplication.html#activateListeners
     */
@@ -269,11 +268,13 @@ export default class QuestTrackerApp extends SvelteApplication
    {
       // Make the window draggable
       const header = targetElement.querySelector('header');
-      new Draggable(this, $(targetElement), header, this.options.resizable);
+      new Draggable(this, [targetElement], header, this.options.resizable);
 
       // Use pointer events to make sure accurate drag & drop is detected especially when mouse outside window bounds.
       header.addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header));
       header.addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header));
+
+      const styles = globalThis.getComputedStyle(targetElement);
 
       /**
        * Stores the app / window extents from styles.
@@ -283,10 +284,10 @@ export default class QuestTrackerApp extends SvelteApplication
        * @private
        */
       this.#appExtents = {
-         minWidth: parseInt(targetElement.style.minWidth),
-         maxWidth: parseInt(targetElement.style.maxWidth),
-         minHeight: parseInt(targetElement.style.minHeight),
-         maxHeight: parseInt(targetElement.style.maxHeight)
+         minWidth: parseInt(styles.minWidth),
+         maxWidth: parseInt(styles.maxWidth),
+         minHeight: parseInt(styles.minHeight),
+         maxHeight: parseInt(styles.maxHeight)
       };
 
       this.#handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));

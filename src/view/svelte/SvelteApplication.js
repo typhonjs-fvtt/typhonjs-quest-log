@@ -400,7 +400,7 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Modified Application `setPosition` to support QuestTrackerApp for switchable resizable window.
+    * Modified Application `setPosition` to support QuestTrackerApp for switchable resizable globalThis.
     * Set the application position and store its new location.
     *
     * @param {object}               [opts] - Optional parameters.
@@ -426,18 +426,18 @@ export class SvelteApplication extends Application
    {
       const el = this.targetElement[0];
       const currentPosition = this.position;
-      const styles = window.getComputedStyle(el);
+      const styles = globalThis.getComputedStyle(el);
 
       // Update width if an explicit value is passed, or if no width value is set on the element
       if (!el.style.width || width)
       {
          const tarW = width || el.offsetWidth;
          const minW = parseInt(styles.minWidth) || MIN_WINDOW_WIDTH;
-         const maxW = el.style.maxWidth || window.innerWidth;
+         const maxW = el.style.maxWidth || globalThis.innerWidth;
          currentPosition.width = width = Math.clamped(tarW, minW, maxW);
 
          if (!noWidth) { el.style.width = `${width}px`; }
-         if ((width + currentPosition.left) > window.innerWidth) { left = currentPosition.left; }
+         if ((width + currentPosition.left) > globalThis.innerWidth) { left = currentPosition.left; }
       }
       width = el.offsetWidth;
 
@@ -446,19 +446,19 @@ export class SvelteApplication extends Application
       {
          const tarH = height || (el.offsetHeight + 1);
          const minH = parseInt(styles.minHeight) || MIN_WINDOW_HEIGHT;
-         const maxH = el.style.maxHeight || window.innerHeight;
+         const maxH = el.style.maxHeight || globalThis.innerHeight;
          currentPosition.height = height = Math.clamped(tarH, minH, maxH);
 
          if (!noHeight) { el.style.height = `${height}px`; }
-         if ((height + currentPosition.top) > window.innerHeight + 1) { top = currentPosition.top - 1; }
+         if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
       }
       height = el.offsetHeight;
 
       // Update Left
       if ((!el.style.left) || Number.isFinite(left))
       {
-         const tarL = Number.isFinite(left) ? left : (window.innerWidth - width) / 2;
-         const maxL = Math.max(window.innerWidth - width, 0);
+         const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
+         const maxL = Math.max(globalThis.innerWidth - width, 0);
          currentPosition.left = left = Math.clamped(tarL, 0, maxL);
          el.style.left = `${left}px`;
       }
@@ -466,8 +466,8 @@ export class SvelteApplication extends Application
       // Update Top
       if ((!el.style.top) || Number.isFinite(top))
       {
-         const tarT = Number.isFinite(top) ? top : (window.innerHeight - height) / 2;
-         const maxT = Math.max(window.innerHeight - height, 0);
+         const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
+         const maxT = Math.max(globalThis.innerHeight - height, 0);
          currentPosition.top = top = Math.clamped(tarT, 0, maxT);
          el.style.top = `${currentPosition.top}px`;
       }

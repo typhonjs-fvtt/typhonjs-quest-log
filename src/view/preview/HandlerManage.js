@@ -44,13 +44,13 @@ export default class HandlerManage
          if (!questPreview._permControl)
          {
             questPreview._permControl = new TQLPermissionControl(quest.entry, {
-               top: Math.min(questPreview.position.top, window.innerHeight - 350),
+               top: Math.min(questPreview.position.top, globalThis.innerHeight - 350),
                left: questPreview.position.left + 125
             });
          }
 
          questPreview._permControl.render(true, {
-            top: Math.min(questPreview.position.top, window.innerHeight - 350),
+            top: Math.min(questPreview.position.top, globalThis.innerHeight - 350),
             left: questPreview.position.left + 125,
             focus: true
          });

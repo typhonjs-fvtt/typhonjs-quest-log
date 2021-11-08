@@ -15,7 +15,7 @@ export default class FoundryUIManager
     */
    static init()
    {
-      window.addEventListener('resize', s_WINDOW_RESIZE);
+      globalThis.addEventListener('resize', s_WINDOW_RESIZE);
       Hooks.on('collapseSidebar', FoundryUIManager.collapseSidebar);
       Hooks.on('renderSceneNavigation', FoundryUIManager.updateTrackerPinned.bind(this));
       Hooks.on('renderQuestTracker', s_QUEST_TRACKER_RENDERED);
@@ -170,7 +170,7 @@ export default class FoundryUIManager
     */
    static unregister()
    {
-      window.removeEventListener('resize', s_WINDOW_RESIZE);
+      globalThis.removeEventListener('resize', s_WINDOW_RESIZE);
 
       Hooks.off('collapseSidebar', FoundryUIManager.collapseSidebar);
       Hooks.off('renderSceneNavigation', FoundryUIManager.updateTrackerPinned);
@@ -364,7 +364,7 @@ function s_STORE_STATE()
          let beforeHeight;
          try
          {
-            const style = window.getComputedStyle(sidebarElem, 'before');
+            const style = globalThis.getComputedStyle(sidebarElem, 'before');
 
             const width = parseInt(style.getPropertyValue('width'), 10);
             if (!Number.isNaN(width)) { beforeWidth = width; }
@@ -399,7 +399,7 @@ function s_STORE_STATE()
          let beforeHeight;
          try
          {
-            const style = window.getComputedStyle(hotbarElem, 'before');
+            const style = globalThis.getComputedStyle(hotbarElem, 'before');
 
             const width = parseInt(style.getPropertyValue('width'), 10);
             if (!Number.isNaN(width)) { beforeWidth = width; }

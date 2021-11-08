@@ -8,12 +8,12 @@
    import { constants, sessionConstants, settings }   from '#constants';
 
    // Bound to TJSApplicationShell content & root elements.
-   let elementContent, elementRoot;
+   export let elementContent, elementRoot;
 
    // Stores height changes between root / content elements and is used as a latch to calculate scroll bar activation
-   // and saving the current root position into module settings for `questTrackerPosition`.
-   let heightChangedContent = true;
-   let heightChangedRoot = true;
+   // and saving the current root position into module settings for `questTrackerPosition`. If passing true to
+   // TJSApplicationShell `heightChanged` is bound to `clientHeight` of the root & content elements.
+   let heightChanged = true;
 
    // Tracks the scroll bar active state.
    let scrollActivated = false;
@@ -36,7 +36,6 @@
       {
          // Potentially change the local latch for scroll bars active.
          scrollActivated = elementContent.clientHeight < elementContent.scrollHeight;
-console.log(`!!!! scrollActivated: ${scrollActivated}`);
       }
 
       if (elementRoot)
@@ -54,21 +53,16 @@ console.log(`!!!! scrollActivated: ${scrollActivated}`);
       }
    }, 400);
 
-   // When heightChanged which is binded to the root & content clientHeight changes execute throttle function.
-   $: if (elementContent)
-   {
-      console.log(`!!!! QTS: throttle`);
-      throttle(heightChangedContent + heightChangedContent);
-   }
+   // `heightChanged` is bound to the root & content clientHeight; execute throttle function on any changes.
+   $: throttle(heightChanged);
 
-   // Set the `pointer-events` CSS attribute when scrollActivated changes.
+   // Set the `pointer-events` CSS attribute when scrollActivated changes. This allows the QuestTracker to pass through
+   // mouse / pointer events to the game canvas below when scroll bars are not activated. Pointer events need to be
+   // turned on when the scrollbar is active.
    $: if (elementRoot)
    {
       elementRoot.style.pointerEvents = scrollActivated ? 'auto' : 'none';
    }
-
-   $: console.log(`!!! QTS - heightChangedContent: ${heightChangedContent}`);
-   $: console.log(`!!! QTS - heightChangedRoot: ${heightChangedRoot}`);
 
    // ------
 
@@ -78,6 +72,6 @@ console.log(`!!!! scrollActivated: ${scrollActivated}`);
       elementRoot.classList[$storeTrackerShowBackground ? 'remove' : 'add']('no-background');
    }
 </script>
-<TJSApplicationShell bind:elementContent bind:elementRoot bind:heightChangedContent bind:heightChangedRoot >
+<TJSApplicationShell bind:elementContent bind:elementRoot bind:heightChanged>
    <MainContainer />
 </TJSApplicationShell>

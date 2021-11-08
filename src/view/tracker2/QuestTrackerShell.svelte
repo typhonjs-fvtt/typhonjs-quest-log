@@ -7,8 +7,10 @@
 
    import { constants, sessionConstants, settings }   from '#constants';
 
-   // Bound to TJSApplicationShell content & root elements.
+   // Application shell contract.
    export let elementContent, elementRoot;
+   export let title = void 0;
+   export let zIndex = void 0
 
    // Stores height changes between root / content elements and is used as a latch to calculate scroll bar activation
    // and saving the current root position into module settings for `questTrackerPosition`. If passing true to
@@ -72,6 +74,9 @@
       elementRoot.classList[$storeTrackerShowBackground ? 'remove' : 'add']('no-background');
    }
 </script>
-<TJSApplicationShell bind:elementContent bind:elementRoot bind:heightChanged>
+
+<svelte:options accessors={true}/>
+
+<TJSApplicationShell bind:elementContent bind:elementRoot bind bind:heightChanged bind:title bind:zIndex>
    <MainContainer />
 </TJSApplicationShell>

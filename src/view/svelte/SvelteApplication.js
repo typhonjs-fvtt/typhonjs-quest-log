@@ -1,5 +1,7 @@
 import { outroAndDestroy, parseSvelteConfig }   from '@typhonjs-fvtt/svelte/util';
 
+import { isApplicationShell } from './isApplicationShell';
+
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
  * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
@@ -10,6 +12,13 @@ import { outroAndDestroy, parseSvelteConfig }   from '@typhonjs-fvtt/svelte/util
  */
 export class SvelteApplication extends Application
 {
+   /**
+    * Stores the first mounted ApplicationShell or TJSApplicationShell.
+    *
+    * @type {ApplicationShell|TJSApplicationShell}
+    */
+   #applicationShell;
+
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
@@ -137,6 +146,16 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * Returns any mounted application shell.
+    *
+    * @returns {ApplicationShell|TJSApplicationShell} Mounted application shell.
+    */
+   getApplicationShell()
+   {
+      return this.#applicationShell;
+   }
+
+   /**
     * Returns the indexed Svelte component.
     *
     * @param {number}   index -
@@ -210,6 +229,16 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * Returns whether an application shell is mounted.
+    *
+    * @returns {boolean} Application shell mounted.
+    */
+   hasApplicationShell()
+   {
+      return this.#applicationShell !== void 0;
+   }
+
+   /**
     * Inject the Svelte components defined in `this.options.svelte`. The Svelte component can attach to the existing
     * pop-out of Application or provide no template and render into a document fragment which is then attached to the
     * DOM.
@@ -231,12 +260,39 @@ export class SvelteApplication extends Application
       {
          for (const svelteConfig of this.options.svelte)
          {
-            this.#svelteData.push(s_LOAD_CONFIG(this, html, svelteConfig));
+            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig);
+            if (isApplicationShell(svelteData.component))
+            {
+               if (this.#applicationShell !== void 0)
+               {
+                  throw new Error(
+                   `SvelteApplication - _injectHTML - An application shell is already mounted; offending config: 
+                    ${JSON.stringify(svelteConfig)}`);
+               }
+
+               this.#applicationShell = svelteData.component;
+            }
+
+            this.#svelteData.push(svelteData);
          }
       }
       else if (typeof this.options.svelte === 'object')
       {
-         this.#svelteData.push(s_LOAD_CONFIG(this, html, this.options.svelte));
+         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte);
+         if (isApplicationShell(svelteData.component))
+         {
+            // A sanity check as shouldn't hit this case as only one component is being mounted.
+            if (this.#applicationShell !== void 0)
+            {
+               throw new Error(
+                `SvelteApplication - _injectHTML - An application shell is already mounted; offending config: 
+                 ${JSON.stringify(this.options.svelte)}`);
+            }
+
+            this.#applicationShell = svelteData.component;
+         }
+
+         this.#svelteData.push(svelteData);
       }
       else
       {

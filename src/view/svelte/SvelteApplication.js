@@ -1,6 +1,7 @@
 import { outroAndDestroy, parseSvelteConfig }   from '@typhonjs-fvtt/svelte/util';
 
 import { isApplicationShell } from './isApplicationShell';
+import { hasGetter }          from './hasAccessor';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
@@ -13,9 +14,10 @@ import { isApplicationShell } from './isApplicationShell';
 export class SvelteApplication extends Application
 {
    /**
-    * Stores the first mounted ApplicationShell or TJSApplicationShell.
+    * Stores the first mounted component which follows the application shell contract.
+    * // TODO Figure out type.
     *
-    * @type {ApplicationShell|TJSApplicationShell}
+    * @type {object} Application shell.
     */
    #applicationShell = null;
 
@@ -102,8 +104,6 @@ export class SvelteApplication extends Application
       const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
 
-      el[0].style.minHeight = '0';
-
       // Dispatch Hooks for closing the base and subclass applications
       for (const cls of this.constructor._getInheritanceChain())
       {
@@ -121,8 +121,16 @@ export class SvelteApplication extends Application
          Hooks.call(`close${cls.name}`, this, el);
       }
 
-      // Await on JQuery to slide up the main element.
-      await new Promise((resolve) => { el.slideUp(200, () => resolve()); });
+      // If options `jqueryAnimation` is false then do not execute the standard JQuery slide up animation.
+      // This allows the Svelte components to provide any out transition.
+      const animate = typeof this.options.jqueryAnimation === 'boolean' ? this.options.jqueryAnimation : true;
+
+      if (animate)
+      {
+         // Await on JQuery to slide up the main element.
+         el[0].style.minHeight = '0';
+         await new Promise((resolve) => { el.slideUp(200, () => resolve()); });
+      }
 
       // Stores the Promises returned from running outro transitions and destroying each Svelte component.
       const svelteDestroyPromises = [];
@@ -163,7 +171,7 @@ export class SvelteApplication extends Application
    /**
     * Returns any mounted application shell.
     *
-    * @returns {ApplicationShell|TJSApplicationShell} Mounted application shell.
+    * @returns {object} Mounted application shell.
     */
    getApplicationShell()
    {
@@ -328,7 +336,14 @@ export class SvelteApplication extends Application
       if (this.hasApplicationShell())
       {
          this._element = $(this.#applicationShell.elementRoot);
-         this.#elementContent = $(this.#applicationShell.elementContent);
+
+         // Detect if the application shell exports an `elementContent` accessor.
+         this.#elementContent = hasGetter(this.#applicationShell, 'elementContent') ?
+          $(this.#applicationShell.elementContent) : null;
+
+         // Detect if the application shell exports an `elementTarget` accessor.
+         this.#elementTarget = hasGetter(this.#applicationShell, 'elementTarget') ?
+          $(this.#applicationShell.elementContent) : null;
       }
       else if (isDocumentFragment) // Set the element of the app to the first child element in order of Svelte components mounted.
       {
@@ -344,9 +359,11 @@ export class SvelteApplication extends Application
 
       // Potentially retrieve a specific target element if `selectorTarget` is defined otherwise make the target the
       // main element.
-      this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
-       this._element.find(this.options.selectorTarget) : this._element;
-
+      if (this.#elementTarget === null)
+      {
+         this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
+          this._element.find(this.options.selectorTarget) : this._element;
+      }
 
       if (this.#elementTarget === null || this.#elementTarget === void 0 || this.#elementTarget.length === 0)
       {
@@ -354,7 +371,7 @@ export class SvelteApplication extends Application
       }
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent !== null ?
-       this.elementContent[0] : void 0, elementTarget: this.#elementTarget[0] });
+       this.elementContent[0] : null, elementTarget: this.#elementTarget[0] });
    }
 
    /**

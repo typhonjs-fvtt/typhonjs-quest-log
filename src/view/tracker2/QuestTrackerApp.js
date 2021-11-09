@@ -103,6 +103,7 @@ export default class QuestTrackerApp extends SvelteApplication
          width: 300,
          height: game.settings.get(constants.moduleName, settings.questTrackerResizable) ? 'auto' : 480,
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
+         // jqueryAnimation: false,    // The Foundry JQuery close animation is not run.
          svelte: {
             class: QuestTrackerShell,
             intro: true,

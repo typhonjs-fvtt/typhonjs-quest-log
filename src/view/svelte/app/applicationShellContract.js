@@ -4,7 +4,7 @@
  *
  * @type {string[]}
  */
-const applicationShellContract = ['elementContent', 'elementRoot', 'title', 'zIndex'];
+const applicationShellContract = ['elementRoot'];
 
 Object.freeze(applicationShellContract);
 

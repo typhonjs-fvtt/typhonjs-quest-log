@@ -9,9 +9,10 @@
    import DialogContent          from './DialogContent.svelte';
 
    // Application shell contract.
-   export let elementContent, elementRoot;
-   export let title = void 0;
-   export let zIndex = void 0
+   export let elementRoot;
+
+   // Provides an object to pass to ApplicationShell for options gathered from dialog data.
+   const appOptions = {};
 
    // The dialog data.
    export let data = {};
@@ -25,9 +26,9 @@
    {
       if (modal === void 0) { modal = typeof data.modal === 'boolean' ? data.modal : false; }
 
-      title = data.title || title || foundryApp.title;
-
-      zIndex = Number.isInteger(data.zIndex) ? data.zIndex : zIndex || Number.MAX_SAFE_INTEGER - 1;
+      // Translates the Dialog data to options for ApplicationShell.
+      appOptions.title = data.title || 'Dialog';
+      appOptions.zIndex = Number.isInteger(data.zIndex) ? data.zIndex : Number.MAX_SAFE_INTEGER - 1;
    }
 </script>
 
@@ -38,12 +39,12 @@
                  {...modalOptions}
                  stopPropagation={false}
                  background="repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)">
-      <ApplicationShell bind:elementContent bind:elementRoot {title}>
+      <ApplicationShell bind:elementRoot {appOptions}>
          <svelte:component this={DialogContent} {data}/>
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
-   <ApplicationShell bind:elementContent bind:elementRoot {title} {zIndex}>
+   <ApplicationShell bind:elementRoot {appOptions}>
       <svelte:component this={DialogContent} {data}/>
    </ApplicationShell>
 {/if}

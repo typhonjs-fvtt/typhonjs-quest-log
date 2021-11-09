@@ -1,8 +1,10 @@
 import { safeAccess, safeSet }   from '@typhonjs-utils/object';
-import { outroAndDestroy, parseSvelteConfig }   from '@typhonjs-fvtt/svelte/util';
 
-import { isApplicationShell }    from './isApplicationShell';
-import { hasGetter, hasSetter }  from './hasAccessor';
+import {
+   hasGetter, hasSetter,
+   isApplicationShell,
+   outroAndDestroy,
+   parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively

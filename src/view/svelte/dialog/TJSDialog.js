@@ -36,7 +36,7 @@ export class TJSDialog extends SvelteApplication
 
    get data() { return this.#data; }
 
-   get title() { return this.#data.title || 'Dialog'; }
+   get title() { return game.i18n.localize(this.#data.title) || 'Dialog'; }
 
    set data(data)
    {
@@ -44,6 +44,14 @@ export class TJSDialog extends SvelteApplication
 
       const componentData = this.getSvelteData(0);
       if (componentData?.component?.data) { componentData.component.data = data; }
+   }
+
+   set title(title)
+   {
+      this.#data.title = title;
+
+      const componentData = this.getSvelteData(0);
+      if (componentData?.component?.data) { componentData.component.data = this.#data; }
    }
 
    /**

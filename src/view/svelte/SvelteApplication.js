@@ -75,6 +75,22 @@ export class SvelteApplication extends Application
    get elementTarget() { return this.#elementTarget; }
 
    /**
+    * Sets `this.options.title` and updates any application shell which exports the `appOptions` property.
+    *
+    * @param {string}   title - Application title; will be localized, so a translation key is fine.
+    */
+   set title(title)
+   {
+      this.options.title = title;
+
+      // If any application shell exports `appOptions` setter / accessor then update options.
+      if (hasSetter(this.#applicationShell, 'appOptions'))
+      {
+         this.#applicationShell.appOptions = this.options;
+      }
+   }
+
+   /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
     * best visual result is to destroy them after the default JQuery slide up animation occurs, but before the element
     * is removed from the DOM.

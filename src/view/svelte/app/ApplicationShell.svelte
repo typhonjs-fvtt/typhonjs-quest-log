@@ -20,6 +20,32 @@
    // `clientHeight`.
    export let heightChanged = false;
 
+   const s_DEFAULT_TRANSITION = () => void 0;
+   const s_DEFAULT_TRANSITION_OPTIONS = {};
+
+   // Exports properties to set a transition w/ in / out options.
+   export let transition = s_DEFAULT_TRANSITION;
+   export let inTransition = s_DEFAULT_TRANSITION;
+   export let outTransition = s_DEFAULT_TRANSITION;
+
+   // Exports properties to set options for any transitions.
+   export let transitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
+   export let inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
+   export let outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
+
+   // If transition is defined then set it to both in and out transition.
+   if (transition !== s_DEFAULT_TRANSITION && typeof transition === 'function')
+   {
+      inTransition = transition;
+      outTransition = transition;
+   }
+   // If transitionOption is defined then set it to both in and out transition options.
+   if (transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object')
+   {
+      inTransitionOptions = transitionOptions;
+      outTransitionOptions = transitionOptions;
+   }
+
    // Stores the app title as it can be provided externally or retrieved from any external Foundry Application.
    let appTitle;
    let zIndex;
@@ -64,7 +90,9 @@
         class="app window-app {foundryApp.options.classes.join(' ')}"
         data-appid={foundryApp.appId}
         bind:clientHeight={heightChanged}
-        bind:this={elementRoot}>
+        bind:this={elementRoot}
+        in:inTransition={inTransitionOptions}
+        out:outTransition={outTransitionOptions}>
       <TJSApplicationHeader title = {appTitle} headerButtons= {foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
          {#if Array.isArray(children)}
@@ -78,7 +106,9 @@
    <div id={foundryApp.id}
         class="app window-app {foundryApp.options.classes.join(' ')}"
         data-appid={foundryApp.appId}
-        bind:this={elementRoot}>
+        bind:this={elementRoot}
+        in:inTransition={inTransitionOptions}
+        out:outTransition={outTransitionOptions}>
       <TJSApplicationHeader title = {appTitle} headerButtons= {foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent}>
          {#if Array.isArray(children)}

@@ -1,5 +1,6 @@
 <script>
    import { getContext }         from 'svelte';
+   import { scale }              from 'svelte/transition';
 
    import TJSApplicationShell    from '../svelte/app/TJSApplicationShell.svelte';
 
@@ -76,6 +77,6 @@
 
 <svelte:options accessors={true}/>
 
-<TJSApplicationShell bind:elementContent bind:elementRoot bind bind:heightChanged {appOptions}>
+<TJSApplicationShell bind:elementContent bind:elementRoot bind:heightChanged {appOptions} transition={scale}>
    <MainContainer />
 </TJSApplicationShell>

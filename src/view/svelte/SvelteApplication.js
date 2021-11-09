@@ -1,7 +1,8 @@
+import { safeAccess, safeSet }   from '@typhonjs-utils/object';
 import { outroAndDestroy, parseSvelteConfig }   from '@typhonjs-fvtt/svelte/util';
 
-import { isApplicationShell } from './isApplicationShell';
-import { hasGetter }          from './hasAccessor';
+import { isApplicationShell }    from './isApplicationShell';
+import { hasGetter, hasSetter }  from './hasAccessor';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
@@ -176,6 +177,24 @@ export class SvelteApplication extends Application
    getApplicationShell()
    {
       return this.#applicationShell;
+   }
+
+   /**
+    * Provides a way to safely get this applications options given an accessor string which describes the
+    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+    * to walk.
+    *
+    * // TODO DOCUMENT the accessor in more detail.
+    *
+    * @param {string}   accessor - The path / key to set. You can set multiple levels.
+    *
+    * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
+    *
+    * @returns {*} Value at the accessor.
+    */
+   getOptions(accessor, defaultValue)
+   {
+      return safeAccess(this.options, accessor, defaultValue);
    }
 
    /**
@@ -375,6 +394,27 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * Provides a way to merge `options` into this applications options.
+    *
+    * Additionally if an application shell Svelte component is mounted and exports the `appOptions` property then
+    * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
+    *
+    * // TODO DOCUMENT the accessor in more detail.
+    *
+    * @param {object}   options - The options object to merge with `this.options`.
+    */
+   mergeOptions(options)
+   {
+      foundry.utils.mergeObject(this.options, options);
+
+      // If any application shell exports `appOptions` setter / accessor then update `appOptions`.
+      if (hasSetter(this.#applicationShell, 'appOptions'))
+      {
+         this.#applicationShell.appOptions = this.options;
+      }
+   }
+
+   /**
     * Provides a callback after all Svelte components are initialized.
     *
     * @param {object}      opts - Options.
@@ -422,6 +462,31 @@ export class SvelteApplication extends Application
        document.createDocumentFragment();
 
       return $(html);
+   }
+
+   /**
+    * Provides a way to safely set this applications options given an accessor string which describes the
+    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+    * to walk.
+    *
+    * Additionally if an application shell Svelte component is mounted and exports the `appOptions` property then
+    * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
+    *
+    * // TODO DOCUMENT the accessor in more detail.
+    *
+    * @param {string}   accessor - The path / key to set. You can set multiple levels.
+    *
+    * @param {*}        value - Value to set.
+    */
+   setOptions(accessor, value)
+   {
+      const success = safeSet(this.options, accessor, value);
+
+      // If `this.options` modified then detect if any application shell exports `appOptions` setter / accessor.
+      if (success && hasSetter(this.#applicationShell, 'appOptions'))
+      {
+         this.#applicationShell.appOptions = this.options;
+      }
    }
 
    /**

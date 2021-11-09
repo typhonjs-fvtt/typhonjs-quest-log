@@ -267,6 +267,14 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    onSvelteMount({ elementTarget })
    {
+      setTimeout(() =>
+      {
+         this.mergeOptions({
+            title: 'TESTING!!!!',
+            zIndex: 10000
+         });
+      }, 1000);
+
       // Make the window draggable
       const header = elementTarget.querySelector('header');
       new Draggable(this, [elementTarget], header, this.options.resizable);

@@ -15,6 +15,7 @@
     "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt/svelte",
     "@typhonjs-plugin/manager": "^0.0.11",
     "@typhonjs-tinymce/oembed": "^0.1.0",
+    "@typhonjs-utils/object": "^0.0.3",
     "collect.js": "^4.28.0",
     "dompurify": "^2.3.0",
     "svelte": "^3"

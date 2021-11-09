@@ -9,6 +9,7 @@
 
    // Application shell contract (only elementRoot is required).
    export let elementContent, elementRoot;
+   export let appOptions;
 
    // Stores height changes between root / content elements and is used as a latch to calculate scroll bar activation
    // and saving the current root position into module settings for `questTrackerPosition`. If passing true to
@@ -75,6 +76,6 @@
 
 <svelte:options accessors={true}/>
 
-<TJSApplicationShell bind:elementContent bind:elementRoot bind bind:heightChanged>
+<TJSApplicationShell bind:elementContent bind:elementRoot bind bind:heightChanged {appOptions}>
    <MainContainer />
 </TJSApplicationShell>

@@ -9,13 +9,13 @@
    export let elementContent;
    export let elementRoot;
 
-   // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
-   // `clientHeight`.
-   export let heightChanged = false;
-
    // Exposed externally to change title on app header and z-index dynamically.
    export let title = void 0;
    export let zIndex = void 0
+
+   // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
+   // `clientHeight`.
+   export let heightChanged = false;
 
    // Stores the app title as it can be provided externally or retrieved from any external Foundry Application.
    let appTitle;

@@ -46,8 +46,10 @@
       outTransitionOptions = transitionOptions;
    }
 
-   // Stores the app title as it can be provided externally or retrieved from any external Foundry Application.
-   let appTitle;
+   // Stores the local app title option which is updated from `appOptions` changes.
+   let title;
+
+   // Stores the local zIndex option which is updated from `appOptions` changes.
    let zIndex;
 
    // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
@@ -69,14 +71,13 @@
 
    $: if (typeof appOptions === 'object')
    {
-      appTitle = typeof appOptions.title === 'string' ? appOptions.title :
-       foundryApp !== void 0 ? foundryApp.title : '';
+      title = typeof appOptions.title === 'string' ? appOptions.title : foundryApp !== void 0 ? foundryApp.title : '';
 
       zIndex = Number.isInteger(appOptions.zIndex) ? appOptions.zIndex : void 0;
    }
 
    // Handles directly updating the element root `z-index` style when `zIndex` changes.
-   $: if (elementRoot) { elementRoot.style.zIndex = Number.isInteger(zIndex) ? zIndex : void 0; }
+   $: if (elementRoot) { elementRoot.style.zIndex = Number.isInteger(zIndex) ? zIndex : null; }
 
    // This component can host multiple children defined in the TyphonJS Svelte configuration object which are
    // potentially mounted in the content area. If no children defined then this component mounts any slotted child.
@@ -93,7 +94,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}>
-      <TJSApplicationHeader title = {appTitle} headerButtons= {foundryApp._getHeaderButtons()} />
+      <TJSApplicationHeader {title} headerButtons={foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
          {#if Array.isArray(children)}
             <TJSContainer {children} />
@@ -109,7 +110,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}>
-      <TJSApplicationHeader title = {appTitle} headerButtons= {foundryApp._getHeaderButtons()} />
+      <TJSApplicationHeader {title} headerButtons={foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent}>
          {#if Array.isArray(children)}
             <TJSContainer {children} />

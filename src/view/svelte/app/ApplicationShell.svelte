@@ -12,8 +12,8 @@
    export let elementRoot;
 
    // Exposed externally to change title on app header and z-index dynamically. If a parent component does not
-   // provide options then the associated Foundry App provides the options. SvelteApplication via the `setOptions`
-   // method will update `appOptions` on changes.
+   // provide options then the associated Foundry App provides the options. SvelteApplication via the `setOptions` /
+   // `mergeOptions` methods will update `appOptions` on changes.
    export let appOptions = void 0;
 
    // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
@@ -46,8 +46,11 @@
       appTitle = typeof appOptions.title === 'string' ? appOptions.title :
        foundryApp !== void 0 ? foundryApp.title : '';
 
-      zIndex = Number.isInteger(appOptions.zIndex) ? `z-index: ${appOptions.zIndex}` : void 0;
+      zIndex = Number.isInteger(appOptions.zIndex) ? appOptions.zIndex : void 0;
    }
+
+   // Handles directly updating the element root `z-index` style when `zIndex` changes.
+   $: if (elementRoot) { elementRoot.style.zIndex = Number.isInteger(zIndex) ? zIndex : void 0; }
 
    // This component can host multiple children defined in the TyphonJS Svelte configuration object which are
    // potentially mounted in the content area. If no children defined then this component mounts any slotted child.
@@ -60,7 +63,6 @@
    <div id={foundryApp.id}
         class="app window-app {foundryApp.options.classes.join(' ')}"
         data-appid={foundryApp.appId}
-        style="{typeof zIndex === 'string' ? zIndex : ''}"
         bind:clientHeight={heightChanged}
         bind:this={elementRoot}>
       <TJSApplicationHeader title = {appTitle} headerButtons= {foundryApp._getHeaderButtons()} />
@@ -76,7 +78,6 @@
    <div id={foundryApp.id}
         class="app window-app {foundryApp.options.classes.join(' ')}"
         data-appid={foundryApp.appId}
-        style="{Number.isInteger(zIndex) ? `z-index: ${zIndex}` : ''}"
         bind:this={elementRoot}>
       <TJSApplicationHeader title = {appTitle} headerButtons= {foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent}>

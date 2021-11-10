@@ -436,23 +436,39 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * Provides a mechanism to update the UI options store for minimized.
+    *
+    * Note: the sanity check is duplicated from {@link Application.maximize} and the store is updated _before_
+    * the actual parent method is invoked. This allows application shells to remove / show any resize handlers
+    * correctly.
+    *
     * @inheritDoc
     */
    async maximize()
    {
-      await super.maximize();
+      if (!this.popOut || [false, null].includes(this._minimized)) { return; }
 
-      this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: this._minimized }));
+      this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: false }));
+
+      await super.maximize();
    }
 
    /**
+    * Provides a mechanism to update the UI options store for minimized.
+    *
+    * Note: the sanity check is duplicated from {@link Application.minimize} and the store is updated _before_
+    * the actual parent method is invoked. This allows application shells to remove / show any resize handlers
+    * correctly.
+    *
     * @inheritDoc
     */
    async minimize()
    {
-      await super.minimize();
+      if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
 
-      this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: this._minimized }));
+      this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: true }));
+
+      await super.minimize();
    }
 
    /**
@@ -462,7 +478,7 @@ export class SvelteApplication extends Application
     */
    mergeOptions(options)
    {
-      this.#storeAppOptions.update((instanceOptions) => foundry.utils.mergeObject(instanceOptions, options));
+      this.#storeAppOptionsUpdate((instanceOptions) => foundry.utils.mergeObject(instanceOptions, options));
    }
 
    /**

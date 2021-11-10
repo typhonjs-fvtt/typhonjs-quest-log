@@ -6,6 +6,9 @@ import { TJSComponentShell }  from '@typhonjs-fvtt/svelte/component';
 import Demo                   from './Demo.svelte';
 import DemoShell              from './DemoShell.svelte';
 
+import TJSApplicationShell    from "../svelte/app/TJSApplicationShell.svelte";
+import ApplicationShell       from "../svelte/app/ApplicationShell.svelte";
+
 /**
  * Creates a basic demo popout Application. Foundry renders the outer frame HTML and `.window-content` is the target
  * to attach Svelte components to. You can pass a single Svelte configuration object (documentation forthcoming!) or
@@ -38,12 +41,25 @@ export default class DemoApp extends SvelteApplication
          title: 'demo app',
 
          svelte: {      // Mount a single Svelte component
-            class: Demo,
-            target: '.window-content',
-            props: {
-               test: 'Foundry'
+            class: ApplicationShell,
+            target: document.body,
+            intro: true,
+
+            children: {
+               class: Demo,
+               props: {
+                  test: 'Foundry'
+               }
             }
          }
+
+         // svelte: {      // Mount a single Svelte component
+         //    class: Demo,
+         //    target: '.window-content',
+         //    props: {
+         //       test: 'Foundry'
+         //    }
+         // }
 
          // svelte: [      // You can also mount multiple components.
          //    {
@@ -75,8 +91,7 @@ export default class DemoApp extends SvelteApplication
          //       props: {
          //          test: 'context'
          //       }
-         //    },
-         //    options: { injectApp: true }
+         //    }
          // }
 
          // svelte: {      // You can also inject multiple children with ComponentShell.
@@ -95,8 +110,7 @@ export default class DemoApp extends SvelteApplication
          //             test: 'Test'
          //          }
          //       }
-         //    ],
-         //    options: { injectApp: true }
+         //    ]
          // }
 
          // svelte: {      // ComponentShell posts a warning if no children added.
@@ -104,12 +118,5 @@ export default class DemoApp extends SvelteApplication
          //    target: '.window-content',
          // }
       });
-   }
-
-   /**
-    * @param {JQuery} element - The JQuery root element of the application.
-    */
-   onSvelteMount(element) // eslint-disable-line no-unused-vars
-   {
    }
 }

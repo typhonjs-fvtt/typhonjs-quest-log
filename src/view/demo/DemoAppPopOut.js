@@ -50,34 +50,4 @@ export default class DemoAppPopOut extends SvelteApplication
          // }
       });
    }
-
-   /**
-    * Defines all {@link JQuery} control callbacks with event listeners for click, drag, drop via various CSS selectors.
-    *
-    * @param {JQuery}  element - The jQuery instance for the element content of this Application.
-    *
-    * @see SvelteApplication.onSvelteMount
-    */
-   onSvelteMount(element)
-   {
-      super.onSvelteMount(element);
-
-      const header = element.find('header')[0];
-
-      // Make the window draggable
-      new Draggable(this, element, header, this.options.resizable);
-   }
-
-   /**
-    * Example of the necessity to override setPosition for non-popout apps as there is an artificial gate at the
-    * beginning of `Application.setPosition`.
-    *
-    * @param {object} pos -
-    */
-   setPosition(pos)
-   {
-      this.options.popOut = true;
-      super.setPosition(pos);
-      this.options.popOut = false;
-   }
 }

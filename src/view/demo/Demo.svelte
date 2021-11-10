@@ -1,6 +1,9 @@
 <script>
-   import { beforeUpdate, onMount, onDestroy}   from 'svelte';
-   import { animate }                           from '@typhonjs-fvtt/svelte/gsap';
+   import {
+      beforeUpdate,
+      onMount,
+      onDestroy}     from 'svelte';
+   import { fade }   from 'svelte/transition';
 
    beforeUpdate(() =>
    {
@@ -23,13 +26,13 @@
 
 <div>
 <main
-    use:animate={{ type: 'from', duration: 5, opacity: 0, onComplete: () => (desc = true) }}>
+    in:fade={{ duration: 3000 }}
+    on:introend="{() => (desc = true)}">
     <h1>Hello {test}!</h1>
 </main>
 
 {#if desc}
-    <p
-        transition:animate={{ type: 'from', duration: 5, opacity: 0 }} class="desc">
+    <p in:fade={{ duration: 3000 }}>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae natus libero quisquam, aliquam quod vel quia necessitatibus? Cupiditate, excepturi nisi. Nam tempora ex numquam voluptatum minima similique sequi, fugit placeat!
     </p>
 {/if}

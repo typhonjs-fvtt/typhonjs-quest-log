@@ -54,13 +54,6 @@ export default class QuestTrackerApp extends SvelteApplication
    #pinned = game.settings.get(constants.moduleName, settings.questTrackerPinned);
 
    /**
-    * Stores whether the QuestTracker window is resizable.
-    *
-    * @type {boolean}
-    */
-   #windowResizable = game.settings.get(constants.moduleName, settings.questTrackerResizable);
-
-   /**
     * @inheritDoc
     * @see https://foundryvtt.com/api/Application.html
     */
@@ -97,8 +90,8 @@ export default class QuestTrackerApp extends SvelteApplication
    {
       return foundry.utils.mergeObject(super.defaultOptions, {
          id: 'quest-tracker',
-         resizable: true,
-         minimizable: true,
+         resizable: game.settings.get(constants.moduleName, settings.questTrackerResizable),
+         minimizable: false,
          popOut: false,
          width: 300,
          height: game.settings.get(constants.moduleName, settings.questTrackerResizable) ? 'auto' : 480,
@@ -130,6 +123,18 @@ export default class QuestTrackerApp extends SvelteApplication
     * @returns {boolean} QuestTracker pinned.
     */
    get pinned() { return this.#pinned; }
+
+   /**
+    * Override default Application `bringToTop` to stop adjustment of z-index and set height to auto if not resizable.
+    *
+    * @override
+    * @inheritDoc
+    * @see https://foundryvtt.com/api/Application.html#bringToTop
+    */
+   bringToTop()
+   {
+      if (!this.resizable) { this.elementTarget[0].style.height = 'auto'; }
+   }
 
    /**
     * Sets `questTrackerEnabled` to false.
@@ -167,26 +172,18 @@ export default class QuestTrackerApp extends SvelteApplication
    /**
     * Handles showing / hiding the resize element.
     *
-    * @param {boolean}  value - Current value of {@link TQLSettings.questTrackerResizable}.
+    * @param {boolean}  resizable - Current value of {@link TQLSettings.questTrackerResizable}.
     */
-   #handleSettingWindowResize(value)
+   #handleSettingWindowResize(resizable)
    {
-      /**
-       * Stores the state of {@link TQLSettings.questTrackerResizable}.
-       *
-       * @type {boolean}
-       * @private
-       */
-      this.#windowResizable = value;
+      this.resizable = resizable;
 
       // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
       if (this.elementTarget === null || this.elementTarget === void 0 || this.elementTarget[0] === void 0) { return; }
 
       const elementTarget = this.elementTarget[0];
 
-      const elemResizeHandle = elementTarget.querySelector('#quest-tracker .window-resizable-handle');
-
-      if (this.#windowResizable)
+      if (resizable)
       {
          // When resizable is set to true set the current position to the stored position. This allows the position
          // variable to be updated to the last auto height set position.
@@ -199,14 +196,11 @@ export default class QuestTrackerApp extends SvelteApplication
             console.log(`TyphonJSQuestLog - QuestTracker - #handleSettingWindowResize - error: ${err.message}`);
          }
 
-         elemResizeHandle.style.display = 'block';
          elementTarget.style.minHeight = this.#appExtents.minHeight;
       }
       else
       {
          const elemWindowHeader = elementTarget.querySelector('#quest-tracker .window-header');
-
-         elemResizeHandle.style.display = 'none';
 
          elementTarget.style.minHeight = elemWindowHeader.scrollHeight;
 
@@ -264,7 +258,6 @@ export default class QuestTrackerApp extends SvelteApplication
    {
       // Make the window draggable
       const header = elementTarget.querySelector('header');
-      new Draggable(this, [elementTarget], header, this.options.resizable);
 
       // Use pointer events to make sure accurate drag & drop is detected especially when mouse outside window bounds.
       header.addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header));
@@ -287,18 +280,6 @@ export default class QuestTrackerApp extends SvelteApplication
       };
 
       this.#handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
-   }
-
-   /**
-    * Override default Application `bringToTop` to stop adjustment of z-index and set height to auto if not resizable.
-    *
-    * @override
-    * @inheritDoc
-    * @see https://foundryvtt.com/api/Application.html#bringToTop
-    */
-   bringToTop()
-   {
-      if (!this.#windowResizable) { this.elementTarget[0].style.height = 'auto'; }
    }
 
    /**
@@ -364,7 +345,7 @@ export default class QuestTrackerApp extends SvelteApplication
 
       // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps and
       // takes a `noHeight` / `noWidth` parameters to alter setting height / width.
-      opts.noHeight = !this.#windowResizable;
+      opts.noHeight = !this.resizable;
       const currentPosition = super.setPosition(opts);
 
       // Pin width / height to min / max styles if defined.
@@ -395,13 +376,13 @@ export default class QuestTrackerApp extends SvelteApplication
       el.style.width = `${currentPosition.width}px`;
 
       // Only set height if resizable.
-      if (this.#windowResizable) { el.style.height = `${currentPosition.height}px`; }
+      if (this.resizable) { el.style.height = `${currentPosition.height}px`; }
 
       // Note: the root position is saved to `settings.questTrackerPosition` in QuestTrackerShell when any
-      // height position changes are made to handle when #windowResizable is false / height is set to `auto`.
+      // height position changes are made to handle when `this.options.resizable` is false; height is set to `auto`.
 
-      // top / left position changes need to be saved here.
-      if (initialTop !== currentPosition.top || initialLeft !== currentPosition.left)
+      // Any position changes need to be saved here when there are actual changes.
+      if (initialTop !== currentPosition.top || initialLeft !== currentPosition.left || initialWidth !== currentPosition.width || initialHeight !== currentPosition.height)
       {
          s_SAVE_POSITION(currentPosition);
       }

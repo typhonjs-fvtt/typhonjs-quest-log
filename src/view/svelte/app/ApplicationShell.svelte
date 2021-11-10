@@ -16,9 +16,6 @@
    // `clientHeight`.
    export let heightChanged = false;
 
-   // Bound to ResizableHandle to track changes to the `resizable` app options.
-   let isResizable;
-
    const s_DEFAULT_TRANSITION = () => void 0;
    const s_DEFAULT_TRANSITION_OPTIONS = {};
 
@@ -57,15 +54,6 @@
    // Store Foundry Application reference.
    const foundryApp = context.foundryApp;
 
-   // The `z-index` app options derived store.
-   const storeZIndex = context.storeAppOptions.zIndex;
-
-   // Handles directly updating the element root `z-index` style when `zIndex` changes.
-   $: if (elementRoot) { elementRoot.style.zIndex = $storeZIndex; }
-
-   // Listens to changes in `isResizable` from ResizableHandler. Adds / removes the `resizable` class.
-   $: if (elementRoot) { elementRoot.classList[isResizable ? 'add' : 'remove']('resizable'); }
-
    // This component can host multiple children defined in the TyphonJS Svelte configuration object which are
    // potentially mounted in the content area. If no children defined then this component mounts any slotted child.
    const children = typeof context === 'object' ? context.children : void 0;
@@ -89,7 +77,7 @@
             <slot />
          {/if}
       </section>
-      <ResizableHandle bind:isResizable />
+      <ResizableHandle />
    </div>
 {:else}
    <div id={foundryApp.id}
@@ -106,6 +94,6 @@
             <slot />
          {/if}
       </section>
-      <ResizableHandle bind:isResizable />
+      <ResizableHandle />
    </div>
 {/if}

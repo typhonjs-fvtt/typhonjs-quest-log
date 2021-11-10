@@ -10,6 +10,19 @@
 
    const foundryApp = context.foundryApp;
    const storeResizable = context.storeAppOptions.resizable;
+   const storeMinimized = context.storeUIOptions.minimized;
+
+   let elementResize;
+
+   $: if (elementResize)
+   {
+      // Instead of creating a derived store it is easier to use isResizable and the minimized store below.
+      elementResize.style.display = isResizable && !$storeMinimized ? 'block' : 'none';
+
+      // Add / remove `resizable` class from element root.
+      const elementRoot = getElementRoot();
+      if (elementRoot) { elementRoot.classList[isResizable ? 'add' : 'remove']('resizable'); }
+   }
 
    /**
     * Provides an action to handle resizing the application shell based on the resizable app option.
@@ -73,7 +86,7 @@
 
          isResizable = true;
 
-         // node.style.display = 'block';
+         node.style.display = 'block';
       }
 
       /**
@@ -88,7 +101,7 @@
          node.removeEventListener(...handlers.resizeMove);
          node.removeEventListener(...handlers.resizeUp);
 
-         // node.style.display = 'none';
+         node.style.display = 'none';
 
          isResizable = false;
       }
@@ -175,4 +188,8 @@
 
 </script>
 
-<div class="window-resizable-handle" use:resizable={$storeResizable}><i class="fas fa-arrows-alt-h"></i></div>
+<div class="window-resizable-handle"
+     use:resizable={$storeResizable}
+     bind:this={elementResize}>
+   <i class="fas fa-arrows-alt-h"></i>
+</div>

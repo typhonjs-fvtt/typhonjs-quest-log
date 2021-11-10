@@ -11,11 +11,6 @@
    export let elementContent;
    export let elementRoot;
 
-   // Exposed externally to change title on app header and z-index dynamically. If a parent component does not
-   // provide options then the associated Foundry App provides the options. SvelteApplication via the `setOptions` /
-   // `mergeOptions` methods will update `appOptions` on changes.
-   export let appOptions = void 0;
-
    // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
    // `clientHeight`.
    export let heightChanged = false;
@@ -46,12 +41,6 @@
       outTransitionOptions = transitionOptions;
    }
 
-   // Stores the local app title option which is updated from `appOptions` changes.
-   let title;
-
-   // Stores the local zIndex option which is updated from `appOptions` changes.
-   let zIndex;
-
    // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
    const bindHeightChanged = !!heightChanged;
@@ -61,23 +50,17 @@
 
    const context = getContext('external');
 
+   // The main Application options store.
+   const storeAppOptions = context.storeAppOptions;
+
    // Store Foundry Application reference.
    const foundryApp = context.foundryApp;
 
-   if (appOptions === void 0)
-   {
-      appOptions = foundryApp.options;
-   }
-
-   $: if (typeof appOptions === 'object')
-   {
-      title = typeof appOptions.title === 'string' ? appOptions.title : foundryApp !== void 0 ? foundryApp.title : '';
-
-      zIndex = Number.isInteger(appOptions.zIndex) ? appOptions.zIndex : void 0;
-   }
-
    // Handles directly updating the element root `z-index` style when `zIndex` changes.
-   $: if (elementRoot) { elementRoot.style.zIndex = Number.isInteger(zIndex) ? zIndex : null; }
+   $: if (elementRoot)
+   {
+      elementRoot.style.zIndex = Number.isInteger($storeAppOptions.zIndex) ? $storeAppOptions.zIndex : null;
+   }
 
    // This component can host multiple children defined in the TyphonJS Svelte configuration object which are
    // potentially mounted in the content area. If no children defined then this component mounts any slotted child.
@@ -94,7 +77,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}>
-      <TJSApplicationHeader {title} headerButtons={foundryApp._getHeaderButtons()} />
+      <TJSApplicationHeader headerButtons={foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
          {#if Array.isArray(children)}
             <TJSContainer {children} />
@@ -110,7 +93,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}>
-      <TJSApplicationHeader {title} headerButtons={foundryApp._getHeaderButtons()} />
+      <TJSApplicationHeader headerButtons={foundryApp._getHeaderButtons()} />
       <section class=window-content bind:this={elementContent}>
          {#if Array.isArray(children)}
             <TJSContainer {children} />

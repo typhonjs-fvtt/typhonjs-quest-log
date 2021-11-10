@@ -1,7 +1,8 @@
+import { get, writable }         from 'svelte/store';
 import { safeAccess, safeSet }   from '@typhonjs-utils/object';
 
 import {
-   hasGetter, hasSetter,
+   hasGetter,
    isApplicationShell,
    outroAndDestroy,
    parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
@@ -25,14 +26,6 @@ export class SvelteApplication extends Application
    #applicationShell = null;
 
    /**
-    * Stores SvelteData entries with instantiated Svelte components.
-    *
-    * @type {object[]}
-    * @private
-    */
-   #svelteData = [];
-
-   /**
     * Stores the target element which may not necessarily be the main element.
     *
     * @type {JQuery}
@@ -47,25 +40,42 @@ export class SvelteApplication extends Application
    #elementContent = null;
 
    /**
+    * The Application option store which is injected into mounted Svelte component context under the `external` key.
+    *
+    * @type {Writable<{}>}
+    */
+   #storeAppOptions;
+
+   /**
+    * Stores SvelteData entries with instantiated Svelte components.
+    *
+    * @type {object[]}
+    * @private
+    */
+   #svelteData = [];
+
+   /**
     * @inheritDoc
     */
    constructor(options)
    {
       super(options);
+
+      const storeAppOptions = writable(this.options);
+      storeAppOptions.get = () => get(storeAppOptions);
+
+      Object.freeze(storeAppOptions);
+
+      // Initialize the store with options set in the Application constructor.
+      this.#storeAppOptions = storeAppOptions;
    }
+
    /**
     * Returns the content element if an application shell is mounted.
     *
     * @returns {JQuery} Content element.
     */
    get elementContent() { return this.#elementContent; }
-
-   /**
-    * Returns the length of the SvelteData entry array.
-    *
-    * @returns {number} Number of SvelteData entries loaded.
-    */
-   get svelteDataLength() { return this.#svelteData.length; }
 
    /**
     * Returns the target element or main element if no target defined.
@@ -75,20 +85,25 @@ export class SvelteApplication extends Application
    get elementTarget() { return this.#elementTarget; }
 
    /**
+    * Returns the Application options store.
+    *
+    * @returns {Writable<{}>} Application options store.
+    */
+   get storeAppOptions() { return this.#storeAppOptions; }
+
+   /**
+    * Returns the length of the SvelteData entry array.
+    *
+    * @returns {number} Number of SvelteData entries loaded.
+    */
+   get svelteDataLength() { return this.#svelteData.length; }
+
+   /**
     * Sets `this.options.title` and updates any application shell which exports the `appOptions` property.
     *
     * @param {string}   title - Application title; will be localized, so a translation key is fine.
     */
-   set title(title)
-   {
-      this.options.title = title;
-
-      // If any application shell exports `appOptions` setter / accessor then update options.
-      if (hasSetter(this.#applicationShell, 'appOptions'))
-      {
-         this.#applicationShell.appOptions = this.options;
-      }
-   }
+   set title(title) { this.setOptions('title', title); }
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
@@ -320,7 +335,7 @@ export class SvelteApplication extends Application
       {
          for (const svelteConfig of this.options.svelte)
          {
-            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig);
+            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig, this.#storeAppOptions);
             if (isApplicationShell(svelteData.component))
             {
                if (this.#applicationShell !== null)
@@ -338,7 +353,7 @@ export class SvelteApplication extends Application
       }
       else if (typeof this.options.svelte === 'object')
       {
-         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte);
+         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte, this.#storeAppOptions);
          if (isApplicationShell(svelteData.component))
          {
             // A sanity check as shouldn't hit this case as only one component is being mounted.
@@ -412,24 +427,15 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Provides a way to merge `options` into this applications options.
-    *
-    * Additionally if an application shell Svelte component is mounted and exports the `appOptions` property then
-    * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
+    * Provides a way to merge `options` into this applications options and update the appOptions store.
     *
     * @param {object}   options - The options object to merge with `this.options`.
     */
    mergeOptions(options)
    {
-      foundry.utils.mergeObject(this.options, options);
-
-      // If any application shell exports `appOptions` setter / accessor then update `appOptions`.
-      if (hasSetter(this.#applicationShell, 'appOptions'))
-      {
-         this.#applicationShell.appOptions = this.options;
-      }
+      this.storeAppOptions.update((instanceOptions) => foundry.utils.mergeObject(instanceOptions, options), {
+         inplace: false
+      });
    }
 
    /**
@@ -500,10 +506,10 @@ export class SvelteApplication extends Application
    {
       const success = safeSet(this.options, accessor, value);
 
-      // If `this.options` modified then detect if any application shell exports `appOptions` setter / accessor.
-      if (success && hasSetter(this.#applicationShell, 'appOptions'))
+      // If `this.options` modified then update the app options store.
+      if (success)
       {
-         this.#applicationShell.appOptions = this.options;
+         this.storeAppOptions.set(this.options);
       }
    }
 
@@ -604,7 +610,7 @@ export class SvelteApplication extends Application
  *
  * @returns {object} The config + instantiated Svelte component.
  */
-function s_LOAD_CONFIG(app, html, config)
+function s_LOAD_CONFIG(app, html, config, storeAppOptions)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
 
@@ -658,6 +664,9 @@ function s_LOAD_CONFIG(app, html, config)
       eventbus = app._eventbus.createProxy();
       svelteConfig.context.get('external').eventbus = eventbus;
    }
+
+   // Always inject the appOptions store.
+   svelteConfig.context.get('external').storeAppOptions = storeAppOptions;
 
    // Create the Svelte component.
    const component = new SvelteComponent(svelteConfig);

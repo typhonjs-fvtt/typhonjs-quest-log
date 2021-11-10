@@ -1,7 +1,9 @@
 // import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
-import { SvelteApplication }  from '../SvelteApplication.js';
+import { safeAccess, safeSet }   from '@typhonjs-utils/object';
 
-import DialogShell            from './DialogShell.svelte';
+import { SvelteApplication }     from '../SvelteApplication.js';
+
+import DialogShell               from './DialogShell.svelte';
 
 /**
  * Provides a Foundry API compatible dialog alternative implemented w/ Svelte. There are several features including
@@ -34,9 +36,13 @@ export class TJSDialog extends SvelteApplication
       });
    }
 
+   get content() { return this.getDialogData('content'); }
+
    get data() { return this.#data; }
 
    get title() { return game.i18n.localize(this.#data.title) || 'Dialog'; }
+
+   set content(content) { this.setDialogData('content', content); }
 
    set data(data)
    {
@@ -46,13 +52,7 @@ export class TJSDialog extends SvelteApplication
       if (componentData?.component?.data) { componentData.component.data = data; }
    }
 
-   set title(title)
-   {
-      this.#data.title = title;
-
-      const componentData = this.getSvelteData(0);
-      if (componentData?.component?.data) { componentData.component.data = this.#data; }
-   }
+   set title(title) { this.setDialogData('title', title); }
 
    /**
     * Implemented only for backwards compatibility w/ default Foundry {@link Dialog} API.
@@ -79,14 +79,14 @@ export class TJSDialog extends SvelteApplication
       return super.close(options);
    }
 
-   getDialogData(key)
+   getDialogData(accessor, defaultValue)
    {
-      return this.#data[key];
+      return safeAccess(this.#data, accessor, defaultValue);
    }
 
    mergeDialogData(data)
    {
-      this.data = foundry.utils.mergeObject(this.#data, data);
+      this.data = foundry.utils.mergeObject(this.#data, data, { inplace: false });
    }
 
    onSvelteMount({ elementTarget })
@@ -98,6 +98,8 @@ export class TJSDialog extends SvelteApplication
       // TODO REMOVE!
       // setTimeout(() =>
       // {
+      //    this.content = 'NEW CONTENT';
+      //
       //    this.mergeDialogData({
       //       title: 'WOOOO!',
       //       content: 'NEW CONTENT',
@@ -111,12 +113,29 @@ export class TJSDialog extends SvelteApplication
       // }, 1000);
    }
 
-   setDialogData(key, value)
+   /**
+    * Provides a way to safely set this dialogs data given an accessor string which describes the
+    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+    * to walk.
+    *
+    * Automatically the dialog data will be updated in the associated DialogShell Svelte component.
+    *
+    * // TODO DOCUMENT the accessor in more detail.
+    *
+    * @param {string}   accessor - The path / key to set. You can set multiple levels.
+    *
+    * @param {*}        value - Value to set.
+    */
+   setDialogData(accessor, value)
    {
-      this.#data[key] = value;
+      const success = safeSet(this.#data, accessor, value);
 
-      const componentData = this.getSvelteData(0);
-      if (componentData?.component?.data) { componentData.component.data = this.#data; }
+      // If `this.options` modified then update the app options store.
+      if (success)
+      {
+         const componentData = this.getSvelteData(0);
+         if (componentData?.component?.data) { componentData.component.data = this.#data; }
+      }
    }
 
    // ---------------------------------------------------------------------------------------------------------------

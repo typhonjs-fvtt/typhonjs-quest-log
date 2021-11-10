@@ -4,6 +4,7 @@
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import { TJSContainer }             from '@typhonjs-fvtt/svelte/component';
    // import TJSContainer                 from '../TJSContainer.svelte';
+   import ResizableHandle              from './ResizableHandle.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -14,6 +15,9 @@
    // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
    // `clientHeight`.
    export let heightChanged = false;
+
+   // Bound to ResizableHandle to track changes to the `resizable` app options.
+   let isResizable;
 
    const s_DEFAULT_TRANSITION = () => void 0;
    const s_DEFAULT_TRANSITION_OPTIONS = {};
@@ -50,17 +54,11 @@
 
    const context = getContext('external');
 
-   // The main Application options store.
-   const storeAppOptions = context.storeAppOptions;
-
    // Store Foundry Application reference.
    const foundryApp = context.foundryApp;
 
-   // Handles directly updating the element root `z-index` style when `zIndex` changes.
-   $: if (elementRoot)
-   {
-      elementRoot.style.zIndex = Number.isInteger($storeAppOptions.zIndex) ? $storeAppOptions.zIndex : null;
-   }
+   // Listens to changes in `isResizable` from ResizableHandler. Adds / removes the `resizable` class.
+   $: if (elementRoot) { elementRoot.classList[isResizable ? 'add' : 'remove']('resizable'); }
 
    // This component can host multiple children defined in the TyphonJS SvelteData configuration object which are
    // potentially mounted in the content area. If no children defined then this component mounts any slotted child.
@@ -85,6 +83,7 @@
                <slot />
            {/if}
        </section>
+       <ResizableHandle bind:isResizable />
    </div>
 {:else}
    <div id={foundryApp.id}
@@ -101,6 +100,7 @@
                <slot />
            {/if}
        </section>
+      <ResizableHandle bind:isResizable />
    </div>
 {/if}
 
@@ -192,4 +192,9 @@
   :global(.typhonjs-window-app.minimized .window-resizable-handle) {
     display: none;
   }
+
+  :global(.typhonjs-window-app.resizable :not(.typhonjs-window-app.minimized) .window-resizable-handle) {
+     display: block;
+  }
+
 </style>

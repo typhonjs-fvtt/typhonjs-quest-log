@@ -17,19 +17,12 @@
    let modalOptions = {}
    let modal = void 0;
 
-   const context = getContext('external');
+   const foundryApp = getContext('external').foundryApp;
 
-   const foundryApp = context.foundryApp;
-   const storeAppOptions = context.storeAppOptions;
-
-   // Update the main appOptions store when data.title changes.
-   $: storeAppOptions.update(
-    (options) => foundry.utils.mergeObject(options, { title: data.title }), { inplace: false });
-
-   // Update the main appOptions store when data.zIndex changes.
-   $: storeAppOptions.update((options) => foundry.utils.mergeObject(options, {
-       zIndex:Number.isInteger(data.zIndex) ? data.zIndex : Number.MAX_SAFE_INTEGER - 1
-   }), { inplace: false });
+   // Update the main foundry options when data changes.
+   $: foundryApp.draggable = data.draggable ?? true;
+   $: foundryApp.title = data.title;
+   $: foundryApp.zIndex = Number.isInteger(data.zIndex) ? data.zIndex : Number.MAX_SAFE_INTEGER - 1;
 
    $: if (modal === void 0) { modal = typeof data.modal === 'boolean' ? data.modal : false; }
 </script>

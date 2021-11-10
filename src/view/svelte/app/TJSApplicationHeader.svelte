@@ -1,24 +1,50 @@
 <script>
    import { getContext }   from 'svelte';
+
    import { localize }     from '@typhonjs-fvtt/svelte/helper';
 
    import TJSHeaderButton  from './TJSHeaderButton.svelte';
 
-   // Stores the local app title option which is updated from `storeAppOptions` changes.
-   let title;
+   import { draggable }    from '../actions/draggable';
 
    const context = getContext('external');
-   const storeAppOptions = context.storeAppOptions;
-   const storeUIOptions = context.storeUIOptions;
+   const foundryApp = context.foundryApp;
 
-   $: title = localize(typeof $storeAppOptions.title === 'string' ? $storeAppOptions.title : '');
+   const bringToTop = typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut ?
+    () => foundryApp.bringToTop.call(foundryApp) : () => void 0;
+
+   const storeTitle = context.storeAppOptions.title;
+   const storeDraggable = context.storeAppOptions.draggable;
+   const storeHeaderButtons = context.storeUIOptions.headerButtons;
+   const storeMinimizable = context.storeAppOptions.minimizable;
+
+   function minimizable(node, booleanStore)
+   {
+      const callback = foundryApp._onToggleMinimize.bind(foundryApp);
+
+      function activateListeners() { node.addEventListener('dblclick', callback); }
+      function removeListeners() { node.removeEventListener('dblclick', callback); }
+
+      if (booleanStore) { activateListeners(); }
+
+      return {
+         update: ({ booleanStore }) =>  // eslint-disable-line no-shadow
+         {
+            if (booleanStore) { activateListeners(); }
+            else { removeListeners(); }
+         },
+
+         destroy: () => removeListeners()
+      };
+   }
 </script>
 
-<svelte:options accessors={true}/>
-
-<header class="window-header flexrow">
-    <h4 class=window-title>{title}</h4>
-    {#each $storeUIOptions.headerButtons as button}
+<header class="window-header flexrow"
+        on:pointerdown={bringToTop}
+        use:draggable={{ positionable: foundryApp, booleanStore: $storeDraggable }}
+        use:minimizable={$storeMinimizable}>
+    <h4 class=window-title>{localize($storeTitle)}</h4>
+    {#each $storeHeaderButtons as button}
         <TJSHeaderButton {button}/>
     {/each}
 </header>

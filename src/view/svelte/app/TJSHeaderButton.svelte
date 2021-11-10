@@ -20,6 +20,6 @@
 
 <svelte:options accessors={true}/>
 
-<a on:click={onClick} class=header-button>
+<a on:click={onClick} class="header-button {button.class}">
     <i class={button.icon} title={localize(button.title)}></i>{localize(button.label)}
 </a>

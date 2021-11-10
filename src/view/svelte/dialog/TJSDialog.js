@@ -40,8 +40,6 @@ export class TJSDialog extends SvelteApplication
 
    get data() { return this.#data; }
 
-   get title() { return game.i18n.localize(this.#data.title) || 'Dialog'; }
-
    set content(content) { this.setDialogData('content', content); }
 
    set data(data)
@@ -51,8 +49,6 @@ export class TJSDialog extends SvelteApplication
       const componentData = this.getSvelteData(0);
       if (componentData?.component?.data) { componentData.component.data = data; }
    }
-
-   set title(title) { this.setDialogData('title', title); }
 
    /**
     * Implemented only for backwards compatibility w/ default Foundry {@link Dialog} API.
@@ -89,28 +85,25 @@ export class TJSDialog extends SvelteApplication
       this.data = foundry.utils.mergeObject(this.#data, data, { inplace: false });
    }
 
-   onSvelteMount({ elementTarget })
+   // TODO REMOVE!
+   onSvelteMount()
    {
-      // Make the window draggable
-      const header = elementTarget.querySelector('header');
-      new Draggable(this, $(elementTarget), header, this.options.resizable);
+      setTimeout(() =>
+      {
+         // this.content = 'NEW CONTENT';
+         // this.title = 'NEW TITLE';
 
-      // TODO REMOVE!
-      // setTimeout(() =>
-      // {
-      //    this.content = 'NEW CONTENT';
-      //
-      //    this.mergeDialogData({
-      //       title: 'WOOOO!',
-      //       content: 'NEW CONTENT',
-      //       buttons: {
-      //          maybe: {
-      //             icon: '<i class="fas fa-bug"></i>',
-      //             label: game.i18n.localize('Maybe')
-      //          }
-      //       }
-      //    });
-      // }, 1000);
+         this.mergeDialogData({
+            title: 'WOOOO!',
+            content: 'NEW CONTENT',
+            buttons: {
+               maybe: {
+                  icon: '<i class="fas fa-bug"></i>',
+                  label: game.i18n.localize('Maybe')
+               }
+            }
+         });
+      }, 1000);
    }
 
    /**

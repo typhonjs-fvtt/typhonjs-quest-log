@@ -103,6 +103,7 @@ export default class QuestTrackerApp extends SvelteApplication
          width: 300,
          height: game.settings.get(constants.moduleName, settings.questTrackerResizable) ? 'auto' : 480,
          title: game.i18n.localize('TyphonJSQuestLog.QuestTracker.Title'),
+         headerButtonNoLabel: true,
          jqueryAnimation: false,    // The Foundry JQuery close animation is not run.
          svelte: {
             class: QuestTrackerShell,
@@ -160,13 +161,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    _getHeaderButtons()
    {
-      const buttons = super._getHeaderButtons();
-
-      // Remove default `Close` label for close button.
-      const closeButton = buttons.find((button) => button?.class === 'close');
-      if (closeButton) { closeButton.label = void 0; }
-
-      return [...createHeaderButtons(this._eventbus), ...buttons];
+      return [...createHeaderButtons(this._eventbus), ...super._getHeaderButtons()];
    }
 
    /**

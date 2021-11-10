@@ -1,4 +1,4 @@
-import { get, writable }         from 'svelte/store';
+import { writable }              from 'svelte/store';
 import { safeAccess, safeSet }   from '@typhonjs-utils/object';
 
 import {
@@ -46,6 +46,8 @@ export class SvelteApplication extends Application
     */
    #storeAppOptions;
 
+   #storeUIOptions;
+
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
@@ -62,12 +64,16 @@ export class SvelteApplication extends Application
       super(options);
 
       const storeAppOptions = writable(this.options);
-      storeAppOptions.get = () => get(storeAppOptions);
-
       Object.freeze(storeAppOptions);
 
       // Initialize the store with options set in the Application constructor.
       this.#storeAppOptions = storeAppOptions;
+
+      const storeUIOptions = writable({});
+      Object.freeze(storeUIOptions);
+
+      // Initialize the store with options set in the Application constructor.
+      this.#storeUIOptions = storeUIOptions;
    }
 
    /**
@@ -83,13 +89,6 @@ export class SvelteApplication extends Application
     * @returns {JQuery} Target element.
     */
    get elementTarget() { return this.#elementTarget; }
-
-   /**
-    * Returns the Application options store.
-    *
-    * @returns {Writable<{}>} Application options store.
-    */
-   get storeAppOptions() { return this.#storeAppOptions; }
 
    /**
     * Returns the length of the SvelteData entry array.
@@ -331,11 +330,13 @@ export class SvelteApplication extends Application
           'SvelteApplication - _injectHTML - A popout app with no template can only support one Svelte component.');
       }
 
+      this.updateHeaderButtons();
+
       if (Array.isArray(this.options.svelte))
       {
          for (const svelteConfig of this.options.svelte)
          {
-            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig, this.#storeAppOptions);
+            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig, this.#storeAppOptions, this.#storeUIOptions);
             if (isApplicationShell(svelteData.component))
             {
                if (this.#applicationShell !== null)
@@ -353,7 +354,7 @@ export class SvelteApplication extends Application
       }
       else if (typeof this.options.svelte === 'object')
       {
-         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte, this.#storeAppOptions);
+         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte, this.#storeAppOptions, this.#storeUIOptions);
          if (isApplicationShell(svelteData.component))
          {
             // A sanity check as shouldn't hit this case as only one component is being mounted.
@@ -461,6 +462,8 @@ export class SvelteApplication extends Application
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {
       if (!element.length) { return; }
+
+      this.updateHeaderButtons();
 
       // For pop-out windows update the window title
       if (this.popOut)
@@ -597,6 +600,32 @@ export class SvelteApplication extends Application
       // Return the updated position object
       return currentPosition;
    }
+
+   /**
+    * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
+    * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
+    * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
+    * the new buttons.
+    *
+    * Optionally you can set in the Foundry app options `headerButtonNoLabel` to true and labels will be removed from
+    * the header buttons.
+    */
+   updateHeaderButtons()
+   {
+      const buttons = this._getHeaderButtons();
+
+      // Remove labels if this.options.headerButtonNoLabel is true;
+      if (typeof this.options.headerButtonNoLabel === 'boolean' && this.options.headerButtonNoLabel)
+      {
+         for (const button of buttons) { button.label = void 0; }
+      }
+
+      this.#storeUIOptions.update((options) =>
+      {
+         options.headerButtons = buttons;
+         return options;
+      });
+   }
 }
 
 /**
@@ -610,7 +639,7 @@ export class SvelteApplication extends Application
  *
  * @returns {object} The config + instantiated Svelte component.
  */
-function s_LOAD_CONFIG(app, html, config, storeAppOptions)
+function s_LOAD_CONFIG(app, html, config, storeAppOptions, storeUIOptions)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
 
@@ -650,10 +679,12 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions)
    const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
    const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
 
+   const externalContext = svelteConfig.context.get('external');
+
    // Potentially inject the Foundry application instance as a Svelte prop.
    if (injectApp)
    {
-      svelteConfig.context.get('external').foundryApp = app;
+      externalContext.foundryApp = app;
    }
 
    let eventbus;
@@ -662,11 +693,12 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions)
    if (injectEventbus && typeof app._eventbus === 'object' && typeof app._eventbus.createProxy === 'function')
    {
       eventbus = app._eventbus.createProxy();
-      svelteConfig.context.get('external').eventbus = eventbus;
+      externalContext.eventbus = eventbus;
    }
 
-   // Always inject the appOptions store.
-   svelteConfig.context.get('external').storeAppOptions = storeAppOptions;
+   // Always inject the appOptions and uiOptions stores.
+   externalContext.storeAppOptions = storeAppOptions;
+   externalContext.storeUIOptions = storeUIOptions;
 
    // Create the Svelte component.
    const component = new SvelteComponent(svelteConfig);

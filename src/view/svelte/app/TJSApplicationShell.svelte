@@ -77,7 +77,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}>
-       <TJSApplicationHeader headerButtons={foundryApp._getHeaderButtons()} />
+       <TJSApplicationHeader />
        <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
            {#if Array.isArray(children)}
                <TJSContainer {children} />
@@ -93,7 +93,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}>
-       <TJSApplicationHeader headerButtons={foundryApp._getHeaderButtons()} />
+       <TJSApplicationHeader />
        <section class=window-content bind:this={elementContent}>
            {#if Array.isArray(children)}
                <TJSContainer {children} />

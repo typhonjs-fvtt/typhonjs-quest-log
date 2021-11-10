@@ -4,13 +4,12 @@
 
    import TJSHeaderButton  from './TJSHeaderButton.svelte';
 
-   export let headerButtons = [];
-
    // Stores the local app title option which is updated from `storeAppOptions` changes.
    let title;
 
    const context = getContext('external');
    const storeAppOptions = context.storeAppOptions;
+   const storeUIOptions = context.storeUIOptions;
 
    $: title = localize(typeof $storeAppOptions.title === 'string' ? $storeAppOptions.title : '');
 </script>
@@ -19,7 +18,7 @@
 
 <header class="window-header flexrow">
     <h4 class=window-title>{title}</h4>
-    {#each headerButtons as button}
+    {#each $storeUIOptions.headerButtons as button}
         <TJSHeaderButton {button}/>
     {/each}
 </header>

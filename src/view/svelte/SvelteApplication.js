@@ -7,6 +7,8 @@ import {
    outroAndDestroy,
    parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
 
+import { GetSvelteData }         from './GetSvelteData';
+
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
  * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
@@ -78,6 +80,8 @@ export class SvelteApplication extends Application
     */
    #svelteData = [];
 
+   #getSvelteData = new GetSvelteData(this.#svelteData);
+
    /**
     * @inheritDoc
     */
@@ -133,11 +137,11 @@ export class SvelteApplication extends Application
    get resizable() { return this.options.resizable; }
 
    /**
-    * Returns the length of the SvelteData entry array.
+    * Returns an object w/ various methods to access mounted Svelte components.
     *
-    * @returns {number} Number of SvelteData entries loaded.
+    * @returns {GetSvelteData} GetSvelteData
     */
-   get svelteDataLength() { return this.#svelteData.length; }
+   get svelte() { return this.#getSvelteData; }
 
    /**
     * Returns the zIndex app option.
@@ -268,7 +272,8 @@ export class SvelteApplication extends Application
          }
       }
 
-      this.#svelteData = [];
+      // Reset SvelteData like this to maintain reference to GetSvelteData.
+      this.#svelteData.length = 0;
 
       // Await all Svelte components to destroy.
       await Promise.all(svelteDestroyPromises);
@@ -284,6 +289,11 @@ export class SvelteApplication extends Application
       this._minimized = false;
       this._scrollPositions = null;
       this._state = states.CLOSED;
+
+      // Update the minimized UI store options.
+      this.#storeUIOptionsUpdate((storeOptions) => foundry.utils.mergeObject(storeOptions, {
+         minimized: this._minimized
+      }));
    }
 
    /**
@@ -302,162 +312,6 @@ export class SvelteApplication extends Application
    getOptions(accessor, defaultValue)
    {
       return safeAccess(this.options, accessor, defaultValue);
-   }
-
-   /**
-    * Returns the indexed Svelte component.
-    *
-    * @param {number}   index -
-    *
-    * @returns {object} The loaded Svelte component.
-    */
-   getSvelteComponent(index)
-   {
-      const data = this.#svelteData[index];
-      return typeof data === 'object' ? data?.component : void 0;
-   }
-
-   /**
-    * Returns the Svelte component entries iterator.
-    *
-    * @returns {Generator<(number|*)[], void, *>} Svelte component entries iterator.
-    * @yields
-    */
-   *getSvelteComponentEntries()
-   {
-      for (let cntr = 0; cntr < this.#svelteData.length; cntr++)
-      {
-         yield [cntr, this.#svelteData[cntr].component];
-      }
-   }
-
-   /**
-    * Returns the Svelte component values iterator.
-    *
-    * @returns {Generator<*, void, *>} Svelte component values iterator.
-    * @yields
-    */
-   *getSvelteComponentValues()
-   {
-      for (let cntr = 0; cntr < this.#svelteData.length; cntr++)
-      {
-         yield this.#svelteData[cntr].component;
-      }
-   }
-
-   /**
-    * Returns the indexed SvelteData entry.
-    *
-    * @param {number}   index -
-    *
-    * @returns {object} The loaded Svelte config + component.
-    */
-   getSvelteData(index)
-   {
-      return this.#svelteData[index];
-   }
-
-   /**
-    * Returns the SvelteData entries iterator.
-    *
-    * @returns {IterableIterator<[number, Object]>} SvelteData entries iterator.
-    */
-   getSvelteDataEntries()
-   {
-      return this.#svelteData.entries();
-   }
-
-   /**
-    * Returns the SvelteData values iterator.
-    *
-    * @returns {IterableIterator<Object>} SvelteData values iterator.
-    */
-   getSvelteDataValues()
-   {
-      return this.#svelteData.values();
-   }
-
-   /**
-    * Initializes the Svelte stores and derived stores for the application options and internally used UI options.
-    *
-    * While writable stores are created the update method is stored in private variables locally and the `set` and
-    * `update` methods removed before injecting into the mounted Svelte components.
-    */
-   #storesInitialize()
-   {
-      const storeAppOptions = writable(this.options);
-
-      // Keep the update function locally, but make the store essentially readable.
-      this.#storeAppOptionsUpdate = storeAppOptions.update;
-      storeAppOptions.set = void 0;
-      storeAppOptions.update = void 0;
-
-      // Create derived stores.
-      storeAppOptions.draggable = derived(storeAppOptions, ($options, set) => set($options.draggable));
-      storeAppOptions.minimizable = derived(storeAppOptions, ($options, set) => set($options.minimizable));
-      storeAppOptions.popOut = derived(storeAppOptions, ($options, set) => set($options.popOut));
-      storeAppOptions.resizable = derived(storeAppOptions, ($options, set) => set($options.resizable));
-      storeAppOptions.title = derived(storeAppOptions, ($options, set) => set($options.title));
-      storeAppOptions.zIndex = derived(storeAppOptions,
-       ($options, set) => set(Number.isInteger($options.zIndex) ? $options.zIndex : null));
-
-      Object.freeze(storeAppOptions);
-
-      // Initialize the store with options set in the Application constructor.
-      this.#storeAppOptions = storeAppOptions;
-
-      const storeUIOptions = writable({});
-
-      // Keep the update function locally, but make the store essentially readable.
-      this.#storeUIOptionsUpdate = storeUIOptions.update;
-      storeUIOptions.set = void 0;
-      storeUIOptions.update = void 0;
-
-      storeUIOptions.headerButtons = derived(storeUIOptions, ($options, set) => set($options.headerButtons));
-
-      Object.freeze(storeUIOptions);
-
-      // Initialize the store with options set in the Application constructor.
-      this.#storeUIOptions = storeUIOptions;
-   }
-
-   /**
-    * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
-    * `zIndex` controls the z-index style of the element root.
-    *
-    * @see SvelteApplication._injectHTML
-    */
-   #storesSubscribe()
-   {
-      // Register local subscriptions.
-      this.#storeUnsubscribe.push(this.#storeAppOptions.popOut.subscribe((value) =>
-      {
-         if (value && this.rendered)
-         {
-            ui.windows[this.appId] = this;
-         }
-         else
-         {
-            delete ui.windows[this.appId];
-         }
-      }));
-
-      // Handles directly updating the element root `z-index` style when `zIndex` changes.
-      this.#storeUnsubscribe.push(this.#storeAppOptions.zIndex.subscribe((value) =>
-      {
-         if (this._element !== null) { this._element[0].style.zIndex = value; }
-      }));
-   }
-
-   /**
-    * Unsubscribes from any locally monitored stores.
-    *
-    * @see SvelteApplication.close
-    */
-   #storesUnsubscribe()
-   {
-      this.#storeUnsubscribe.forEach((unsubscribe) => unsubscribe());
-      this.#storeUnsubscribe = [];
    }
 
    /**
@@ -582,15 +436,33 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * @inheritDoc
+    */
+   async maximize()
+   {
+      await super.maximize();
+
+      this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: this._minimized }));
+   }
+
+   /**
+    * @inheritDoc
+    */
+   async minimize()
+   {
+      await super.minimize();
+
+      this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: this._minimized }));
+   }
+
+   /**
     * Provides a way to merge `options` into this applications options and update the appOptions store.
     *
     * @param {object}   options - The options object to merge with `this.options`.
     */
    mergeOptions(options)
    {
-      this.#storeAppOptions.update((instanceOptions) => foundry.utils.mergeObject(instanceOptions, options), {
-         inplace: false
-      });
+      this.#storeAppOptions.update((instanceOptions) => foundry.utils.mergeObject(instanceOptions, options));
    }
 
    /**
@@ -688,7 +560,7 @@ export class SvelteApplication extends Application
     *
     * @param {boolean}              [opts.noHeight] - When true no element height is modified.
     *
-    * @param {boolean}              [opts.noWidth] - When true no element Width is modified.
+    * @param {boolean}              [opts.noWidth] - When true no element width is modified.
     *
     * @returns {{left: number, top: number, width: number, height: number, scale:number}}
     * The updated position object for the application containing the new values
@@ -753,6 +625,93 @@ export class SvelteApplication extends Application
 
       // Return the updated position object
       return currentPosition;
+   }
+
+   /**
+    * Initializes the Svelte stores and derived stores for the application options and internally used UI options.
+    *
+    * While writable stores are created the update method is stored in private variables locally and the `set` and
+    * `update` methods removed before injecting into the mounted Svelte components.
+    */
+   #storesInitialize()
+   {
+      const storeAppOptions = writable(this.options);
+
+      // Keep the update function locally, but make the store essentially readable.
+      this.#storeAppOptionsUpdate = storeAppOptions.update;
+      storeAppOptions.set = void 0;
+      storeAppOptions.update = void 0;
+
+      // Create derived stores.
+      storeAppOptions.draggable = derived(storeAppOptions, ($options, set) => set($options.draggable));
+      storeAppOptions.minimizable = derived(storeAppOptions, ($options, set) => set($options.minimizable));
+      storeAppOptions.popOut = derived(storeAppOptions, ($options, set) => set($options.popOut));
+      storeAppOptions.resizable = derived(storeAppOptions, ($options, set) => set($options.resizable));
+      storeAppOptions.title = derived(storeAppOptions, ($options, set) => set($options.title));
+      storeAppOptions.zIndex = derived(storeAppOptions,
+       ($options, set) => set(Number.isInteger($options.zIndex) ? $options.zIndex : null));
+
+      Object.freeze(storeAppOptions);
+
+      // Initialize the store with options set in the Application constructor.
+      this.#storeAppOptions = storeAppOptions;
+
+      const storeUIOptions = writable({
+         headerButtons: [],
+         minimized: this._minimized
+      });
+
+      // Keep the update function locally, but make the store essentially readable.
+      this.#storeUIOptionsUpdate = storeUIOptions.update;
+      storeUIOptions.set = void 0;
+      storeUIOptions.update = void 0;
+
+      storeUIOptions.headerButtons = derived(storeUIOptions, ($options, set) => set($options.headerButtons));
+      storeUIOptions.minimized = derived(storeUIOptions, ($options, set) => set($options.minimized));
+
+      Object.freeze(storeUIOptions);
+
+      // Initialize the store with options set in the Application constructor.
+      this.#storeUIOptions = storeUIOptions;
+   }
+
+   /**
+    * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
+    * `zIndex` controls the z-index style of the element root.
+    *
+    * @see SvelteApplication._injectHTML
+    */
+   #storesSubscribe()
+   {
+      // Register local subscriptions.
+      this.#storeUnsubscribe.push(this.#storeAppOptions.popOut.subscribe((value) =>
+      {
+         if (value && this.rendered)
+         {
+            ui.windows[this.appId] = this;
+         }
+         else
+         {
+            delete ui.windows[this.appId];
+         }
+      }));
+
+      // Handles directly updating the element root `z-index` style when `zIndex` changes.
+      this.#storeUnsubscribe.push(this.#storeAppOptions.zIndex.subscribe((value) =>
+      {
+         if (this._element !== null) { this._element[0].style.zIndex = value; }
+      }));
+   }
+
+   /**
+    * Unsubscribes from any locally monitored stores.
+    *
+    * @see SvelteApplication.close
+    */
+   #storesUnsubscribe()
+   {
+      this.#storeUnsubscribe.forEach((unsubscribe) => unsubscribe());
+      this.#storeUnsubscribe = [];
    }
 
    /**

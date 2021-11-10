@@ -46,8 +46,8 @@ export class TJSDialog extends SvelteApplication
    {
       this.#data = data;
 
-      const componentData = this.getSvelteData(0);
-      if (componentData?.component?.data) { componentData.component.data = data; }
+      const component = this.svelte.component(0);
+      if (component?.data) { component.data = data; }
    }
 
    /**
@@ -126,8 +126,8 @@ export class TJSDialog extends SvelteApplication
       // If `this.options` modified then update the app options store.
       if (success)
       {
-         const componentData = this.getSvelteData(0);
-         if (componentData?.component?.data) { componentData.component.data = this.#data; }
+         const component = this.svelte.component(0);
+         if (component?.data) { component.data = this.#data; }
       }
    }
 

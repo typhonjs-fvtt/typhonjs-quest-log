@@ -97,3 +97,9 @@
       <ResizableHandle />
    </div>
 {/if}
+
+<style>
+   .window-app {
+      overflow: inherit;
+   }
+</style>

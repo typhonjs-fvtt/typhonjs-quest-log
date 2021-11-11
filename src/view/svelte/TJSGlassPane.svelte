@@ -52,5 +52,6 @@
 <style>
    .tjs-glass-pane {
       position: absolute;
+      overflow: inherit;
    }
 </style>

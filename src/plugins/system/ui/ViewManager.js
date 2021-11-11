@@ -98,17 +98,6 @@ export default class ViewManager
          instance: Apps.questTracker
       });
 
-      // Load and set the quest tracker position from settings.
-      try
-      {
-         const position = JSON.parse(game.settings.get(constants.moduleName, settings.questTrackerPosition));
-         if (position && position.width && position.height)
-         {
-            Apps.questTracker.position = position;
-         }
-      }
-      catch (err) { /**/ }
-
       // Whenever a QuestPreview closes and matches any tracked app that is adding a new quest set it to undefined.
       Hooks.on('closeQuestPreview', s_QUEST_PREVIEW_CLOSED);
       Hooks.on('renderQuestPreview', s_QUEST_PREVIEW_RENDER);

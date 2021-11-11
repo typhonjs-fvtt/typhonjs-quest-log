@@ -1,7 +1,19 @@
+/**
+ * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
+ * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
+ */
 class GetSvelteData
 {
+   /**
+    * @type {SvelteData[]}
+    */
    #svelteData;
 
+   /**
+    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+    *
+    * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
+    */
    constructor(svelteData)
    {
       this.#svelteData = svelteData;
@@ -89,3 +101,15 @@ class GetSvelteData
 Object.freeze(GetSvelteData);
 
 export { GetSvelteData };
+
+/**
+ * @typedef {object} SvelteData
+ *
+ * @property {object}            config -
+ *
+ * @property {SvelteComponent}   component -
+ *
+ * @property {HTMLElement}       element -
+ *
+ * @property {Eventbus}          eventbus -
+ */

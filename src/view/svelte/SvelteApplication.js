@@ -44,42 +44,51 @@ export class SvelteApplication extends Application
    /**
     * The Application option store which is injected into mounted Svelte component context under the `external` key.
     *
-    * @type {Writable<{}>}
+    * @type {StoreAppOptions}
     */
    #storeAppOptions;
 
    /**
     * Stores the update function for `#storeAppOptions`.
+    *
+    * @type {import('svelte/store').Writable.update}
     */
    #storeAppOptionsUpdate;
 
    /**
     * The UI option store which is injected into mounted Svelte component context under the `external` key.
     *
-    * @type {Writable<{}>}
+    * @type {StoreUIOptions}
     */
    #storeUIOptions;
 
    /**
     * Stores the update function for `#storeUIOptions`.
+    *
+    * @type {import('svelte/store').Writable.update}
     */
    #storeUIOptionsUpdate;
 
    /**
     * Stores the unsubscribe functions from local store subscriptions.
     *
-    * @type {Function[]}
+    * @type {import('svelte/store').Unsubscriber[]}
     */
    #storeUnsubscribe = [];
 
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {object[]}
-    * @private
+    * @type {SvelteData[]}
     */
    #svelteData = [];
 
+   /**
+    * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
+    * {@link #svelteData}.
+    *
+    * @type {GetSvelteData}
+    */
    #getSvelteData = new GetSvelteData(this.#svelteData);
 
    /**
@@ -137,7 +146,7 @@ export class SvelteApplication extends Application
    get resizable() { return this.options.resizable; }
 
    /**
-    * Returns an object w/ various methods to access mounted Svelte components.
+    * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
     *
     * @returns {GetSvelteData} GetSvelteData
     */
@@ -272,12 +281,13 @@ export class SvelteApplication extends Application
          }
       }
 
-      // Reset SvelteData like this to maintain reference to GetSvelteData.
-      this.#svelteData.length = 0;
-
       // Await all Svelte components to destroy.
       await Promise.all(svelteDestroyPromises);
 
+      // Reset SvelteData like this to maintain reference to GetSvelteData / `this.#getSvelteData`.
+      this.#svelteData.length = 0;
+
+      // Use JQuery to remove `this._element` from the DOM. Most SvelteComponents have already removed it.
       el.remove();
 
       // Clean up data
@@ -450,7 +460,7 @@ export class SvelteApplication extends Application
 
       this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: false }));
 
-      await super.maximize();
+      return super.maximize();
    }
 
    /**
@@ -468,7 +478,7 @@ export class SvelteApplication extends Application
 
       this.#storeUIOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: true }));
 
-      await super.minimize();
+      return super.minimize();
    }
 
    /**
@@ -644,46 +654,58 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Initializes the Svelte stores and derived stores for the application options and internally used UI options.
+    * Initializes the Svelte stores and derived stores for the application options and UI state.
     *
-    * While writable stores are created the update method is stored in private variables locally and the `set` and
-    * `update` methods removed before injecting into the mounted Svelte components.
+    * While writable stores are created the update method is stored in private variables locally and derived Readable
+    * stores are provided for essential options which are commonly used.
+    *
+    * These stores are injected into all Svelte components mounted under the `external` context: `storeAppOptions` and
+    * ` storeUIOptions`.
     */
    #storesInitialize()
    {
-      const storeAppOptions = writable(this.options);
+      const writtableAppOptions = writable(this.options);
 
       // Keep the update function locally, but make the store essentially readable.
-      this.#storeAppOptionsUpdate = storeAppOptions.update;
-      storeAppOptions.set = void 0;
-      storeAppOptions.update = void 0;
+      this.#storeAppOptionsUpdate = writtableAppOptions.update;
 
-      // Create derived stores.
-      storeAppOptions.draggable = derived(storeAppOptions, ($options, set) => set($options.draggable));
-      storeAppOptions.minimizable = derived(storeAppOptions, ($options, set) => set($options.minimizable));
-      storeAppOptions.popOut = derived(storeAppOptions, ($options, set) => set($options.popOut));
-      storeAppOptions.resizable = derived(storeAppOptions, ($options, set) => set($options.resizable));
-      storeAppOptions.title = derived(storeAppOptions, ($options, set) => set($options.title));
-      storeAppOptions.zIndex = derived(storeAppOptions,
-       ($options, set) => set(Number.isInteger($options.zIndex) ? $options.zIndex : null));
+      /**
+       * @type {StoreAppOptions}
+       */
+      const storeAppOptions = {
+         subscribe: writtableAppOptions.subscribe,
+
+         draggable: derived(writtableAppOptions, ($options, set) => set($options.draggable)),
+         minimizable: derived(writtableAppOptions, ($options, set) => set($options.minimizable)),
+         popOut: derived(writtableAppOptions, ($options, set) => set($options.popOut)),
+         resizable: derived(writtableAppOptions, ($options, set) => set($options.resizable)),
+         title: derived(writtableAppOptions, ($options, set) => set($options.title)),
+         zIndex: derived(writtableAppOptions,
+          ($options, set) => set(Number.isInteger($options.zIndex) ? $options.zIndex : null))
+      };
 
       Object.freeze(storeAppOptions);
 
-      // Initialize the store with options set in the Application constructor.
       this.#storeAppOptions = storeAppOptions;
 
-      const storeUIOptions = writable({
+      // Create a store for UI state data.
+      const writableUIOptions = writable({
          headerButtons: [],
          minimized: this._minimized
       });
 
       // Keep the update function locally, but make the store essentially readable.
-      this.#storeUIOptionsUpdate = storeUIOptions.update;
-      storeUIOptions.set = void 0;
-      storeUIOptions.update = void 0;
+      this.#storeUIOptionsUpdate = writableUIOptions.update;
 
-      storeUIOptions.headerButtons = derived(storeUIOptions, ($options, set) => set($options.headerButtons));
-      storeUIOptions.minimized = derived(storeUIOptions, ($options, set) => set($options.minimized));
+      /**
+       * @type {StoreUIOptions}
+       */
+      const storeUIOptions = {
+         subscribe: writableUIOptions.subscribe,
+
+         headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
+         minimized: derived(writableUIOptions, ($options, set) => set($options.minimized))
+      };
 
       Object.freeze(storeUIOptions);
 
@@ -766,9 +788,9 @@ export class SvelteApplication extends Application
  *
  * @param {object}            config - Svelte component options
  *
- * @param {Readable<object>}  storeAppOptions - Svelte store for app options.
+ * @param {StoreAppOptions}   storeAppOptions - Svelte store for app options.
  *
- * @param {Readable<object>}  storeUIOptions - Svelte store for UI options.
+ * @param {StoreUIOptions}    storeUIOptions - Svelte store for UI options.
  *
  * @returns {object} The config + instantiated Svelte component.
  */
@@ -877,3 +899,32 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions, storeUIOptions)
 
    return result;
 }
+
+/**
+ * @typedef {object} StoreAppOptions - Provides a custom readable Svelte store for Application options state.
+ *
+ * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all app options updates.
+ *
+ * @property {import('svelte/store').Readable<boolean>} draggable - Derived store for `draggable` updates.
+ *
+ * @property {import('svelte/store').Readable<boolean>} minimizable - Derived store for `minimizable` updates.
+ *
+ * @property {import('svelte/store').Readable<boolean>} popOut - Derived store for `popOut` updates.
+ *
+ * @property {import('svelte/store').Readable<boolean>} resizable - Derived store for `resizable` updates.
+ *
+ * @property {import('svelte/store').Readable<string>} title - Derived store for `title` updates.
+ *
+ * @property {import('svelte/store').Readable<number>} zIndex - Derived store for `zIndex` updates.
+ */
+
+/**
+ * @typedef {object} StoreUIOptions - Provides a custom readable Svelte store for UI options state.
+ *
+ * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all UI options updates.
+ *
+ * @property {import('svelte/store').Readable<ApplicationHeaderButton[]>} headerButtons - Derived store for
+ *                                                                                        `headerButtons` updates.
+ *
+ * @property {import('svelte/store').Readable<boolean>} minimized - Derived store for `minimized` updates.
+ */

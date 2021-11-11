@@ -170,6 +170,17 @@ export class SvelteApplication extends Application
    }
 
    /**
+    * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
+    * from `ui.windows`.
+    *
+    * @param {boolean}  popOut - Sets the popOut option.
+    */
+   set popOut(popOut)
+   {
+      if (typeof popOut === 'boolean') { this.setOptions('popOut', popOut); }
+   }
+
+   /**
     * Sets `this.options.resizable` which is reactive for application shells.
     *
     * @param {boolean}  resizable - Sets the resizable option.

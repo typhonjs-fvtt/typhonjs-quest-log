@@ -76,7 +76,7 @@
 
 {#if bindHeightChanged}
    <div id={foundryApp.id}
-        class="typhonjs-app typhonjs-window-app {foundryApp.options.classes.join(' ')}"
+        class="tjs-app tjs-window-app {foundryApp.options.classes.join(' ')}"
         data-appid={foundryApp.appId}
         bind:clientHeight={heightChanged}
         bind:this={elementRoot}
@@ -94,7 +94,7 @@
    </div>
 {:else}
    <div id={foundryApp.id}
-        class="typhonjs-app typhonjs-window-app {foundryApp.options.classes.join(' ')}"
+        class="tjs-app tjs-window-app {foundryApp.options.classes.join(' ')}"
         data-appid={foundryApp.appId}
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
@@ -119,7 +119,7 @@
    * by any given game system / mods that might effect the standard Foundry Application CSS. This allows separate
    * and unique styles to be given to this component regardless of game system / module modifications.
    */
-  :global(.typhonjs-app) {
+  :global(.tjs-app) {
     max-height: 100%;
     background: url(/ui/denim075.png) repeat;
     border-radius: 5px;
@@ -129,7 +129,7 @@
     position: absolute;
   }
 
-  :global(.typhonjs-window-app) {
+  :global(.tjs-window-app) {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -138,7 +138,7 @@
     z-index: 99;
   }
 
-  :global(.typhonjs-window-app .window-content) {
+  :global(.tjs-window-app .window-content) {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -149,7 +149,7 @@
     overflow-x: hidden;
   }
 
-  :global(.typhonjs-window-app .window-header) {
+  :global(.tjs-window-app .window-header) {
     flex: 0 0 30px;
     overflow: hidden;
     padding: 0 8px;
@@ -158,25 +158,25 @@
     pointer-events: auto;
   }
 
-  :global(.typhonjs-window-app .window-header a) {
+  :global(.tjs-window-app .window-header a) {
     flex: none;
     margin: 0 0 0 8px;
   }
 
-  :global(.typhonjs-window-app .window-header h4) {
+  :global(.tjs-window-app .window-header h4) {
     font-family: Signika, sans-serif;
   }
 
-  :global(.typhonjs-window-app .window-header i[class^=fa]) {
+  :global(.tjs-window-app .window-header i[class^=fa]) {
     margin-right: 3px;
   }
 
-  :global(.typhonjs-window-app .window-header .window-title) {
+  :global(.tjs-window-app .window-header .window-title) {
     margin: 0;
     word-break: break-all;
   }
 
-  :global(.typhonjs-window-app .window-resizable-handle) {
+  :global(.tjs-window-app .window-resizable-handle) {
     width: 20px;
     height: 20px;
     position: absolute;
@@ -188,11 +188,11 @@
     border-radius: 4px 0 0 0;
   }
 
-  :global(.typhonjs-window-app .window-resizable-handle i.fas) {
+  :global(.tjs-window-app .window-resizable-handle i.fas) {
     transform: rotate(45deg);
   }
 
-  :global(.typhonjs-window-app.minimized .window-header) {
+  :global(.tjs-window-app.minimized .window-header) {
      border: 1px solid #000;
   }
 </style>

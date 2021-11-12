@@ -88,7 +88,12 @@ export default class PluginLoader
          {
             name: 'tql-system-quest-api',
             instance: SystemPlugins.QuestAPIModule
-         }
+         },
+         // Provides creating data for dialogs.
+         {
+            name: 'tql-data-dialog',
+            instance: DataPlugins.CreateDialogData
+         },
       ]);
 
       // Store public QuestAPI in the game modules data object.

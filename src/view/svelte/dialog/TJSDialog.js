@@ -137,8 +137,20 @@ export class TJSDialog extends SvelteApplication
 
    static async confirm({ title, content, yes, no, render, defaultYes = true, rejectClose = false, options = {},
     draggable = true, modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex, transition,
-     inTransition, outTransition, transitionOptions, inTransitionOptions, outTransitionOptions } = {})
+     inTransition, outTransition, transitionOptions, inTransitionOptions, outTransitionOptions, buttons = {} } = {})
    {
+      // Allow overwriting of default icon and labels.
+      const mergedButtons = foundry.utils.mergeObject({
+         yes: {
+            icon: '<i class="fas fa-check"></i>',
+            label: game.i18n.localize('Yes')
+         },
+         no: {
+            icon: '<i class="fas fa-times"></i>',
+            label: game.i18n.localize('No'),
+         }
+      }, buttons);
+
       return new Promise((resolve, reject) =>
       {
          const dialog = new this({
@@ -156,10 +168,8 @@ export class TJSDialog extends SvelteApplication
             transitionOptions,
             inTransitionOptions,
             outTransitionOptions,
-            buttons: {
+            buttons: foundry.utils.mergeObject(mergedButtons, {
                yes: {
-                  icon: '<i class="fas fa-check"></i>',
-                  label: game.i18n.localize('Yes'),
                   callback: (html) =>
                   {
                      const result = yes ? yes(html) : true;
@@ -167,15 +177,33 @@ export class TJSDialog extends SvelteApplication
                   }
                },
                no: {
-                  icon: '<i class="fas fa-times"></i>',
-                  label: game.i18n.localize('No'),
                   callback: (html) =>
                   {
                      const result = no ? no(html) : false;
                      resolve(result);
                   }
                }
-            },
+            }),
+            // buttons: {
+            //    yes: {
+            //       icon: '<i class="fas fa-check"></i>',
+            //       label: game.i18n.localize('Yes'),
+            //       callback: (html) =>
+            //       {
+            //          const result = yes ? yes(html) : true;
+            //          resolve(result);
+            //       }
+            //    },
+            //    no: {
+            //       icon: '<i class="fas fa-times"></i>',
+            //       label: game.i18n.localize('No'),
+            //       callback: (html) =>
+            //       {
+            //          const result = no ? no(html) : false;
+            //          resolve(result);
+            //       }
+            //    }
+            // },
             default: defaultYes ? "yes" : "no",
             render,
             close: () =>

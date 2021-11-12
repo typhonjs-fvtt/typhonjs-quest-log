@@ -1,5 +1,3 @@
-import TQLDialog        from '../TQLDialog.js';
-
 import { TJSMenu }      from '@typhonjs-fvtt/svelte';
 
 import createMenuItems  from './createMenuItems.js';
@@ -140,7 +138,7 @@ export default class QuestLog extends Application
     */
    async close(options)
    {
-      TQLDialog.closeDialogs({ isQuestLog: true });
+      // TQLDialog.closeDialogs({ isQuestLog: true });
       return super.close(options);
    }
 

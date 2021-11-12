@@ -1,4 +1,4 @@
-import TQLDialog from '../TQLDialog.js';
+import { TJSDialog } from '../svelte/dialog/TJSDialog';
 
 /**
  * Provides all {@link JQuery} callbacks for the {@link QuestLog}.
@@ -35,10 +35,10 @@ export default class HandlerLog
       const questId = $(event.target).data('quest-id');
       const name = $(event.target).data('quest-name');
 
-      const result = await TQLDialog.confirmDeleteQuest({ name, result: questId, questId, isQuestLog: true });
+      const result = await TJSDialog.confirm(eventbus.triggerSync('tql:data:dialog:quest:delete:get', name));
       if (result)
       {
-         await eventbus.triggerAsync('tql:questdb:quest:delete', { questId: result });
+         await eventbus.triggerAsync('tql:questdb:quest:delete', { questId });
       }
    }
 

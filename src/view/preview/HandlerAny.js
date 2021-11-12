@@ -1,4 +1,4 @@
-import TQLDialog  from '../TQLDialog.js';
+import { TJSDialog } from '../svelte/dialog/TJSDialog';
 
 /**
  * These handler {@link JQuery} callbacks can be called on any tab.
@@ -12,19 +12,17 @@ export default class HandlerAny
     *
     * @param {Eventbus}          eventbus - Plugin manager eventbus
     *
-    * @param {Quest}             quest - The current quest being manipulated.
-    *
     * @returns {Promise<void>}
     */
-   static async questDelete(event, eventbus, quest)
+   static async questDelete(event, eventbus)
    {
       const questId = $(event.target).data('quest-id');
       const name = $(event.target).data('quest-name');
 
-      const result = await TQLDialog.confirmDeleteQuest({ name, result: questId, questId: quest.id });
+      const result = await TJSDialog.confirm(eventbus.triggerSync('tql:data:dialog:quest:delete:get', name));
       if (result)
       {
-         await eventbus.triggerAsync('tql:questdb:quest:delete', { questId: result });
+         await eventbus.triggerAsync('tql:questdb:quest:delete', { questId });
       }
    }
 

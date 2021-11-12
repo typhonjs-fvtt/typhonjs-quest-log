@@ -1,5 +1,3 @@
-import TQLDialog              from '../TQLDialog.js';
-
 import HandlerAny             from './HandlerAny.js';
 import HandlerDetails         from './HandlerDetails.js';
 import HandlerManage          from './HandlerManage.js';
@@ -448,7 +446,7 @@ export default class QuestPreview extends FormApplication
           (event) => HandlerDetails.taskAdd(event, this._quest, this));
 
          html.on(jquery.click, '.actions.tasks .delete', async (event) =>
-          await HandlerDetails.taskDelete(event, this._quest, this));
+          await HandlerDetails.taskDelete(event, eventbus, this._quest, this));
 
          html.on(jquery.drop, '.tasks-box',
           async (event) => await HandlerDetails.taskDropItem(event, eventbus, this._quest));
@@ -464,7 +462,7 @@ export default class QuestPreview extends FormApplication
       if (this.canEdit || this.canAccept)
       {
          html.on(jquery.click, '.actions.quest-status i.delete', async (event) =>
-          await HandlerAny.questDelete(event, eventbus, this._quest));
+          await HandlerAny.questDelete(event, eventbus));
 
          html.on(jquery.click, '.actions.quest-status i.move', async (event) =>
           await HandlerAny.questStatusSet(event, eventbus));
@@ -492,7 +490,7 @@ export default class QuestPreview extends FormApplication
           HandlerDetails.rewardAbstractEditName(event, this._quest, this));
 
          html.on(jquery.click, '.actions.rewards .delete', async (event) =>
-          await HandlerDetails.rewardDelete(event, this._quest, this));
+          await HandlerDetails.rewardDelete(event, eventbus, this._quest, this));
 
          html.on(jquery.drop, '.rewards-box',
           async (event) => await HandlerDetails.rewardDropItem(event, eventbus, this._quest, this));
@@ -564,8 +562,6 @@ export default class QuestPreview extends FormApplication
     */
    async close({ noSave = false, ...options } = {})
    {
-      TQLDialog.closeDialogs({ questId: this._quest.id });
-
       // If a permission control app / dialog is open close it.
       if (this._permControl)
       {

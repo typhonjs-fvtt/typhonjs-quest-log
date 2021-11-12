@@ -1,4 +1,4 @@
-import TQLDialog  from '../TQLDialog.js';
+import { TJSDialog }          from '../svelte/dialog/TJSDialog';
 
 import { constants, jquery, settings } from '#constants';
 
@@ -425,23 +425,25 @@ export default class HandlerDetails
    /**
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @param {QuestPreview}      questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async rewardDelete(event, quest, questPreview)
+   static async rewardDelete(event, eventbus, quest, questPreview)
    {
       const target = $(event.target);
       const uuidv4 = target.data('uuidv4');
       const name = target.data('reward-name');
 
-      // Await a semi-modal dialog.
-      const result = await TQLDialog.confirmDeleteReward({ name, result: uuidv4, questId: quest.id });
+      // Await a modal dialog.
+      const result = await TJSDialog.confirm(eventbus.triggerSync('tql:data:dialog:reward:delete:get', name));
       if (result)
       {
-         quest.removeReward(result);
+         quest.removeReward(uuidv4);
 
          await questPreview.saveQuest();
       }
@@ -834,22 +836,24 @@ export default class HandlerDetails
    /**
     * @param {JQuery.ClickEvent} event - JQuery.ClickEvent
     *
+    * @param {Eventbus}          eventbus - Plugin manager eventbus
+    *
     * @param {Quest}             quest - The current quest being manipulated.
     *
     * @param {QuestPreview}      questPreview - The QuestPreview being manipulated.
     *
     * @returns {Promise<void>}
     */
-   static async taskDelete(event, quest, questPreview)
+   static async taskDelete(event, eventbus, quest, questPreview)
    {
       const target = $(event.target);
       const uuidv4 = target.data('uuidv4');
       const name = target.data('task-name');
 
-      const result = await TQLDialog.confirmDeleteTask({ name, result: uuidv4, questId: quest.id });
+      const result = await TJSDialog.confirm(eventbus.triggerSync('tql:data:dialog:task:delete:get', name));
       if (result)
       {
-         quest.removeTask(result);
+         quest.removeTask(uuidv4);
 
          await questPreview.saveQuest();
       }

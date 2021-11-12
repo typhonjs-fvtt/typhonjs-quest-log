@@ -13,6 +13,8 @@ const s_NEW_QUEST_TRACKER = true;
 
 import { TJSDialog } from "../../../view/svelte/dialog/TJSDialog";
 import DialogTest from "../../../view/svelte/dialog/DialogTest.svelte";
+import TJSComponentShell from "../../../view/svelte/TJSComponentShell.svelte";
+import {fade} from "svelte/transition";
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -67,18 +69,35 @@ export default class ViewManager
          const data = { value: 0 };
 
          const result = await TJSDialog.confirm({
+            // draggable: false,
+            // resizable: true,
             modal: true,
+            // zIndex: null,
+            // popOut: false,
+            modalOptions: {
+               background: "repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)"
+            },
+            // transition: fade,
+            // transitionOptions: { duration: 2000 },
             title: 'TEST DIALOG',
             content: {
                class: DialogTest,
                props: { data }
             },
+            // content: {
+            //    class: TJSComponentShell,
+            //
+            //    children: {
+            //       class: DialogTest,
+            //       props: { data }
+            //    }
+            // },
             label: 'My Button',
             yes: () => `CLICKED YES: ${data.value}`,
             no: () => `CLICKED NO: ${data.value}`
          });
 
-         // console.log(result);
+         console.log(result);
 
          // Dialog.prompt({
          //    title: 'DEFAULT DIALOG',

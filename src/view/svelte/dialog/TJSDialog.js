@@ -25,13 +25,11 @@ export class TJSDialog extends SvelteApplication
       return foundry.utils.mergeObject(super.defaultOptions, {
          classes: ['dialog'],
          width: 400,
-         popOut: false,
          svelte: {
             class: DialogShell,
             intro: true,
             target: document.body,
-            props: function() { return { data: this.#data }; },
-            options: { injectApp: true }
+            props: function() { return { data: this.#data }; }
          }
       });
    }
@@ -88,22 +86,26 @@ export class TJSDialog extends SvelteApplication
    // TODO REMOVE!
    onSvelteMount()
    {
-      setTimeout(() =>
-      {
-         // this.content = 'NEW CONTENT';
-         // this.title = 'NEW TITLE';
-
-         this.mergeDialogData({
-            title: 'WOOOO!',
-            content: 'NEW CONTENT',
-            buttons: {
-               maybe: {
-                  icon: '<i class="fas fa-bug"></i>',
-                  label: game.i18n.localize('Maybe')
-               }
-            }
-         });
-      }, 1000);
+      // setTimeout(() =>
+      // {
+      //    // this.content = 'NEW CONTENT';
+      //    // this.title = 'NEW TITLE';
+      //
+      //    this.mergeDialogData({
+      //       title: 'WOOOO!',
+      //       content: 'NEW CONTENT',
+      //       modalOptions: {
+      //          transition: slide,
+      //          transitionOptions: { duration: 2000 },
+      //       },
+      //       buttons: {
+      //          maybe: {
+      //             icon: '<i class="fas fa-bug"></i>',
+      //             label: game.i18n.localize('Maybe')
+      //          }
+      //       }
+      //    });
+      // }, 5000);
    }
 
    /**
@@ -133,15 +135,27 @@ export class TJSDialog extends SvelteApplication
 
    // ---------------------------------------------------------------------------------------------------------------
 
-   static async confirm({ title, content, yes, no, render, defaultYes = true, rejectClose = false, modal = false,
-    options = {} } = {})
+   static async confirm({ title, content, yes, no, render, defaultYes = true, rejectClose = false, options = {},
+    draggable = true, modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex, transition,
+     inTransition, outTransition, transitionOptions, inTransitionOptions, outTransitionOptions } = {})
    {
       return new Promise((resolve, reject) =>
       {
          const dialog = new this({
             title,
             content,
+            draggable,
             modal,
+            modalOptions,
+            popOut,
+            resizable,
+            zIndex,
+            transition,
+            inTransition,
+            outTransition,
+            transitionOptions,
+            inTransitionOptions,
+            outTransitionOptions,
             buttons: {
                yes: {
                   icon: '<i class="fas fa-check"></i>',
@@ -174,15 +188,27 @@ export class TJSDialog extends SvelteApplication
       });
    }
 
-   static async prompt({ title, content, label, callback, render, rejectClose = true, modal = false,
-    options = {} } = {})
+   static async prompt({ title, content, label, callback, render, rejectClose = true, options = {}, draggable = true,
+    modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex, transition, inTransition, outTransition,
+     transitionOptions, inTransitionOptions, outTransitionOptions } = {})
    {
       return new Promise((resolve, reject) =>
       {
          const dialog = new this({
             title,
             content,
+            draggable,
             modal,
+            modalOptions,
+            popOut,
+            resizable,
+            zIndex,
+            transition,
+            inTransition,
+            outTransition,
+            transitionOptions,
+            inTransitionOptions,
+            outTransitionOptions,
             buttons: {
                ok: {
                   icon: '<i class="fas fa-check"></i>',

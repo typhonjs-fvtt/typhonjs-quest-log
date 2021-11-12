@@ -13,22 +13,22 @@
 
    let foundryApp = getContext('external').foundryApp;
 
+   $: buttons = Object.keys(data.buttons).reduce((obj, key) =>
+   {
+      const b = data.buttons[key];
+      if (b.condition !== false)
+      {
+         obj.push({
+            ...b,
+            id: key,
+            cssClass: [key, data.default === key ? 'default' : ''].filterJoin(' ')
+         })
+      }
+      return obj;
+   }, []);
+
    $:
    {
-      buttons = Object.keys(data.buttons).reduce((obj, key) =>
-      {
-         const b = data.buttons[key];
-         if (b.condition !== false)
-         {
-            obj.push({
-               ...b,
-               id: key,
-               cssClass: [key, data.default === key ? 'default' : ''].filterJoin(' ')
-            })
-         }
-         return obj;
-      }, []);
-
       content = data.content;
 
       try
@@ -42,7 +42,13 @@
          {
             const svelteConfig = parseSvelteConfig(content, foundryApp);
             dialogComponent = svelteConfig.class;
-            dialogProps = svelteConfig.props;
+            dialogProps = svelteConfig.props ?? {};
+
+            // Check for any children parsed and added to the external context.
+            const children = svelteConfig?.context?.get('external')?.children;
+
+            // If so add to dialogProps.
+            if (Array.isArray(children)) { dialogProps.children = children; }
          }
          else
          {

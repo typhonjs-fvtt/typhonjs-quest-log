@@ -1,4 +1,4 @@
-import { TJSDialog }          from '../svelte/dialog/TJSDialog';
+import { TJSDialog }          from '../svelte/application/TJSDialog';
 
 import { constants, jquery, settings } from '#constants';
 

@@ -1,8 +1,8 @@
 <script>
    import { getContext }         from 'svelte';
 
-   import { isSvelteComponent }  from '@typhonjs-fvtt/svelte/util';
-   import { parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+   import { isSvelteComponent,
+            parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
    export let data = {};
 

@@ -5,7 +5,7 @@
 
    import TJSHeaderButton  from './TJSHeaderButton.svelte';
 
-   import { draggable }    from '../actions/draggable';
+   import { draggable }    from '../../actions/draggable';
 
    const context = getContext('external');
    const foundryApp = context.foundryApp;

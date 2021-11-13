@@ -3,7 +3,7 @@
    import { fade }                     from 'svelte/transition';
 
    // import { ApplicationShell }      from '@typhonjs-fvtt/svelte/component';
-   import ApplicationShell             from '../app/ApplicationShell.svelte';
+   import ApplicationShell             from '../application/ApplicationShell.svelte';
 
    import TJSGlassPane                 from '../TJSGlassPane.svelte';
 

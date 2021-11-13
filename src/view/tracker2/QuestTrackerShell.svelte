@@ -2,7 +2,7 @@
    import { getContext }         from 'svelte';
    import { scale }              from 'svelte/transition';
 
-   import TJSApplicationShell    from '../svelte/app/TJSApplicationShell.svelte';
+   import TJSApplicationShell    from '../svelte/component/application/TJSApplicationShell.svelte';
 
    import MainContainer          from './MainContainer.svelte';
 

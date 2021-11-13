@@ -7,7 +7,7 @@ import {
    outroAndDestroy,
    parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
 
-import { GetSvelteData }         from './GetSvelteData';
+import { GetSvelteData }         from './GetSvelteData.js';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively

@@ -1,7 +1,7 @@
 <script>
    import {
       s_DEFAULT_TRANSITION,
-      s_DEFAULT_TRANSITION_OPTIONS }   from './transition/transitionDefaults';
+      s_DEFAULT_TRANSITION_OPTIONS }   from '../transition/transitionDefaults';
 
    export let id = void 0;
    export let zIndex = Number.MAX_SAFE_INTEGER;

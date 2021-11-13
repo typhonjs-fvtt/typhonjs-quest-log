@@ -1,7 +1,10 @@
-import { TJSMenu }      from '@typhonjs-fvtt/svelte';
+import { scale }                 from 'svelte/transition';
+import { TJSMenu }               from '@typhonjs-fvtt/svelte';
 
-import createMenuItems  from './createMenuItems.js';
-import HandlerLog       from './HandlerLog.js';
+import { HandlebarsApplication } from '../svelte/application/legacy/HandlebarsApplication';
+
+import createMenuItems           from './createMenuItems.js';
+import HandlerLog                from './HandlerLog.js';
 
 import { constants, jquery, questStatusI18n, questTabIndex, settings } from '#constants';
 
@@ -17,7 +20,7 @@ import { constants, jquery, questStatusI18n, questTabIndex, settings } from '#co
  * {@link JQuery} control callbacks are setup in {@link QuestLog.activateListeners} and are located in a separate static
  * control class {@link HandlerLog}.
  */
-export default class QuestLog extends Application
+export default class QuestLog extends HandlebarsApplication
 {
    /**
     * @inheritDoc
@@ -45,7 +48,13 @@ export default class QuestLog extends Application
          minimizable: true,
          resizable: true,
          title: game.i18n.localize('TyphonJSQuestLog.QuestLog.Title'),
-         tabs: [{ navSelector: '.log-tabs', contentSelector: '.log-body', initial: 'active' }]
+         tabs: [{ navSelector: '.log-tabs', contentSelector: '.log-body', initial: 'active' }],
+         svelte: {
+            props: {
+               transition: scale,
+               transitionOptions: { duration: 2000 }
+            }
+         }
       });
    }
 
@@ -138,7 +147,6 @@ export default class QuestLog extends Application
     */
    async close(options)
    {
-      // TQLDialog.closeDialogs({ isQuestLog: true });
       return super.close(options);
    }
 

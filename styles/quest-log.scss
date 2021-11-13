@@ -3,11 +3,9 @@
   min-height: 640px;
 
   // Necessary to ensure the bookmark tabs show. See `QuestLog.setPosition` for the manual positioning necessary.
-  // Some game systems and UI theming modules override `overflow`, so we must visible, but then handle very long
+  // Some game systems and UI theming modules override `overflow`, so we set it visible, but then handle very long
   // list of quests / `.table` below manually based on the Application / setPosition.
-  &.window-app .window-content {
-    overflow: visible;
-  }
+  overflow: visible;
 
   $quest-min-height: 42px;  // Defines the height of the quest <li> and children elements.
 

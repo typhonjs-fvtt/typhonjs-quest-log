@@ -146,6 +146,11 @@ export class SvelteApplication extends Application
    get elementTarget() { return this.#elementTarget; }
 
    /**
+    * @inheritDoc
+    */
+   get popOut() { return super.popOut; }
+
+   /**
     * Returns the resizable option.
     *
     * @returns {boolean} Resizable app option.
@@ -411,10 +416,11 @@ export class SvelteApplication extends Application
 
          this.#svelteData.push(svelteData);
       }
-      else
-      {
-         throw new TypeError(`SvelteApplication - _injectHTML - this.options.svelte not an array or object.`);
-      }
+      // TODO EVALUATE; COMMENTED OUT WHILE WORKING ON HandlebarsApplication.
+      // else
+      // {
+      //    throw new TypeError(`SvelteApplication - _injectHTML - this.options.svelte not an array or object.`);
+      // }
 
       // Detect if this is a synthesized DocumentFragment.
       const isDocumentFragment = html.length && html[0] instanceof DocumentFragment;
@@ -827,12 +833,13 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions, storeUIOptions)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
 
-   if (typeof app.template === 'string' && typeof config.target !== 'string')
-   {
-      throw new TypeError(
-       `SvelteApplication - s_LOAD_CONFIG - Template defined and target selector not a string for config:\n${
-        JSON.stringify(config)}`);
-   }
+   // TODO EVALUATE; COMMENTED OUT WHILE WORKING ON HandlebarsApplication.
+   // if (typeof app.template === 'string' && typeof config.target !== 'string')
+   // {
+   //    throw new TypeError(
+   //     `SvelteApplication - s_LOAD_CONFIG - Template defined and target selector not a string for config:\n${
+   //      JSON.stringify(config)}`);
+   // }
 
    let target;
 

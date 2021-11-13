@@ -132,7 +132,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    bringToTop()
    {
-      if (!this.resizable) { this.elementTarget[0].style.height = 'auto'; }
+      if (!this.resizable) { this.elementTarget.style.height = 'auto'; }
    }
 
    /**
@@ -178,9 +178,9 @@ export default class QuestTrackerApp extends SvelteApplication
       this.resizable = resizable;
 
       // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
-      if (this.elementTarget === null || this.elementTarget === void 0 || this.elementTarget[0] === void 0) { return; }
+      if (this.elementTarget === null || this.elementTarget === void 0) { return; }
 
-      const elementTarget = this.elementTarget[0];
+      const elementTarget = this.elementTarget;
 
       if (resizable)
       {
@@ -242,7 +242,7 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          this.#pinned = true;
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-         this.elementTarget[0].style.animation = '';
+         this.elementTarget.style.animation = '';
       }
    }
 
@@ -353,7 +353,7 @@ export default class QuestTrackerApp extends SvelteApplication
       if (currentPosition.height < this.#appExtents.minHeight) { currentPosition.height = this.#appExtents.minHeight; }
       if (currentPosition.height > this.#appExtents.maxHeight) { currentPosition.height = this.#appExtents.maxHeight; }
 
-      const el = this.elementTarget[0];
+      const el = this.elementTarget;
 
       currentPosition.resizeWidth = initialWidth < currentPosition.width;
       currentPosition.resizeHeight = initialHeight < currentPosition.height;

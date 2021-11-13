@@ -37,14 +37,14 @@ export class SvelteApplication extends Application
    /**
     * Stores the target element which may not necessarily be the main element.
     *
-    * @type {JQuery}
+    * @type {HTMLElement}
     */
    #elementTarget = null;
 
    /**
     * Stores the content element which is set for application shells.
     *
-    * @type {JQuery}
+    * @type {HTMLElement}
     */
    #elementContent = null;
 
@@ -134,14 +134,14 @@ export class SvelteApplication extends Application
    /**
     * Returns the content element if an application shell is mounted.
     *
-    * @returns {JQuery} Content element.
+    * @returns {HTMLElement} Content element.
     */
    get elementContent() { return this.#elementContent; }
 
    /**
     * Returns the target element or main element if no target defined.
     *
-    * @returns {JQuery} Target element.
+    * @returns {HTMLElement} Target element.
     */
    get elementTarget() { return this.#elementTarget; }
 
@@ -258,7 +258,7 @@ export class SvelteApplication extends Application
        *
        * @type {JQuery}
        */
-      const el = this.#elementTarget;
+      const el = $(this.#elementTarget);
       if (!el) { return this._state = states.CLOSED; }
 
       // Dispatch Hooks for closing the base and subclass applications
@@ -433,11 +433,11 @@ export class SvelteApplication extends Application
 
          // Detect if the application shell exports an `elementContent` accessor.
          this.#elementContent = hasGetter(this.#applicationShell, 'elementContent') ?
-          $(this.#applicationShell.elementContent) : null;
+          this.#applicationShell.elementContent : null;
 
          // Detect if the application shell exports an `elementTarget` accessor.
          this.#elementTarget = hasGetter(this.#applicationShell, 'elementTarget') ?
-          $(this.#applicationShell.elementTarget) : null;
+          this.#applicationShell.elementTarget : null;
       }
       else if (isDocumentFragment) // Set the element of the app to the first child element in order of Svelte components mounted.
       {
@@ -455,10 +455,13 @@ export class SvelteApplication extends Application
       // main element.
       if (this.#elementTarget === null)
       {
-         this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
+         const element = typeof this.options.selectorTarget === 'string' ?
           this._element.find(this.options.selectorTarget) : this._element;
+
+         this.#elementTarget = element[0];
       }
 
+      // TODO VERIFY THIS CHECK ESPECIALLY `this.#elementTarget.length === 0`.
       if (this.#elementTarget === null || this.#elementTarget === void 0 || this.#elementTarget.length === 0)
       {
          throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
@@ -467,8 +470,8 @@ export class SvelteApplication extends Application
       // Subscribe to local store handling. Defer to next clock tick for the render cycle to complete.
       setTimeout(() => this.#storesSubscribe(), 0);
 
-      this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent !== null ?
-       this.elementContent[0] : null, elementTarget: this.#elementTarget[0] });
+      this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
+       this.#elementTarget });
    }
 
    /**
@@ -619,7 +622,7 @@ export class SvelteApplication extends Application
     */
    setPosition({ left, top, width, height, scale, noHeight = false, noWidth = false } = {})
    {
-      const el = this.elementTarget[0];
+      const el = this.elementTarget;
       const currentPosition = this.position;
       const styles = globalThis.getComputedStyle(el);
 

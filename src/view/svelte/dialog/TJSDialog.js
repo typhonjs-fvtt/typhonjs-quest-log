@@ -156,6 +156,7 @@ export class TJSDialog extends SvelteApplication
          const dialog = new this({
             title,
             content,
+            render,
             draggable,
             modal,
             modalOptions,
@@ -184,28 +185,7 @@ export class TJSDialog extends SvelteApplication
                   }
                }
             }),
-            // buttons: {
-            //    yes: {
-            //       icon: '<i class="fas fa-check"></i>',
-            //       label: game.i18n.localize('Yes'),
-            //       callback: (html) =>
-            //       {
-            //          const result = yes ? yes(html) : true;
-            //          resolve(result);
-            //       }
-            //    },
-            //    no: {
-            //       icon: '<i class="fas fa-times"></i>',
-            //       label: game.i18n.localize('No'),
-            //       callback: (html) =>
-            //       {
-            //          const result = no ? no(html) : false;
-            //          resolve(result);
-            //       }
-            //    }
-            // },
             default: defaultYes ? "yes" : "no",
-            render,
             close: () =>
             {
                if (rejectClose) { reject('The confirmation Dialog was closed without a choice being made.'); }
@@ -216,15 +196,16 @@ export class TJSDialog extends SvelteApplication
       });
    }
 
-   static async prompt({ title, content, label, callback, render, rejectClose = true, options = {}, draggable = true,
-    modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex, transition, inTransition, outTransition,
-     transitionOptions, inTransitionOptions, outTransitionOptions } = {})
+   static async prompt({ title, content, label, callback, render, rejectClose = false, options = {}, draggable = true,
+    icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex,
+     transition, inTransition, outTransition, transitionOptions, inTransitionOptions, outTransitionOptions } = {})
    {
       return new Promise((resolve, reject) =>
       {
          const dialog = new this({
             title,
             content,
+            render,
             draggable,
             modal,
             modalOptions,
@@ -239,17 +220,16 @@ export class TJSDialog extends SvelteApplication
             outTransitionOptions,
             buttons: {
                ok: {
-                  icon: '<i class="fas fa-check"></i>',
+                  icon,
                   label,
                   callback: (html) =>
                   {
-                     const result = callback(html);
+                     const result = callback ? callback(html) : null;
                      resolve(result);
                   }
                },
             },
             default: 'ok',
-            render,
             close: () =>
             {
                if (rejectClose)

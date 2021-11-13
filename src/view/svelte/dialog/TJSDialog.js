@@ -83,31 +83,6 @@ export class TJSDialog extends SvelteApplication
       this.data = foundry.utils.mergeObject(this.#data, data, { inplace: false });
    }
 
-   // TODO REMOVE!
-   onSvelteMount()
-   {
-      // setTimeout(() =>
-      // {
-      //    // this.content = 'NEW CONTENT';
-      //    // this.title = 'NEW TITLE';
-      //
-      //    this.mergeDialogData({
-      //       title: 'WOOOO!',
-      //       content: 'NEW CONTENT',
-      //       modalOptions: {
-      //          transition: slide,
-      //          transitionOptions: { duration: 2000 },
-      //       },
-      //       buttons: {
-      //          maybe: {
-      //             icon: '<i class="fas fa-bug"></i>',
-      //             label: game.i18n.localize('Maybe')
-      //          }
-      //       }
-      //    });
-      // }, 5000);
-   }
-
    /**
     * Provides a way to safely set this dialogs data given an accessor string which describes the
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -136,8 +111,8 @@ export class TJSDialog extends SvelteApplication
    // ---------------------------------------------------------------------------------------------------------------
 
    static async confirm({ title, content, yes, no, render, defaultYes = true, rejectClose = false, options = {},
-    draggable = true, modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex, transition,
-     inTransition, outTransition, transitionOptions, inTransitionOptions, outTransitionOptions, buttons = {} } = {})
+    buttons = {}, draggable = true, modal = false, modalOptions = {}, popOut = true, resizable = false, transition = {},
+     zIndex } = {})
    {
       // Allow overwriting of default icon and labels.
       const mergedButtons = foundry.utils.mergeObject({
@@ -164,11 +139,6 @@ export class TJSDialog extends SvelteApplication
             resizable,
             zIndex,
             transition,
-            inTransition,
-            outTransition,
-            transitionOptions,
-            inTransitionOptions,
-            outTransitionOptions,
             buttons: foundry.utils.mergeObject(mergedButtons, {
                yes: {
                   callback: (html) =>
@@ -197,8 +167,8 @@ export class TJSDialog extends SvelteApplication
    }
 
    static async prompt({ title, content, label, callback, render, rejectClose = false, options = {}, draggable = true,
-    icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true, resizable = false, zIndex,
-     transition, inTransition, outTransition, transitionOptions, inTransitionOptions, outTransitionOptions } = {})
+    icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true, resizable = false,
+     transition = {}, zIndex } = {})
    {
       return new Promise((resolve, reject) =>
       {
@@ -211,13 +181,8 @@ export class TJSDialog extends SvelteApplication
             modalOptions,
             popOut,
             resizable,
-            zIndex,
             transition,
-            inTransition,
-            outTransition,
-            transitionOptions,
-            inTransitionOptions,
-            outTransitionOptions,
+            zIndex,
             buttons: {
                ok: {
                   icon,

@@ -23,125 +23,159 @@
 
    let modal = void 0;
 
-   let modalBackground = void 0;
-   let modalTransition = void 0;
-   let modalTransitionOptions = void 0;
+   // Stores props for the ApplicationShell.
+   const appProps = {
+      // Stores any transition functions.
+      transition: void 0,
+      inTransition: void 0,
+      outTransition: void 0,
 
-   // Stores any transition properties to set ApplicationShell with a transition w/ in / out options.
-   let transition = void 0;
-   let inTransition = void 0;
-   let outTransition = void 0;
+      // Stores properties to set for options for any transitions.
+      transitionOptions: void 0,
+      inTransitionOptions: void 0,
+      outTransitionOptions: void 0,
+   }
 
-   // Stores properties to set ApplicationShell with options for any transitions.
-   let transitionOptions = void 0;
-   let inTransitionOptions = void 0;
-   let outTransitionOptions = void 0;
+   const modalProps = {
+      // Background CSS style string.
+      background: void 0,
+
+      // Stores any transition functions.
+      transition: void 0,
+      inTransition: void 0,
+      outTransition: void 0,
+
+      // Stores properties to set for options for any transitions.
+      transitionOptions: void 0,
+      inTransitionOptions: void 0,
+      outTransitionOptions: void 0,
+   }
 
    let zIndex = void 0;
 
    // Only set modal once on mount. You can't change between a modal an non-modal dialog during runtime.
-   if (modal === void 0) { modal = typeof data.modal === 'boolean' ? data.modal : false; }
+   if (modal === void 0) { modal = typeof data?.modal === 'boolean' ? data.modal : false; }
 
    // Retrieve values from the DialogData object and also potentially set any SvelteApplication accessors.
    // Explicit checks are performed against existing local variables as the only externally reactive variable is `data`.
    // All of the checks below trigger when there are any external changes to the `data` prop.
    // Prevent any unnecessary changing of local & `foundryApp` variables unless actual changes occur.
+
+   // Foundry App options --------------------------------------------------------------------------------------------
+
+   $: if (typeof data === 'object')
+   {
+      const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
+       modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
+      if (zIndex !== newZIndex) { zIndex = newZIndex; }
+
+      // Update the main foundry options when data changes. Perform explicit checks against existing data in `foundryApp`.
+      const newDraggable = data.draggable ?? true;
+      if (foundryApp.draggable !== newDraggable) { foundryApp.draggable = newDraggable; }
+
+      const newPopOut = data.popOut ?? true;
+      if (foundryApp.popOut !== newPopOut) { foundryApp.popOut = newPopOut; }
+
+      const newResizable = data.resizable ?? false;
+      if (foundryApp.resizable !== newResizable) { foundryApp.resizable = newResizable; }
+
+      // Note foundryApp.title from Application localizes `options.title`, so compare with `foundryApp.options.title`.
+      const newTitle = data.title ?? 'Dialog';
+      if (newTitle !== foundryApp?.options?.title) { foundryApp.title = newTitle; }
+
+      if (foundryApp.zIndex !== zIndex) { foundryApp.zIndex = zIndex; }
+   }
+
+   // ApplicationShell transition options ----------------------------------------------------------------------------
+
+   $: if (typeof data?.transition === 'object')
+   {
+      // Store data.transitions to shorten statements below.
+      const d = data.transition;
+
+      if (d?.transition !== appProps.transition) { appProps.transition = d.transition; }
+      if (d?.inTransition !== appProps.inTransition) { appProps.inTransition = d.inTransition; }
+      if (d?.outTransition !== appProps.outTransition) { appProps.outTransition = d.outTransition; }
+      if (d?.transitionOptions !== appProps.transitionOptions) { appProps.transitionOptions = d.transitionOptions; }
+
+      if (d?.inTransitionOptions !== appProps.inTransitionOptions)
+      {
+         appProps.inTransitionOptions = d.inTransitionOptions;
+      }
+
+      if (d?.outTransitionOptions !== appProps.outTransitionOptions)
+      {
+         appProps.outTransitionOptions = d.outTransitionOptions;
+      }
+   }
+
+   // Modal options --------------------------------------------------------------------------------------------------
+
    $:
    {
       const newModalBackground = typeof data?.modalOptions?.background === 'string' ? data.modalOptions.background :
        s_MODAL_BACKGROUND;
 
-      if (newModalBackground !== modalBackground) { modalBackground = newModalBackground; }
+      if (newModalBackground !== modalProps.background) { modalProps.background = newModalBackground; }
    }
 
-   $: {
-      const newModalTransition = typeof data?.modalOptions?.transition === 'function' ? data.modalOptions.transition :
-       s_MODAL_TRANSITION;
+   $: if (typeof data?.modalOptions?.transition === 'object')
+   {
+      // Store data.transitions to shorten statements below.
+      const d = data.modalOptions.transition;
 
-      if (newModalTransition !== modalTransition) { modalTransition = newModalTransition; }
+      if (d?.transition !== modalProps.transition)
+      {
+         modalProps.transition = typeof d?.transition === 'function' ? d.transition : s_MODAL_TRANSITION;
+      }
+
+      if (d?.inTransition !== modalProps.inTransition) { modalProps.inTransition = d.inTransition; }
+      if (d?.outTransition !== modalProps.outTransition) { modalProps.outTransition = d.outTransition; }
+
+      // Provide default transition options if not defined.
+      if (d?.transitionOptions !== modalProps.transitionOptions)
+      {
+         modalProps.transitionOptions = typeof d?.transitionOptions === 'object' ? d.transitionOptions :
+          s_MODAL_TRANSITION_OPTIONS;
+      }
+
+      if (d?.inTransitionOptions !== modalProps.inTransitionOptions)
+      {
+         modalProps.inTransitionOptions = d.inTransitionOptions;
+      }
+
+      if (d?.outTransitionOptions !== modalProps.outTransitionOptions)
+      {
+         modalProps.outTransitionOptions = d.outTransitionOptions;
+      }
    }
+   else  // Provide a fallback / default glass pane transition when `data.modalOptions.transition` is not defined.
+   {
+      const newModalTransition = typeof data?.modalOptions?.transition?.transition === 'function' ?
+       data.modalOptions.transition.transition : s_MODAL_TRANSITION;
 
-   $: {
+      if (newModalTransition !== modalProps.transition) { modalProps.transition = newModalTransition; }
+
       const newModalTransitionOptions = typeof data?.modalOptions?.transitionOptions === 'object' ?
        data.modalOptions.transitionOptions : s_MODAL_TRANSITION_OPTIONS;
 
-      if (newModalTransitionOptions !== modalTransitionOptions) { modalTransitionOptions = newModalTransitionOptions; }
+      if (newModalTransitionOptions !== modalProps.transitionOptions)
+      {
+         modalProps.transitionOptions = newModalTransitionOptions;
+      }
    }
-
-   $: if (data?.transition !== transition) { transition = data.transition; }
-   $: if (data?.inTransition !== inTransition) { inTransition = data.inTransition; }
-   $: if (data?.outTransition !== outTransition) { outTransition = data.outTransition; }
-
-   $: if (data?.transitionOptions !== transitionOptions) { transitionOptions = data.transitionOptions; }
-   $: if (data?.inTransitionOptions !== inTransitionOptions) { inTransitionOptions = data.inTransitionOptions; }
-   $: if (data?.outTransitionOptions !== outTransitionOptions) { outTransitionOptions = data.outTransitionOptions; }
-
-   $:
-   {
-      const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
-       modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
-
-      if (zIndex !== newZIndex) { zIndex = newZIndex; }
-   }
-
-   // Update the main foundry options when data changes. Perform explicit checks against existing data in `foundryApp`.
-   $:
-   {
-      const newDraggable = data.draggable ?? true;
-      if (foundryApp.draggable !== newDraggable) { foundryApp.draggable = newDraggable; }
-   }
-
-   $:
-   {
-      const newPopOut = data.popOut ?? true;
-      if (foundryApp.popOut !== newPopOut) { foundryApp.popOut = newPopOut; }
-   }
-
-   $:
-   {
-      const newResizable = data.resizable ?? false;
-      if (foundryApp.resizable !== newResizable) { foundryApp.resizable = newResizable; }
-   }
-
-   $:
-   {
-      const newTitle = data.title ?? 'Dialog';
-
-      // Note foundryApp.title from Application localizes `options.title`, so compare with `foundryApp.options.title`.
-      if (newTitle !== foundryApp?.options?.title) { foundryApp.title = newTitle; }
-   }
-
-   $: if (foundryApp.zIndex !== zIndex) { foundryApp.zIndex = zIndex; }
 </script>
 
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={foundryApp.id}
-                 stopPropagation={false}
-                 background={modalBackground}
-                 transition={modalTransition}
-                 transitionOptions={modalTransitionOptions}
-                 {zIndex}>
-      <ApplicationShell bind:elementRoot
-                        {transition}
-                        {inTransition}
-                        {outTransition}
-                        {transitionOptions}
-                        {inTransitionOptions}
-                        {outTransitionOptions}>
+   <TJSGlassPane id={foundryApp.id} stopPropagation={false} {...modalProps} {zIndex}>
+      <ApplicationShell bind:elementRoot {...appProps}>
          <DialogContent {data} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
-   <ApplicationShell bind:elementRoot
-                     {transition}
-                     {inTransition}
-                     {outTransition}
-                     {transitionOptions}
-                     {inTransitionOptions}
-                     {outTransitionOptions}>
+   <ApplicationShell bind:elementRoot {...appProps}>
       <DialogContent {data} />
    </ApplicationShell>
 {/if}
-

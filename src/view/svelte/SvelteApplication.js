@@ -112,7 +112,7 @@ export class SvelteApplication extends Application
       return foundry.utils.mergeObject(super.defaultOptions, {
          draggable: true,              // If true then application shells are draggable.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
-         jqueryAnimation: true,        // If false the Foundry JQuery close animation is not run.
+         jqueryCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
          zIndex: null                  // When set the zIndex is manually controlled.
       });
    }
@@ -151,6 +151,14 @@ export class SvelteApplication extends Application
     * @returns {GetSvelteData} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
+
+   /**
+    * Returns the title accessor from the parent Application class.
+    * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.
+    *
+    * @returns {string} Title.
+    */
+   get title() { return super.title; }
 
    /**
     * Returns the zIndex app option.
@@ -263,10 +271,10 @@ export class SvelteApplication extends Application
          Hooks.call(`close${cls.name}`, this, el);
       }
 
-      // If options `jqueryAnimation` is false then do not execute the standard JQuery slide up animation.
-      // This allows the Svelte components to provide any out transition.
-      const animate = typeof this.options.jqueryAnimation === 'boolean' ? this.options.jqueryAnimation : true;
-
+      // If options `jqueryCloseAnimation` is false then do not execute the standard JQuery slide up animation.
+      // This allows Svelte components to provide any out transition. Application shells will automatically set
+      // `jqueryCloseAnimation` based on any out transition set or unset.
+      const animate = typeof this.options.jqueryCloseAnimation === 'boolean' ? this.options.jqueryCloseAnimation : true;
       if (animate)
       {
          // Await on JQuery to slide up the main element.

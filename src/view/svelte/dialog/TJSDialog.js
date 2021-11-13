@@ -44,7 +44,7 @@ export class TJSDialog extends SvelteApplication
    {
       this.#data = data;
 
-      const component = this.svelte.component(0);
+      const component = this.svelte.applicationShell;
       if (component?.data) { component.data = data; }
    }
 

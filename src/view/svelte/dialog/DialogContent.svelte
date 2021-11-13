@@ -13,7 +13,8 @@
 
    let foundryApp = getContext('external').foundryApp;
 
-   $: buttons = Object.keys(data.buttons).reduce((obj, key) =>
+   // If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
+   $: buttons = typeof data.buttons !== 'object' ? [] : Object.keys(data.buttons).reduce((obj, key) =>
    {
       const b = data.buttons[key];
       if (b.condition !== false)

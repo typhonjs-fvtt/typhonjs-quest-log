@@ -23,9 +23,16 @@ export class SvelteApplication extends Application
     * Stores the first mounted component which follows the application shell contract.
     * // TODO Figure out type.
     *
-    * @type {object} Application shell.
+    * @type {ApplicationShell|null[]} Application shell.
     */
-   #applicationShell = null;
+   #applicationShellHolder = [null];
+
+   /**
+    * Get the current application shell.
+    *
+    * @returns {ApplicationShell|null} The first mounted component which follows the application shell contract.
+    */
+   get #applicationShell() { return this.#applicationShellHolder[0]; }
 
    /**
     * Stores the target element which may not necessarily be the main element.
@@ -89,7 +96,7 @@ export class SvelteApplication extends Application
     *
     * @type {GetSvelteData}
     */
-   #getSvelteData = new GetSvelteData(this.#svelteData);
+   #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
    /**
     * @inheritDoc
@@ -303,14 +310,14 @@ export class SvelteApplication extends Application
       // Await all Svelte components to destroy.
       await Promise.all(svelteDestroyPromises);
 
-      // Reset SvelteData like this to maintain reference to GetSvelteData / `this.#getSvelteData`.
+      // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
       this.#svelteData.length = 0;
 
       // Use JQuery to remove `this._element` from the DOM. Most SvelteComponents have already removed it.
       el.remove();
 
       // Clean up data
-      this.#applicationShell = null;
+      this.#applicationShellHolder[0] = null;
       this._element = null;
       this.#elementContent = null;
       this.#elementTarget = null;
@@ -379,7 +386,7 @@ export class SvelteApplication extends Application
                     ${JSON.stringify(svelteConfig)}`);
                }
 
-               this.#applicationShell = svelteData.component;
+               this.#applicationShellHolder[0] = svelteData.component;
             }
 
             this.#svelteData.push(svelteData);
@@ -399,7 +406,7 @@ export class SvelteApplication extends Application
                  ${JSON.stringify(this.options.svelte)}`);
             }
 
-            this.#applicationShell = svelteData.component;
+            this.#applicationShellHolder[0] = svelteData.component;
          }
 
          this.#svelteData.push(svelteData);
@@ -430,7 +437,7 @@ export class SvelteApplication extends Application
 
          // Detect if the application shell exports an `elementTarget` accessor.
          this.#elementTarget = hasGetter(this.#applicationShell, 'elementTarget') ?
-          $(this.#applicationShell.elementContent) : null;
+          $(this.#applicationShell.elementTarget) : null;
       }
       else if (isDocumentFragment) // Set the element of the app to the first child element in order of Svelte components mounted.
       {
@@ -918,32 +925,3 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions, storeUIOptions)
 
    return result;
 }
-
-/**
- * @typedef {object} StoreAppOptions - Provides a custom readable Svelte store for Application options state.
- *
- * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all app options updates.
- *
- * @property {import('svelte/store').Readable<boolean>} draggable - Derived store for `draggable` updates.
- *
- * @property {import('svelte/store').Readable<boolean>} minimizable - Derived store for `minimizable` updates.
- *
- * @property {import('svelte/store').Readable<boolean>} popOut - Derived store for `popOut` updates.
- *
- * @property {import('svelte/store').Readable<boolean>} resizable - Derived store for `resizable` updates.
- *
- * @property {import('svelte/store').Readable<string>} title - Derived store for `title` updates.
- *
- * @property {import('svelte/store').Readable<number>} zIndex - Derived store for `zIndex` updates.
- */
-
-/**
- * @typedef {object} StoreUIOptions - Provides a custom readable Svelte store for UI options state.
- *
- * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all UI options updates.
- *
- * @property {import('svelte/store').Readable<ApplicationHeaderButton[]>} headerButtons - Derived store for
- *                                                                                        `headerButtons` updates.
- *
- * @property {import('svelte/store').Readable<boolean>} minimized - Derived store for `minimized` updates.
- */

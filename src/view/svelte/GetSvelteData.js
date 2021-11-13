@@ -5,6 +5,11 @@
 class GetSvelteData
 {
    /**
+    * @type {ApplicationShell|null[]}
+    */
+   #applicationShellHolder;
+
+   /**
     * @type {SvelteData[]}
     */
    #svelteData;
@@ -12,12 +17,22 @@ class GetSvelteData
    /**
     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
     *
+    * @param {ApplicationShell|null[]}  applicationShellHolder - A reference to the ApplicationShell array.
+    *
     * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
     */
-   constructor(svelteData)
+   constructor(applicationShellHolder, svelteData)
    {
+      this.#applicationShellHolder = applicationShellHolder;
       this.#svelteData = svelteData;
    }
+
+   /**
+    * Returns any mounted {@link ApplicationShell}.
+    *
+    * @returns {ApplicationShell|null} Any mounted application shell.
+    */
+   get applicationShell() { return this.#applicationShellHolder[0]; }
 
    /**
     * Returns the indexed Svelte component.

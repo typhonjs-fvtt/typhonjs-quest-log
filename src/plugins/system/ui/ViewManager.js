@@ -9,12 +9,7 @@ import { constants, questDBHooks, questStatus, questStatusI18n, settings } from 
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
-const s_NEW_QUEST_TRACKER = false;
-
-import { TJSDialog } from "../../../view/svelte/application/TJSDialog";
-import DialogTest from "../../../view/svelte/component/dialog/DialogTest.svelte";
-import TJSComponentShell from "../../../view/svelte/component/TJSComponentShell.svelte";
-import {fade, slide} from "svelte/transition";
+const s_NEW_QUEST_TRACKER = true;
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -56,98 +51,7 @@ export default class ViewManager
       Hooks.on('TQL.DemoApp.close', () => demoApp.close());
       Hooks.on('TQL.DemoApp.render', () => { demoApp.render(true); });
       Hooks.on('TQL.DemoAppPopOut.close', () => demoAppPopOut.close());
-      // Hooks.on('TQL.DemoAppPopOut.render', () => { demoAppPopOut.render(true); });
-      Hooks.on('TQL.DemoAppPopOut.render', async () =>
-      {
-         // TJSDialog.prompt({
-         //    title: 'TEST DIALOG',
-         //    content: 'Some Content',
-         //    label: 'My Button',
-         //    callback: () => console.log(`!!!! CLICKED BUTTON`)
-         // });
-
-         const data = { value: 0 };
-
-         const result = await TJSDialog.confirm({
-            // draggable: false,
-            // resizable: true,
-            modal: true,
-            // zIndex: null,
-            // popOut: false,
-            modalOptions: {
-               background: "repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)",
-               // transition: {
-               //    inTransition: fade,
-               //    outTransition: slide,
-               //    // transitionOptions: { duration: 2000 },
-               // }
-            },
-            transition: {
-               transition: fade,
-               transitionOptions: { duration: 2000 },
-            },
-            title: 'TEST DIALOG',
-            content: {
-               class: DialogTest,
-               props: { data }
-            },
-            // content: {
-            //    class: TJSComponentShell,
-            //
-            //    children: {
-            //       class: DialogTest,
-            //       props: { data }
-            //    }
-            // },
-            label: 'My Button',
-            yes: () => `CLICKED YES: ${data.value}`,
-            no: () => `CLICKED NO: ${data.value}`
-         });
-
-         console.log(result);
-
-         // const result = await TJSDialog.prompt({
-         //    // draggable: false,
-         //    resizable: true,
-         //    rejectClose: false,
-         //    // modal: true,
-         //    minimizable: true,
-         //    // zIndex: null,
-         //    // popOut: false,
-         //    modalOptions: {
-         //       background: "repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)"
-         //    },
-         //    // transition: {
-         //    //    transition: fade,
-         //    //    transitionOptions: { duration: 2000 },
-         //    // },
-         //    title: 'TEST DIALOG',
-         //    content: {
-         //       class: DialogTest,
-         //       props: { data }
-         //    },
-         //    // content: {
-         //    //    class: TJSComponentShell,
-         //    //
-         //    //    children: {
-         //    //       class: DialogTest,
-         //    //       props: { data }
-         //    //    }
-         //    // },
-         //    label: 'My Button',
-         //    icon: '<i class="fas fa-trash"></i>',
-         //    callback: () => true
-         // });
-         //
-         // console.log(result);
-
-         // Dialog.prompt({
-         //    title: 'DEFAULT DIALOG',
-         //    content: 'Some Content',
-         //    label: 'My Button',
-         //    callback: () => console.log(`!!!! CLICKED BUTTON`)
-         // });
-      });
+      Hooks.on('TQL.DemoAppPopOut.render', () => { demoAppPopOut.render(true); });
 
       await this._eventbus.triggerAsync('plugins:async:add', {
          name: 'tql-view-quest-log',

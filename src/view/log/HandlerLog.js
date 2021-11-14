@@ -1,4 +1,4 @@
-import { TJSDialog } from '../svelte/application/TJSDialog';
+import { TJSDialog } from '@typhonjs-fvtt/svelte';
 
 /**
  * Provides all {@link JQuery} callbacks for the {@link QuestLog}.

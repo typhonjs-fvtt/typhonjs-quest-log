@@ -1,13 +1,11 @@
-import { TJSMenu }      from '@typhonjs-fvtt/svelte';
-import collect          from '#collect';
+import { TJSMenu }               from '@typhonjs-fvtt/svelte';
+import { HandlebarsApplication } from '@typhonjs-fvtt/svelte/legacy';
+import collect                   from '#collect';
 
-import HandlerTracker   from './HandlerTracker.js';
-import createMenuItems  from '../tracker2/createMenuItems.js';
+import HandlerTracker            from './HandlerTracker.js';
+import createMenuItems           from '../tracker2/createMenuItems.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '#constants';
-
-import { HandlebarsApplication } from '../svelte/application/legacy/HandlebarsApplication';
-import {scale} from "svelte/transition";
 
 /**
  * Provides the default width for the QuestTracker if not defined.

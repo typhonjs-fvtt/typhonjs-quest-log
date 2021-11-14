@@ -1,4 +1,4 @@
-import { TJSDialog } from '../svelte/application/TJSDialog';
+import { TJSDialog } from '@typhonjs-fvtt/svelte';
 
 /**
  * These handler {@link JQuery} callbacks can be called on any tab.

@@ -1,10 +1,10 @@
 <script>
-   import { getContext }         from 'svelte';
-   import { scale }              from 'svelte/transition';
+   import { getContext }            from 'svelte';
+   import { scale }                 from 'svelte/transition';
 
-   import TJSApplicationShell    from '../svelte/component/application/TJSApplicationShell.svelte';
+   import { TJSApplicationShell }   from '@typhonjs-fvtt/svelte/component';
 
-   import MainContainer          from './MainContainer.svelte';
+   import MainContainer             from './MainContainer.svelte';
 
    import { constants, sessionConstants, settings }   from '#constants';
 

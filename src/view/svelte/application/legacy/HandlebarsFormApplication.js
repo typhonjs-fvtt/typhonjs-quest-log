@@ -100,6 +100,7 @@ export class HandlebarsFormApplication extends SvelteFormApplication
       {
          element.replaceWith(html);
          this._element = html;
+         this.elementTarget = html[0];
       }
    }
 }

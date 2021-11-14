@@ -188,6 +188,34 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
+    * Sets the content element.
+    *
+    * @param {HTMLElement} content - Content element.
+    */
+   set elementContent(content)
+   {
+      if (!(content instanceof HTMLElement))
+      {
+         throw new TypeError(`SvelteFormApplication - set elementContent error: 'content' is not an HTMLElement.`);
+      }
+      this.#elementContent = content;
+   }
+
+   /**
+    * Sets the target element or main element if no target defined.
+    *
+    * @param {HTMLElement} target - Target element.
+    */
+   set elementTarget(target)
+   {
+      if (!(target instanceof HTMLElement))
+      {
+         throw new TypeError(`SvelteFormApplication - set elementTarget error: 'target' is not an HTMLElement.`);
+      }
+      this.#elementTarget = target;
+   }
+
+   /**
     * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
     * from `ui.windows`.
     *

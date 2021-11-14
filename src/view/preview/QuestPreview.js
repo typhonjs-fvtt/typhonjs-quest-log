@@ -7,6 +7,9 @@ import { constants, jquery, settings }  from '#constants';
 // TODO: Temporarily importing the plugin manager eventbus
 import { eventbus }           from '../../plugins/PluginManager.js';
 
+import { HandlebarsFormApplication } from '../svelte/application/legacy/HandlebarsFormApplication.js';
+import { scale }              from 'svelte/transition';
+
 /**
  * QuestPreview is the main app / window of TQL for modifying individual Quest data. It appears reactive, but every
  * single time a data value is manipulated in the quest it is saved and this app renders again. There are many cases
@@ -63,7 +66,7 @@ import { eventbus }           from '../../plugins/PluginManager.js';
  * @see {@link HandlerDetails}
  * @see {@link HandlerManage}
  */
-export default class QuestPreview extends FormApplication
+export default class QuestPreview extends HandlebarsFormApplication // FormApplication
 {
    /**
     * Constructs a QuestPreview instance with a Quest and passes on options to FormApplication.
@@ -208,7 +211,13 @@ export default class QuestPreview extends FormApplication
          submitOnChange: false,
          submitOnClose: false,
          title: game.i18n.localize('TyphonJSQuestLog.QuestPreview.Title'),
-         tabs: [{ navSelector: '.quest-tabs', contentSelector: '.quest-body', initial: 'details' }]
+         tabs: [{ navSelector: '.quest-tabs', contentSelector: '.quest-body', initial: 'details' }],
+         svelte: {
+            props: {
+               transition: scale,
+               transitionOptions: { duration: 2000 }
+            }
+         }
       });
    }
 

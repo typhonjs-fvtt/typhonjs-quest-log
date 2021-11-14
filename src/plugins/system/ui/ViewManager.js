@@ -9,12 +9,12 @@ import { constants, questDBHooks, questStatus, questStatusI18n, settings } from 
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
-const s_NEW_QUEST_TRACKER = true;
+const s_NEW_QUEST_TRACKER = false;
 
-import { TJSDialog } from "../../../view/svelte/dialog/TJSDialog";
-import DialogTest from "../../../view/svelte/dialog/DialogTest.svelte";
-import TJSComponentShell from "../../../view/svelte/TJSComponentShell.svelte";
-import {fade} from "svelte/transition";
+import { TJSDialog } from "../../../view/svelte/application/TJSDialog";
+import DialogTest from "../../../view/svelte/component/dialog/DialogTest.svelte";
+import TJSComponentShell from "../../../view/svelte/component/TJSComponentShell.svelte";
+import {fade, slide} from "svelte/transition";
 
 /**
  * Locally stores the app instances which are accessible by getter methods.
@@ -75,10 +75,17 @@ export default class ViewManager
             // zIndex: null,
             // popOut: false,
             modalOptions: {
-               background: "repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)"
+               background: "repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)",
+               // transition: {
+               //    inTransition: fade,
+               //    outTransition: slide,
+               //    // transitionOptions: { duration: 2000 },
+               // }
             },
-            // transition: fade,
-            // transitionOptions: { duration: 2000 },
+            transition: {
+               transition: fade,
+               transitionOptions: { duration: 2000 },
+            },
             title: 'TEST DIALOG',
             content: {
                class: DialogTest,
@@ -98,6 +105,41 @@ export default class ViewManager
          });
 
          console.log(result);
+
+         // const result = await TJSDialog.prompt({
+         //    // draggable: false,
+         //    resizable: true,
+         //    rejectClose: false,
+         //    // modal: true,
+         //    minimizable: true,
+         //    // zIndex: null,
+         //    // popOut: false,
+         //    modalOptions: {
+         //       background: "repeat url('modules/typhonjs-quest-log/assets/hex-chain-link.webp'), linear-gradient(to top, #03001e66, #7303c066, #ec38bc44, #fdeff944)"
+         //    },
+         //    // transition: {
+         //    //    transition: fade,
+         //    //    transitionOptions: { duration: 2000 },
+         //    // },
+         //    title: 'TEST DIALOG',
+         //    content: {
+         //       class: DialogTest,
+         //       props: { data }
+         //    },
+         //    // content: {
+         //    //    class: TJSComponentShell,
+         //    //
+         //    //    children: {
+         //    //       class: DialogTest,
+         //    //       props: { data }
+         //    //    }
+         //    // },
+         //    label: 'My Button',
+         //    icon: '<i class="fas fa-trash"></i>',
+         //    callback: () => true
+         // });
+         //
+         // console.log(result);
 
          // Dialog.prompt({
          //    title: 'DEFAULT DIALOG',

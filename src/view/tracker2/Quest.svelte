@@ -6,7 +6,7 @@
    import { slideFade }          from '@typhonjs-fvtt/svelte/transition';
    import { createMultiClick }   from '@typhonjs-fvtt/svelte/handler';
 
-   import createMenuItems        from '../tracker/createMenuItems.js';
+   import createMenuItems        from './createMenuItems.js';
 
    import QuestTasks             from './QuestTasks.svelte';
 

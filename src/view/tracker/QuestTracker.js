@@ -2,9 +2,12 @@ import { TJSMenu }      from '@typhonjs-fvtt/svelte';
 import collect          from '#collect';
 
 import HandlerTracker   from './HandlerTracker.js';
-import createMenuItems  from './createMenuItems.js';
+import createMenuItems  from '../tracker2/createMenuItems.js';
 
 import { constants, jquery, questStatus, sessionConstants, settings } from '#constants';
+
+import { HandlebarsApplication } from '../svelte/application/legacy/HandlebarsApplication';
+import {scale} from "svelte/transition";
 
 /**
  * Provides the default width for the QuestTracker if not defined.
@@ -29,7 +32,7 @@ const s_DEFAULT_POSITION = { top: 80, width: s_DEFAULT_WIDTH };
  * used in the {@link Handlebars} template. In the future this may be cached in a similar way that {@link Quest} data
  * is cached for {@link QuestLog}.
  */
-export default class QuestTracker extends Application
+export default class QuestTracker extends HandlebarsApplication
 {
    /**
     * @inheritDoc
@@ -512,6 +515,9 @@ export default class QuestTracker extends Application
    onPluginLoad(ev)
    {
       this._eventbus = ev.eventbus;
+
+      ev.eventbus.on(`tql:settings:change:${settings.primaryQuest}`, this.render, this);
+      ev.eventbus.on(`tql:settings:change:${settings.questTrackerResizable}`, this.render, this);
    }
 }
 

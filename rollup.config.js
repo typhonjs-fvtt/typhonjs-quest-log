@@ -3,7 +3,7 @@ import commonjs      from '@rollup/plugin-commonjs';
 import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
 import resolve       from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 import svelte        from 'rollup-plugin-svelte';
-import preprocess    from 'svelte-preprocess';
+// import preprocess    from 'svelte-preprocess';
 import { terser }    from 'rollup-plugin-terser';        // Terser is used for minification / mangling
 import virtual       from '@rollup/plugin-virtual';
 
@@ -18,8 +18,8 @@ import terserConfig  from './terser.config.mjs';
 import postcssConfig from './postcss.config.mjs';
 
 const s_COMPRESS = false;
-const s_SOURCEMAPS = true;
-const s_PRODUCTION = true;
+const s_SOURCEMAPS = false;
+const s_PRODUCTION = false;
 
 const postcssMain = postcssConfig({
    extract: 'typhonjs-quest-log.css',
@@ -32,6 +32,51 @@ const postcssTinyMCE = postcssConfig({
    compress: s_COMPRESS,
    sourceMap: s_SOURCEMAPS
 });
+
+// Defines @typhonjs-fvtt/svelte imports to exclude and foundry-gsap.
+const s_LOCAL_EXTERNAL = [
+   '@typhonjs-fvtt/svelte', '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/component',
+   '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper',
+   '@typhonjs-fvtt/svelte/legacy', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
+   '@typhonjs-fvtt/svelte/util',
+   '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
+
+   'svelte/internal',
+
+   `@typhonjs-plugin/manager`,
+
+   `#collect`,
+   `#DOMPurify`,
+
+   `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
+];
+
+// Defines @typhonjs-fvtt/svelte browser imports to and foundry-gsap.
+const s_LIBRARY_PATHS = {
+   '@typhonjs-fvtt/svelte': '/modules/typhonjs/svelte/index.js',
+   '@typhonjs-fvtt/svelte/action': '/modules/typhonjs/svelte/action.js',
+   '@typhonjs-fvtt/svelte/component': '/modules/typhonjs/svelte/component.js',
+   '@typhonjs-fvtt/svelte/gsap': '/modules/typhonjs/svelte/gsap.js',
+   '@typhonjs-fvtt/svelte/handler': '/modules/typhonjs/svelte/handler.js',
+   '@typhonjs-fvtt/svelte/helper': '/modules/typhonjs/svelte/helper.js',
+   '@typhonjs-fvtt/svelte/legacy': '/modules/typhonjs/svelte/legacy.js',
+   '@typhonjs-fvtt/svelte/store': '/modules/typhonjs/svelte/store.js',
+   '@typhonjs-fvtt/svelte/transition': '/modules/typhonjs/svelte/transition.js',
+   '@typhonjs-fvtt/svelte/util': '/modules/typhonjs/svelte/util.js',
+   '@typhonjs-fvtt/svelte/plugin/data': '/modules/typhonjs/svelte/plugin/data.js',
+   '@typhonjs-fvtt/svelte/plugin/system': '/modules/typhonjs/svelte/plugin/system.js',
+
+   'svelte/easing': '/modules/typhonjs/svelte/easing.js',
+   'svelte/internal': '/modules/typhonjs/svelte/internal.js',
+   'svelte/transition': '/modules/typhonjs/svelte/transition.js',
+
+   '@typhonjs-plugin/manager': '/modules/typhonjs/plugin/manager.js',
+
+   '#collect': '/modules/typhonjs/collectjs/collect.js',
+   '#DOMPurify': '/modules/typhonjs/dompurify/DOMPurify.js',
+
+   'foundry-gsap': '/scripts/greensock/esm/all.js'
+};
 
 export default () =>
 {
@@ -49,15 +94,11 @@ export default () =>
    return [
       {  // The main module bundle
          input: `src/init.js`,
-         external: [                                  // Suppresses the warning and excludes ansi-colors from the
-            'foundry-gsap'
-         ],
+         external: s_LOCAL_EXTERNAL,
          output: {
             file: `dist/typhonjs-quest-log.js`,
             format: 'es',
-            paths: {
-               'foundry-gsap': '/scripts/greensock/esm/all.js'
-            },
+            paths: s_LIBRARY_PATHS,
             plugins: outputPlugins,
             sourcemap,
             // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
@@ -65,9 +106,9 @@ export default () =>
          plugins: [
             alias({
                entries: [
-                  { find: '#collect', replacement: './src/npm/collect.js' },
+                  // { find: '#collect', replacement: './src/npm/collect.js' },
                   { find: '#constants', replacement: './src/constants.js' },
-                  { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
+                  // { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
                ]
             }),
             svelte({
@@ -75,7 +116,7 @@ export default () =>
                   // enable run-time checks when not in production
                   dev: !s_PRODUCTION
                },
-               preprocess: preprocess(),
+               // preprocess: preprocess(),
                onwarn: (warning, handler) =>
                {
                   // Suppress `a11y-missing-attribute` for missing href in <a> links.

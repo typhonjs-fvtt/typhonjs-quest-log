@@ -1,7 +1,8 @@
-import { SvelteApplication }  from '../SvelteApplication';
-import ApplicationShell       from '../../component/application/ApplicationShell.svelte';
+import { SvelteFormApplication } from './SvelteFormApplication';
 
-export class HandlebarsApplication extends SvelteApplication
+import ApplicationShell          from '../../component/application/ApplicationShell.svelte';
+
+export class HandlebarsFormApplication extends SvelteFormApplication
 {
    /**
     * Temporarily holds the original popOut value when rendering.
@@ -13,9 +14,9 @@ export class HandlebarsApplication extends SvelteApplication
    /**
     * @inheritDoc
     */
-   constructor(options)
+   constructor(object, options)
    {
-      super(options);
+      super(object, options);
 
       if (this.popOut)
       {
@@ -40,6 +41,22 @@ export class HandlebarsApplication extends SvelteApplication
       this.options.popOut = false;
       await super._render(force, options);
       this.options.popOut = this.#orignalPopOut;
+   }
+
+   /**
+    * Duplicates the FormApplication `_renderInner` method as SvelteFormApplication does not defer to super
+    * implementations.
+    *
+    * @inheritDoc
+    */
+   async _renderInner(data)
+   {
+      const html = await super._renderInner(data);
+
+      this.form = html.filter((i, el) => el instanceof HTMLFormElement)[0];
+      if (!this.form) { this.form = html.find('form')[0]; }
+
+      return html;
    }
 
    _injectHTML(html)

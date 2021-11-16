@@ -99,11 +99,7 @@ export default class QuestTrackerApp extends SvelteApplication
          svelte: {
             class: QuestTrackerShell,
             intro: true,
-            target: document.body,
-            options: {
-               injectApp: true,
-               injectEventbus: true,
-            }
+            target: document.body
          }
       });
    }

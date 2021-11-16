@@ -2,7 +2,7 @@
    import { getContext }            from 'svelte';
    import { scale }                 from 'svelte/transition';
 
-   import { TJSApplicationShell }   from '@typhonjs-fvtt/svelte/component';
+   import { TJSApplicationShell }   from '@typhonjs-fvtt/svelte/component/core';
 
    import MainContainer             from './MainContainer.svelte';
 

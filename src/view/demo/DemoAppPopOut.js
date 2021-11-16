@@ -1,5 +1,5 @@
 import { SvelteApplication }     from '@typhonjs-fvtt/svelte';
-import { TJSApplicationShell }   from '@typhonjs-fvtt/svelte/component';
+import { TJSApplicationShell }   from '@typhonjs-fvtt/svelte/component/core';
 
 import DemoPopOut                from './DemoPopOut.svelte';
 
@@ -29,6 +29,7 @@ export default class DemoAppPopOut extends SvelteApplication
 
          svelte: {         // Add a single Svelte component to Application Shell.
             class: TJSApplicationShell,
+            target: document.body,
             children: {
                class: DemoPopOut
             }
@@ -36,6 +37,7 @@ export default class DemoAppPopOut extends SvelteApplication
 
          // svelte: {      // Add multiple Svelte components to ApplicationShell.
          //    class: TJSApplicationShell,
+         //    target: document.body,
          //    children: [
          //       { class: DemoPopOut },
          //       { class: DemoPopOut }
@@ -43,7 +45,8 @@ export default class DemoAppPopOut extends SvelteApplication
          // }
 
          // svelte: {         // A warning is posted w/ no children.
-         //    class: TJSApplicationShell
+         //    class: TJSApplicationShell,
+         //    target: document.body
          // }
       });
    }

@@ -35,7 +35,7 @@ const postcssTinyMCE = postcssConfig({
 
 // Defines @typhonjs-fvtt/svelte imports to exclude and foundry-gsap.
 const s_LOCAL_EXTERNAL = [
-   '@typhonjs-fvtt/svelte', '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/component',
+   '@typhonjs-fvtt/svelte', '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/component/core',
    '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper',
    '@typhonjs-fvtt/svelte/legacy', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util',
@@ -50,7 +50,7 @@ const s_LOCAL_EXTERNAL = [
    `@typhonjs-plugin/manager`,
 
    // `#collect`,
-   `#DOMPurify`,
+   // `#DOMPurify`,
 
    '/modules/typhonjs/tinymce/initializePlugins.js'
 ];
@@ -59,7 +59,7 @@ const s_LOCAL_EXTERNAL = [
 const s_LIBRARY_PATHS = {
    '@typhonjs-fvtt/svelte': '/modules/typhonjs/svelte/index.js',
    '@typhonjs-fvtt/svelte/action': '/modules/typhonjs/svelte/action.js',
-   '@typhonjs-fvtt/svelte/component': '/modules/typhonjs/svelte/component.js',
+   '@typhonjs-fvtt/svelte/component/core': '/modules/typhonjs/svelte/component/core.js',
    '@typhonjs-fvtt/svelte/gsap': '/modules/typhonjs/svelte/gsap.js',
    '@typhonjs-fvtt/svelte/handler': '/modules/typhonjs/svelte/handler.js',
    '@typhonjs-fvtt/svelte/helper': '/modules/typhonjs/svelte/helper.js',
@@ -79,7 +79,7 @@ const s_LIBRARY_PATHS = {
    '@typhonjs-plugin/manager': '/modules/typhonjs/plugin/manager.js',
 
    // '#collect': '/modules/typhonjs/collectjs/collect.js',
-   '#DOMPurify': '/modules/typhonjs/dompurify/DOMPurify.js',
+   // '#DOMPurify': '/modules/typhonjs/dompurify/DOMPurify.js',
 };
 
 const svelteBuild = () =>
@@ -119,21 +119,22 @@ export default () =>
    return [
       {  // The main module bundle
          input: `src/init.js`,
-         external: s_LOCAL_EXTERNAL,
+         // external: s_LOCAL_EXTERNAL,
          output: {
             file: `dist/typhonjs-quest-log.js`,
             format: 'es',
-            paths: s_LIBRARY_PATHS,
+            // paths: s_LIBRARY_PATHS,
             plugins: outputPlugins,
             sourcemap,
             // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
          },
          plugins: [
-            svelteBuild(),
+            // svelteBuild(),
             alias({
                entries: [
                   { find: '#collect', replacement: './src/npm/collect.js' },
-                  { find: '#constants', replacement: './src/constants.js' }
+                  { find: '#constants', replacement: './src/constants.js' },
+                  { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
                ]
             }),
             svelte({

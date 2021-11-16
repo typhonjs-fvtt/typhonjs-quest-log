@@ -7,7 +7,7 @@ import {
    ApplicationShell,
    // TJSApplicationShell,
    // TJSComponentShell
-}                             from '@typhonjs-fvtt/svelte/component';
+}                             from '@typhonjs-fvtt/svelte/component/core';
 
 /**
  * Creates a basic demo popout Application. Foundry renders the outer frame HTML and `.window-content` is the target
@@ -42,8 +42,8 @@ export default class DemoApp extends SvelteApplication
 
          svelte: {      // Mount a single Svelte component
             class: ApplicationShell,
-            target: document.body,
             intro: true,
+            target: document.body,
 
             children: {
                class: Demo,

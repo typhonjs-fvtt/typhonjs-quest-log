@@ -19,7 +19,7 @@ import postcssConfig from './postcss.config.mjs';
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = false;
-const s_PRODUCTION = false;
+const s_PRODUCTION = true;
 
 const postcssMain = postcssConfig({
    extract: 'typhonjs-quest-log.css',
@@ -129,7 +129,7 @@ export default () =>
             // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
          },
          plugins: [
-            // svelteBuild(),
+            svelteBuild(),
             alias({
                entries: [
                   { find: '#collect', replacement: './src/npm/collect.js' },

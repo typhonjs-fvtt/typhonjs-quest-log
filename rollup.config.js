@@ -41,14 +41,18 @@ const s_LOCAL_EXTERNAL = [
    '@typhonjs-fvtt/svelte/util',
    '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
 
+   'svelte/easing',
    'svelte/internal',
+   'svelte/transition',
+
+   `foundry-gsap`,  // Replaced by consumer for Foundry GSAP path.
 
    `@typhonjs-plugin/manager`,
 
-   `#collect`,
+   // `#collect`,
    `#DOMPurify`,
 
-   `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
+   '/modules/typhonjs/tinymce/initializePlugins.js'
 ];
 
 // Defines @typhonjs-fvtt/svelte browser imports to and foundry-gsap.
@@ -70,12 +74,33 @@ const s_LIBRARY_PATHS = {
    'svelte/internal': '/modules/typhonjs/svelte/internal.js',
    'svelte/transition': '/modules/typhonjs/svelte/transition.js',
 
+   'foundry-gsap': '/scripts/greensock/esm/all.js',
+
    '@typhonjs-plugin/manager': '/modules/typhonjs/plugin/manager.js',
 
-   '#collect': '/modules/typhonjs/collectjs/collect.js',
+   // '#collect': '/modules/typhonjs/collectjs/collect.js',
    '#DOMPurify': '/modules/typhonjs/dompurify/DOMPurify.js',
+};
 
-   'foundry-gsap': '/scripts/greensock/esm/all.js'
+const svelteBuild = () =>
+{
+   return {
+      name: 'svelte-shared-build',
+      options(opts)
+      {
+         const externalOpts = Object.keys(s_LIBRARY_PATHS);
+         opts.external = Array.isArray(opts.external) ? [...externalOpts, ...opts.external] : externalOpts;
+
+         if (Array.isArray(opts.output))
+         {
+            for (const outputOpts of opts.output)
+            {
+               outputOpts.paths = typeof outputOpts.paths === 'object' ? { ...outputOpts.paths, ...s_LIBRARY_PATHS } :
+                s_LIBRARY_PATHS;
+            }
+         }
+      }
+   };
 };
 
 export default () =>
@@ -104,11 +129,11 @@ export default () =>
             // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
          },
          plugins: [
+            svelteBuild(),
             alias({
                entries: [
-                  // { find: '#collect', replacement: './src/npm/collect.js' },
-                  { find: '#constants', replacement: './src/constants.js' },
-                  // { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
+                  { find: '#collect', replacement: './src/npm/collect.js' },
+                  { find: '#constants', replacement: './src/constants.js' }
                ]
             }),
             svelte({

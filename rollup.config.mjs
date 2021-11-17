@@ -21,7 +21,6 @@ import postcssConfig from './postcss.config.mjs';
 
 const s_COMPRESS = true;
 const s_SOURCEMAPS = false;
-const s_PRODUCTION = true;
 const s_TYPHONJS_MODULE_LIB = true;
 
 const postcssMain = postcssConfig({
@@ -40,46 +39,10 @@ export default () =>
 {
    // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
    // minified / mangled.
-   const outputPlugins = [];
-   if (s_TYPHONJS_MODULE_LIB) { outputPlugins.push(typhonjsRuntime({ output: true })); }
-   if (s_COMPRESS) { outputPlugins.push(terser(terserConfig)); }
+   const outputPlugins = s_COMPRESS ? [terser(terserConfig)] : [];
 
    // Defines whether source maps are generated / loaded from the .env file.
    const sourcemap = s_SOURCEMAPS;
-
-   const plugins = [
-      alias({
-         entries: [
-            { find: '#collect', replacement: './src/npm/collect.js' },
-            { find: '#constants', replacement: './src/constants.js' },
-            { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
-         ]
-      }),
-      svelte({
-         compilerOptions: {
-            // enable run-time checks when not in production
-            dev: !s_PRODUCTION
-         },
-         // preprocess: preprocess(),
-         onwarn: (warning, handler) =>
-         {
-            // Suppress `a11y-missing-attribute` for missing href in <a> links.
-            if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
-
-            // Let Rollup handle all other warnings normally.
-            handler(warning);
-         },
-      }),
-      postcss(postcssMain),
-      resolve({
-         browser: true,
-         dedupe: ['svelte']
-      }),
-      commonjs(),
-      // sourcemaps()
-   ];
-
-   if (s_TYPHONJS_MODULE_LIB) { plugins.push(typhonjsRuntime()); }
 
    return [
       {  // The main module bundle
@@ -91,7 +54,34 @@ export default () =>
             sourcemap,
             // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
          },
-         plugins
+         plugins: [
+            alias({
+               entries: [
+                  { find: '#collect', replacement: './src/npm/collect.js' },
+                  { find: '#constants', replacement: './src/constants.js' },
+                  { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
+               ]
+            }),
+            svelte({
+               // preprocess: preprocess(),
+               onwarn: (warning, handler) =>
+               {
+                  // Suppress `a11y-missing-attribute` for missing href in <a> links.
+                  if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
+
+                  // Let Rollup handle all other warnings normally.
+                  handler(warning);
+               },
+            }),
+            postcss(postcssMain),
+            resolve({
+               browser: true,
+               dedupe: ['svelte']
+            }),
+            commonjs(),
+            // sourcemaps()
+            s_TYPHONJS_MODULE_LIB && typhonjsRuntime()
+         ]
       },
       {  // A 2nd virtual bundle to process TinyMCE CSS separately.
          input: 'pack',

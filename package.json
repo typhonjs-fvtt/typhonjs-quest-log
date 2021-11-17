@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt-lib/svelte",
+    "@typhonjs-fvtt/runtime": "github:typhonjs-fvtt-lib/typhonjs",
     "@typhonjs-plugin/manager": "^0.0.11",
     "collect.js": "^4.28.0",
     "dompurify": "^2.3.0",

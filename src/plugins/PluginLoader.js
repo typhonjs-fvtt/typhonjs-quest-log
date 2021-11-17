@@ -15,7 +15,7 @@ export default class PluginLoader
          // Manages session storage w/ Svelte stores for each session item.
          {
             name: 'tql-system-session-storage',
-            instance: SessionStorage,
+            instance: new SessionStorage(),
             options: { eventPrepend: 'tql' }
          },
          // Provides utilities, but also preloads Handlebars templates and registers helpers.

@@ -17,7 +17,9 @@ import virtual             from '@rollup/plugin-virtual';
 // Import config files for Terser and Postcss; refer to respective documentation for more information.
 // We are using `require` here in order to be compliant w/ `fvttdev` for testing purposes.
 import terserConfig  from './terser.config.mjs';
-import postcssConfig from './postcss.config.mjs';
+
+// A function to create PostCSS config objects.
+import postcssConfig from './postcssConfig.js';
 
 const s_COMPRESS = true;
 const s_SOURCEMAPS = false;

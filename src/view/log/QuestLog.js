@@ -1,7 +1,7 @@
 import { scale }                 from 'svelte/transition';
-import { TJSMenu }               from '@typhonjs-fvtt/svelte';
+import { TJSMenu }               from '@typhonjs-fvtt/svelte/application';
 
-import { HandlebarsApplication } from '@typhonjs-fvtt/svelte/legacy';
+import { HandlebarsApplication } from '@typhonjs-fvtt/svelte/application/legacy';
 
 import createMenuItems           from './createMenuItems.js';
 import HandlerLog                from './HandlerLog.js';

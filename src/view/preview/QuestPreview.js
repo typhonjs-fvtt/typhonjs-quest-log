@@ -1,4 +1,4 @@
-import { HandlebarsFormApplication }   from '@typhonjs-fvtt/svelte/legacy';
+import { HandlebarsFormApplication }   from '@typhonjs-fvtt/svelte/application/legacy';
 
 import HandlerAny                      from './HandlerAny.js';
 import HandlerDetails                  from './HandlerDetails.js';

@@ -1,4 +1,5 @@
-import { SessionStorage }  from '@typhonjs-fvtt/svelte/plugin/system';
+import { DOMPurify }       from '@typhonjs-fvtt/runtime/dompurify/plugin/system';
+import { SessionStorage }  from '@typhonjs-fvtt/runtime/svelte/plugin/system';
 
 import * as DataPlugins    from './data/index.js';
 import * as SystemPlugins  from './system/index.js';
@@ -26,7 +27,8 @@ export default class PluginLoader
          // Provides DOMPurify support.
          {
             name: 'tql-system-dompurify',
-            instance: SystemPlugins.DOMPurify
+            instance: DOMPurify,
+            options: { eventPrepend: 'tql' }
          },
          // Provides Quest enrichment for template display.
          {

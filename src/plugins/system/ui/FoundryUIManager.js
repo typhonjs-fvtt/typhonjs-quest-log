@@ -156,6 +156,8 @@ export default class FoundryUIManager
     */
    static updateTrackerPinned()
    {
+console.log(`!!! updateTrackerPinned`);
+
       const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
       const pinned = tracker.pinned;
       const sidebarData = sidebar.open;
@@ -187,12 +189,14 @@ export default class FoundryUIManager
 
       ev.eventbus.on('tql:foundryuimanager:check:position', this.checkPosition, this, opts);
       ev.eventbus.on('tql:foundryuimanager:update:tracker', this.updateTracker, this, opts);
-      ev.eventbus.on('tql:foundryuimanager:update:tracker:pinned', this.updateTrackerPinned, this, opts);
 
       // Respond to settings change when questTrackerPinned is true update the tracker to snap.
-      ev.eventbus.on(`tql:settings:change:${settings.questTrackerPinned}`, (value) =>
+      ev.eventbus.on(`tjs:system:game:settings:change:${settings.questTrackerPinned}`, (value) =>
       {
+console.log(`!!! QUEST TRACKER PINNED SETTING; `);
          if (value) { this.updateTracker(); }
+
+         this.updateTrackerPinned();
       });
    }
 

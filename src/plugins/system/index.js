@@ -1,7 +1,6 @@
 export { default as Utils }            from './Utils.js';
 export { default as Enrich }           from './ui/Enrich.js';
 export { default as SettingsControl }  from './settings/SettingsControl.js';
-export { default as SettingsDispatch } from './settings/SettingsDispatch.js';
 export * as QuestAPIModule             from './public/QuestAPI.js';
 
 export { default as QuestDB }          from './database/QuestDB.js';

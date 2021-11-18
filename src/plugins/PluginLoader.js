@@ -1,5 +1,7 @@
 import { DOMPurify }       from '@typhonjs-fvtt/runtime/dompurify/plugin/system';
-import { SessionStorage }  from '@typhonjs-fvtt/runtime/svelte/plugin/system';
+import {
+   SessionStorage,
+   TJSGameSettings }       from '@typhonjs-fvtt/runtime/svelte/plugin/system';
 
 import * as DataPlugins    from './data/index.js';
 import * as SystemPlugins  from './system/index.js';
@@ -15,7 +17,7 @@ export default class PluginLoader
       pluginManager.addAll([
          // Manages session storage w/ Svelte stores for each session item.
          {
-            name: 'tql-system-session-storage',
+            name: 'tjs-system-session-storage',
             instance: new SessionStorage(),
             options: { eventPrepend: 'tql' }
          },
@@ -35,15 +37,15 @@ export default class PluginLoader
             name: 'tql-system-enrich',
             instance: SystemPlugins.Enrich
          },
+         // Add setting dispatch / triggers events w/ data for all settings changes; also provides Svelte stores.
+         {
+            name: 'tjs-system-game-settings',
+            instance: new TJSGameSettings()
+         },
          // Add setting control / responder to settings changes.
          {
             name: 'tql-system-settings-control',
             instance: SystemPlugins.SettingsControl
-         },
-         // Add setting dispatch / triggers events w/ data for all settings changes.
-         {
-            name: 'tql-system-settings-dispatch',
-            instance: SystemPlugins.SettingsDispatch
          },
          // Handles returning the left-hand note controls
          {

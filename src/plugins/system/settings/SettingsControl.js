@@ -1,3 +1,5 @@
+import { tqlSettings }  from './tqlSettings.js';
+
 import { constants, questStatus, sessionConstants, settings } from '#constants';
 
 /**
@@ -237,13 +239,6 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
    }
 
-   // TODO CONSIDER HAVING FoundryUIManager listen directly for this change.
-   static handle_questTrackerPinned()
-   {
-      // The quest tracker pinned state has changed so update any Foundry UI management.
-      this._eventbus.trigger('tql:foundryuimanager:update:tracker:pinned');
-   }
-
    static handle_questTrackerResizable(value)
    {
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
@@ -289,7 +284,12 @@ export default class SettingsControl
 
       const opts = { guard: true };
 
-      ev.eventbus.on('tql:settings:change:any', this.handleDispatch, this, opts);
-      ev.eventbus.on('tql:settings:log:enable', (enabled) => loggingEnabled = enabled, void 0, opts);
+      ev.eventbus.on('tjs:system:game:settings:change:any', this.handleDispatch, this, opts);
+
+      // Enables local logging of setting changes.
+      ev.eventbus.on('tql:game:settings:log:enable', (enabled) => loggingEnabled = enabled, void 0, opts);
+
+      // Load all TQL game settings.
+      ev.eventbus.trigger('tjs:system:game:settings:register:all', tqlSettings);
    }
 }

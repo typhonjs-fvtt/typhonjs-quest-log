@@ -216,7 +216,13 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          this.#dragHeader = true;
          this.#pinned = false;
-         await game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
+
+         // Only set `setting.questTrackerPinned` to false if it is currently true.
+         if (game.settings.get(constants.moduleName, settings.questTrackerPinned))
+         {
+            await game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
+         }
+
          header.setPointerCapture(event.pointerId);
       }
    }
@@ -388,7 +394,8 @@ export default class QuestTrackerApp extends SvelteApplication
    {
       this._eventbus = ev.eventbus;
 
-      ev.eventbus.on(`tql:settings:change:${settings.questTrackerResizable}`, this.#handleSettingWindowResize, this);
+      ev.eventbus.on(`tjs:system:game:settings:change:${settings.questTrackerResizable}`,
+       this.#handleSettingWindowResize, this);
    }
 }
 

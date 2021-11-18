@@ -514,8 +514,8 @@ export default class QuestTracker extends HandlebarsApplication
    {
       this._eventbus = ev.eventbus;
 
-      ev.eventbus.on(`tql:settings:change:${settings.primaryQuest}`, this.render, this);
-      ev.eventbus.on(`tql:settings:change:${settings.questTrackerResizable}`, this.render, this);
+      ev.eventbus.on(`tjs:system:game:settings:change:${settings.primaryQuest}`, this.render, this);
+      ev.eventbus.on(`tjs:system:game:settings:change:${settings.questTrackerResizable}`, this.render, this);
    }
 }
 

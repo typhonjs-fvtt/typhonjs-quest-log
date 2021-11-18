@@ -60,8 +60,7 @@ export default () =>
             alias({
                entries: [
                   { find: '#collect', replacement: './src/npm/collect.js' },
-                  { find: '#constants', replacement: './src/constants.js' },
-                  { find: '#DOMPurify', replacement: './src/npm/DOMPurify.js' }
+                  { find: '#constants', replacement: './src/constants.js' }
                ]
             }),
             svelte({

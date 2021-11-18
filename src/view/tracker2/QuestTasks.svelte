@@ -1,7 +1,7 @@
 <script>
    import { getContext, onDestroy } from 'svelte';
    import { quintIn, quintOut }     from 'svelte/easing';
-   import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
+   import { slideFade }             from '@typhonjs-fvtt/runtime/svelte/transition';
 
    import { sessionConstants }      from '#constants';
 

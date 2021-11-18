@@ -1,4 +1,4 @@
-import { SvelteApplication }     from '@typhonjs-fvtt/svelte/application';
+import { SvelteApplication }     from '@typhonjs-fvtt/runtime/svelte/application';
 
 import createHeaderButtons       from './createHeaderButtons.js';
 import QuestTrackerShell         from './QuestTrackerShell.svelte';

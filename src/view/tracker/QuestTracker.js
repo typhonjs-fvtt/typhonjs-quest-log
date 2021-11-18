@@ -1,5 +1,5 @@
-import { TJSMenu }               from '@typhonjs-fvtt/svelte/application';
-import { HandlebarsApplication } from '@typhonjs-fvtt/svelte/application/legacy';
+import { TJSMenu }               from '@typhonjs-fvtt/runtime/svelte/application';
+import { HandlebarsApplication } from '@typhonjs-fvtt/runtime/svelte/application/legacy';
 import collect                   from '#collect';
 
 import HandlerTracker            from './HandlerTracker.js';

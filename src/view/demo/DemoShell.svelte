@@ -1,6 +1,11 @@
 <script>
-   import { beforeUpdate, onMount, onDestroy, getContext } from 'svelte';
-   import { animate }                           from '@typhonjs-fvtt/svelte/gsap';
+   import {
+      beforeUpdate,
+      onMount,
+      onDestroy,
+      getContext }      from 'svelte';
+
+   import { animate }   from '@typhonjs-fvtt/runtime/svelte/gsap';
 
    beforeUpdate(() =>
    {

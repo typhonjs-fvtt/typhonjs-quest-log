@@ -1,4 +1,4 @@
-import { TJSDialog } from '@typhonjs-fvtt/svelte/application';
+import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 
 import { constants, jquery, settings } from '#constants';
 

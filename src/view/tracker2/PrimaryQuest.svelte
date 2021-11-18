@@ -1,6 +1,6 @@
 <script>
    import { getContext }         from 'svelte';
-   import { localize }           from '@typhonjs-fvtt/svelte/helper';
+   import { localize }           from '@typhonjs-fvtt/runtime/svelte/helper';
 
    import Quest                  from './Quest.svelte';
 

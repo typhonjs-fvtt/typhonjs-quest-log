@@ -12,10 +12,9 @@
     "#constants": "./src/constants.js"
   },
   "dependencies": {
-    "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt-lib/svelte",
     "@typhonjs-fvtt/runtime": "github:typhonjs-fvtt-lib/typhonjs",
     "collect.js": "^4.28.0",
-    "svelte": "^3"
+    "svelte": "^3.44.0"
   },
   "devDependencies": {
     "@itsjamie/esdoc-core": "^0.3",

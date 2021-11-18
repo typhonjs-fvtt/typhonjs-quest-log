@@ -22,7 +22,7 @@ import terserConfig  from './terser.config.mjs';
 import postcssConfig from './postcssConfig.js';
 
 const s_COMPRESS = true;
-const s_SOURCEMAPS = false;
+const s_SOURCEMAPS = true;
 const s_TYPHONJS_MODULE_LIB = true;
 
 const postcssMain = postcssConfig({

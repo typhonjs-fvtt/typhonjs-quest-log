@@ -2,9 +2,9 @@
    import { getContext }         from 'svelte';
    import { quintOut }           from 'svelte/easing';
 
-   import { TJSMenu }            from '@typhonjs-fvtt/svelte/application';
-   import { slideFade }          from '@typhonjs-fvtt/svelte/transition';
-   import { createMultiClick }   from '@typhonjs-fvtt/svelte/handler';
+   import { TJSMenu }            from '@typhonjs-fvtt/runtime/svelte/application';
+   import { slideFade }          from '@typhonjs-fvtt/runtime/svelte/transition';
+   import { createMultiClick }   from '@typhonjs-fvtt/runtime/svelte/handler';
 
    import createMenuItems        from './createMenuItems.js';
 

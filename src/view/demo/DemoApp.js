@@ -1,13 +1,13 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte/application';
-
-import Demo                   from './Demo.svelte';
-// import DemoShell              from './DemoShell.svelte';
+import { SvelteApplication }  from '@typhonjs-fvtt/runtime/svelte/application';
 
 import {
    ApplicationShell,
    // TJSApplicationShell,
    // TJSComponentShell
-}                             from '@typhonjs-fvtt/svelte/component/core';
+}                             from '@typhonjs-fvtt/runtime/svelte/component/core';
+
+import Demo                   from './Demo.svelte';
+// import DemoShell              from './DemoShell.svelte';
 
 /**
  * Creates a basic demo popout Application. Foundry renders the outer frame HTML and `.window-content` is the target

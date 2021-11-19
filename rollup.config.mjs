@@ -21,7 +21,7 @@ import terserConfig  from './terser.config.mjs';
 // A function to create PostCSS config objects.
 import postcssConfig from './postcssConfig.js';
 
-const s_COMPRESS = false;
+const s_COMPRESS = true;
 const s_SOURCEMAPS = true;
 const s_TYPHONJS_MODULE_LIB = true;
 

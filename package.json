@@ -14,7 +14,7 @@
   "dependencies": {
     "@typhonjs-fvtt/runtime": "github:typhonjs-fvtt-lib/typhonjs",
     "collect.js": "^4.28.0",
-    "svelte": "^3.44.0"
+    "svelte": "3.44.2"
   },
   "devDependencies": {
     "@itsjamie/esdoc-core": "^0.3",
@@ -27,18 +27,8 @@
     "@types/jquery": "^3",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
-    "autoprefixer": "^10",
-    "cssnano": "^5",
     "eslint": "^8",
-    "postcss": "^8",
-    "postcss-preset-env": "^6",
-    "rollup": "^2",
-    "rollup-plugin-postcss": "^4",
-    "rollup-plugin-sourcemaps": "^0.6",
-    "rollup-plugin-svelte": "^7",
-    "rollup-plugin-terser": "^7",
-    "sass": "^1",
-    "svelte-preprocess": "^4"
+    "rollup": "^2"
   },
   "scripts": {
     "build-dist": "rollup --config",

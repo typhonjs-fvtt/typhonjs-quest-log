@@ -31,8 +31,8 @@
     "rollup": "^2"
   },
   "scripts": {
-    "build-dist": "rollup --config",
-    "build-dist-watch": "rollup --watch --config",
+    "build": "rollup --config",
+    "build-watch": "rollup --watch --config",
     "eslint": "eslint .",
     "esdoc": "esdoc"
   }

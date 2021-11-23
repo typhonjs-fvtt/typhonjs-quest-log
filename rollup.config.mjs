@@ -5,8 +5,9 @@ import resolve             from '@rollup/plugin-node-resolve'; // This resolves 
 import svelte              from 'rollup-plugin-svelte';
 // import preprocess          from 'svelte-preprocess';
 import { terser }          from 'rollup-plugin-terser';        // Terser is used for minification / mangling
-import { typhonjsRuntime } from '@typhonjs-fvtt/runtime/rollup';
-
+import {
+   postcssConfig,
+   typhonjsRuntime }       from '@typhonjs-fvtt/runtime/rollup';
 import virtual             from '@rollup/plugin-virtual';
 
 // `typhonjs-quest-log.css`
@@ -16,10 +17,7 @@ import virtual             from '@rollup/plugin-virtual';
 
 // Import config files for Terser and Postcss; refer to respective documentation for more information.
 // We are using `require` here in order to be compliant w/ `fvttdev` for testing purposes.
-import terserConfig  from './terser.config.mjs';
-
-// A function to create PostCSS config objects.
-import postcssConfig from './postcssConfig.js';
+import terserConfig  from './terser.config.js';
 
 const s_COMPRESS = true;
 const s_SOURCEMAPS = true;

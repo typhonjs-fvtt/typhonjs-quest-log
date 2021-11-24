@@ -17,6 +17,9 @@
     "svelte": "3.44.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@rollup/plugin-babel": "^5",
     "@itsjamie/esdoc-core": "^0.3",
     "@itsjamie/esdoc-cli": "^0.3",
     "@itsjamie/esdoc-standard-plugin": "^0.3",

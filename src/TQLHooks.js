@@ -124,28 +124,28 @@ export default class TQLHooks
    static async foundryReady()
    {
       // Add the TQL unique Quest data type to the Foundry core data types.
-      CONST.ENTITY_TYPES?.push(constants.questDocumentName);
-      CONST.ENTITY_LINK_TYPES?.push(constants.questDocumentName);
+      // CONST.ENTITY_TYPES?.push(constants.questDocumentName);
+      // CONST.ENTITY_LINK_TYPES?.push(constants.questDocumentName);
 
-      // Add the TQL Quest data type to CONFIG.
-      CONFIG[constants.questDocumentName] = {
-         entityClass: Quest,
-         documentClass: Quest,
-         collection: QuestCollection,
-         sidebarIcon: 'fas fa-scroll',
-         sheetClass: QuestPreview
-      };
+      // // Add the TQL Quest data type to CONFIG.
+      // CONFIG[constants.questDocumentName] = {
+      //    entityClass: Quest,
+      //    documentClass: Quest,
+      //    collection: QuestCollection,
+      //    sidebarIcon: 'fas fa-scroll',
+      //    sheetClass: QuestPreview
+      // };
 
-      const questCollection = new QuestCollection();
-
-      // Add the quest collection to the plugin eventbus to access QuestDB.
-      await eventbus.triggerAsync('plugins:async:add', {
-         name: 'tql-data-quest-collection',
-         instance: questCollection
-      });
+      // const questCollection = new QuestCollection();
+      //
+      // // Add the quest collection to the plugin eventbus to access QuestDB.
+      // await eventbus.triggerAsync('plugins:async:add', {
+      //    name: 'tql-data-quest-collection',
+      //    instance: questCollection
+      // });
 
       // Add our QuestCollection to the game collections.
-      game.collections.set(constants.questDocumentName, questCollection);
+      // game.collections.set(constants.questDocumentName, questCollection);
 
       // Initialize / add plugins.
       await PluginLoader.foundryReady();

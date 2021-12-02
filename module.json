@@ -17,8 +17,8 @@
     "allowBugReporter": true
   },
   "version": "0.8.0-alpha1",
-  "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "0.8.9",
+  "minimumCoreVersion": "9",
+  "compatibleCoreVersion": "9",
   "scripts": [],
   "esmodules": [
     "./dist/typhonjs-quest-log.js",

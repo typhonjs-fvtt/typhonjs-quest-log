@@ -127,7 +127,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    bringToTop()
    {
-      if (!this.resizable) { this.elementTarget.style.height = 'auto'; }
+      if (!this.reactive.resizable) { this.elementTarget.style.height = 'auto'; }
    }
 
    /**
@@ -163,45 +163,6 @@ export default class QuestTrackerApp extends SvelteApplication
       return [...createHeaderButtons(this._eventbus), ...super._getHeaderButtons()];
    }
 
-   /**
-    * Handles showing / hiding the resize element.
-    *
-    * @param {boolean}  resizable - Current value of {@link TQLSettings.questTrackerResizable}.
-    */
-   #handleSettingWindowResize(resizable)
-   {
-      this.resizable = resizable;
-
-      // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
-      if (this.elementTarget === null || this.elementTarget === void 0) { return; }
-
-      const elementTarget = this.elementTarget;
-
-      if (resizable)
-      {
-         // When resizable is set to true set the current position to the stored position. This allows the position
-         // variable to be updated to the last auto height set position.
-         try
-         {
-            this.position = JSON.parse(game.settings.get(constants.moduleName, settings.questTrackerPosition));
-         }
-         catch (err)
-         {
-            console.log(`TyphonJSQuestLog - QuestTracker - #handleSettingWindowResize - error: ${err.message}`);
-         }
-
-         elementTarget.style.minHeight = this.#appExtents.minHeight;
-      }
-      else
-      {
-         const elemWindowHeader = elementTarget.querySelector('#quest-tracker .window-header');
-
-         elementTarget.style.minHeight = elemWindowHeader.scrollHeight;
-
-         // Set height to auto. This will cause QuestTrackerShell to save the new position.
-         elementTarget.style.height = 'auto';
-      }
-   }
    /**
     * Handles the pointer down event from the header to reset the pinned state.
     *
@@ -245,6 +206,51 @@ export default class QuestTrackerApp extends SvelteApplication
          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
          this.elementTarget.style.animation = '';
       }
+   }
+
+   /**
+    * Handles showing / hiding the resize element.
+    *
+    * @param {boolean}  resizable - Current value of {@link TQLSettings.questTrackerResizable}.
+    */
+   #handleSettingWindowResize(resizable)
+   {
+      // Early out if there is no root element; resize setting can be set when there is no quest tracker rendered.
+      if (this.elementTarget === null || this.elementTarget === void 0) { return; }
+
+      const elementTarget = this.elementTarget;
+
+      if (resizable)
+      {
+         // When resizable is set to true set the current position to the stored position. This allows the position
+         // variable to be updated to the last auto height set position.
+         try
+         {
+            this.position = JSON.parse(game.settings.get(constants.moduleName, settings.questTrackerPosition));
+         }
+         catch (err)
+         {
+            console.log(`TyphonJSQuestLog - QuestTracker - #handleSettingWindowResize - error: ${err.message}`);
+         }
+
+         elementTarget.style.minHeight = this.#appExtents.minHeight;
+
+         // Set height to null. This will cause setPosition to set the height style.
+         elementTarget.style.height = null;
+
+         this.setPosition(this.position);
+      }
+      else
+      {
+         const elemWindowHeader = elementTarget.querySelector('#quest-tracker .window-header');
+
+         elementTarget.style.minHeight = elemWindowHeader.scrollHeight;
+
+         // Set height to auto. This will cause QuestTrackerShell to save the new position.
+         elementTarget.style.height = 'auto';
+      }
+
+      this.reactive.resizable = resizable;
    }
 
    /**
@@ -345,7 +351,7 @@ export default class QuestTrackerApp extends SvelteApplication
 
       // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps and
       // takes a `noHeight` / `noWidth` parameters to alter setting height / width.
-      opts.noHeight = !this.resizable;
+      // opts.noHeight = !this.reactive.resizable;
       const currentPosition = super.setPosition(opts);
 
       // Pin width / height to min / max styles if defined.
@@ -376,7 +382,7 @@ export default class QuestTrackerApp extends SvelteApplication
       el.style.width = `${currentPosition.width}px`;
 
       // Only set height if resizable.
-      if (this.resizable) { el.style.height = `${currentPosition.height}px`; }
+      if (this.reactive.resizable) { el.style.height = `${currentPosition.height}px`; }
 
       // Note: the root position is saved to `settings.questTrackerPosition` in QuestTrackerShell when any
       // height position changes are made to handle when `this.options.resizable` is false; height is set to `auto`.

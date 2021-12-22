@@ -9,7 +9,10 @@ import { constants, questDBHooks, questStatus, questStatusI18n, settings } from 
 // TODO: remove
 import DemoApp       from '../../../view/demo/DemoApp.js';
 import DemoAppPopOut from '../../../view/demo/DemoAppPopOut.js';
+import TestEmptyHB   from '../../../view/_test/TestEmptyHB.js';
+
 const s_NEW_QUEST_TRACKER = true;
+
 
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { fade } from "svelte/transition";
@@ -51,11 +54,13 @@ export default class ViewManager
       // TODO TEMPORARY!
       const demoApp = new DemoApp();
       const demoAppPopOut = new DemoAppPopOut();
+      const testEmptyHB = new TestEmptyHB();
       Hooks.on('TQL.DemoApp.close', () => demoApp.close());
-      Hooks.on('TQL.DemoApp.render', () => { demoApp.render(true); });
+      Hooks.on('TQL.DemoApp.render', () => { demoApp.render(true, { focus: true }); });
       Hooks.on('TQL.DemoAppPopOut.close', () => demoAppPopOut.close());
-      // Hooks.on('TQL.DemoAppPopOut.render', () => { demoAppPopOut.render(true); });
-      Hooks.on('TQL.DemoAppPopOut.render', async () =>
+      Hooks.on('TQL.DemoAppPopOut.render', () => { demoAppPopOut.render(true, { focus: true }); });
+      Hooks.on('TQL.TestEmtpyHB.render', () => { testEmptyHB.render(true, { focus: true }); });
+      Hooks.on('TQL.DemoAppPopOut.render2', async () =>
       {
          const data = { value: 0 };
 

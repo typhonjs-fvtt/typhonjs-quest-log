@@ -12,9 +12,9 @@ import {
    typhonjsRuntime }       from '@typhonjs-fvtt/runtime/rollup';
 import virtual             from '@rollup/plugin-virtual';
 
-const s_COMPRESS = true;
+const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
-const s_TYPHONJS_MODULE_LIB = true;
+const s_TYPHONJS_MODULE_LIB = false;
 
 const postcssMain = postcssConfig({
    extract: 'typhonjs-quest-log.css',

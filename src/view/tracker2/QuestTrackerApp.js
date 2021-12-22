@@ -413,4 +413,5 @@ export default class QuestTrackerApp extends SvelteApplication
 const s_SAVE_POSITION = foundry.utils.debounce((currentPosition) =>
 {
    game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify(currentPosition));
+   console.log(currentPosition);
 }, 1000);

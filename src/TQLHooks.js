@@ -6,7 +6,7 @@ import QuestPreview     from './view/preview/QuestPreview.js';
 import PluginLoader     from './plugins/PluginLoader.js';
 import { eventbus }     from './plugins/PluginManager.js';
 
-import { constants, jquery, sessionConstants, settings } from '#constants';
+import { constants, sessionConstants, settings } from '#constants';
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -452,29 +452,8 @@ export default class TQLHooks
     */
    static renderJournalDirectory(app, html)
    {
-      if (game.user.isGM || !game.settings.get(constants.moduleName, settings.hideTQLFromPlayers))
-      {
-         const button = $(`<button class="quest-log-btn">${game.i18n.localize(
-          'TyphonJSQuestLog.QuestLogButton')}</button>`);
-
-         let footer = html.find('.directory-footer');
-         if (footer.length === 0)
-         {
-            footer = $(`<footer class="directory-footer"></footer>`);
-            html.append(footer);
-         }
-         footer.append(button);
-
-         button.on(jquery.click, () =>
-         {
-            const questLog = eventbus.triggerSync('tql:viewmanager:quest:log:get');
-            if (questLog) { questLog.render(true); }
-         });
-      }
-
       if (!(game.user.isGM && game.settings.get(constants.moduleName, settings.showFolder)))
       {
-         // const folder = Utils.getQuestFolder();
          const folder = eventbus.triggerSync('tql:utils:quest:folder:get');
          if (folder !== void 0)
          {

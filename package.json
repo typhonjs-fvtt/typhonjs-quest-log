@@ -12,8 +12,7 @@
     "#constants": "./src/constants.js"
   },
   "dependencies": {
-    "@typhonjs-fvtt/runtime": "^0.0.1",
-    "@typhonjs-fvtt/svelte": "github:typhonjs-fvtt-lib/svelte",
+    "@typhonjs-fvtt/runtime": "^0.0.2",
     "collect.js": "^4.28.0",
     "svelte": "3.44.3"
   },

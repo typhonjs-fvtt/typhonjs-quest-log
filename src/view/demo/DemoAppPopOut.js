@@ -1,5 +1,4 @@
-// import { SvelteApplication }     from '@typhonjs-fvtt/runtime/svelte/application';
-import { SvelteApplication }     from '@typhonjs-fvtt/svelte/application';
+import { SvelteApplication }     from '@typhonjs-fvtt/runtime/svelte/application';
 import { TJSApplicationShell }   from '@typhonjs-fvtt/runtime/svelte/component/core';
 
 import DemoPopOut                from './DemoPopOut.svelte';

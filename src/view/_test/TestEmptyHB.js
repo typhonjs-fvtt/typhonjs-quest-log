@@ -1,9 +1,9 @@
-import { HandlebarsApplication } from '@typhonjs-fvtt/svelte/application/legacy';
+import { HandlebarsApplication } from '@typhonjs-fvtt/runtime/svelte/application/legacy';
 
 import { constants }             from '#constants';
 import { scale }                 from 'svelte/transition';
 let count = 0;
-export default class TestEmptyHB extends Application
+export default class TestEmptyHB extends HandlebarsApplication
 {
    /**
     * Default Application options

@@ -137,6 +137,8 @@ export {
  *
  * @property {string}   trackerFolderState - Stores a boolean with tacked on quest ID for whether objectives are shown.
  *
+ * @property {string}   trackerShowBackground - Shows / hides the quest tracker background.
+ *
  * @property {string}   trackerShowPrimary - Stores a boolean if the tracker is showing the primary quest or all quests.
  */
 

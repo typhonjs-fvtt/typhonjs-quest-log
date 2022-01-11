@@ -9,7 +9,7 @@
 [![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Ftyphonjs-quest-log%2Fshield%2Fendorsements)](https://www.foundryvtt-hub.com/package/typhonjs-quest-log/)
 
 **NOTE** This is a new quest log module which continues from Michael's / TyphonJS' work on the `0.7.x` series of 
-Forien's Quest Log. A whole new UI / tech stack (Svelte + GSAP) and utilization of the TyphonJS plugin manager / 
+Forien's Quest Log. A whole new UI / tech stack based on Svelte and utilization of the TyphonJS plugin manager / 
 eventbus is forthcoming. Many new features are planned for the TyphonJS Quest Log providing a high performance 
 quest runtime for Foundry VTT.
 
@@ -26,8 +26,7 @@ This module provides comprehensive Quest Log system for players and Game Masters
 
 ## Installation
 
-1. Install the TyphonJS Quest Log from the Foundry Module browser directly, or manually using manifest URL: https://github.com/typhonjs-fvtt/typhonjs-quest-log/releases/latest/download/module.json
-2. While loaded in World, enable the **_TyphonJS Quest Log_** module.
+Presently TQL is in development and is not officially released. The initial release should be available in Q1 '22. 
 
 ## Usage
 

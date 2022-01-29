@@ -2,9 +2,10 @@
    import { getContext }         from 'svelte';
    import { quintOut }           from 'svelte/easing';
 
-   import { TJSMenu }            from '@typhonjs-fvtt/runtime/svelte/application';
-   import { slideFade }          from '@typhonjs-fvtt/runtime/svelte/transition';
    import { createMultiClick }   from '@typhonjs-fvtt/runtime/svelte/handler';
+   import { slideFade }          from '@typhonjs-fvtt/runtime/svelte/transition';
+
+   import { TJSContextMenu }     from '@typhonjs-fvtt/svelte-standard/application';
 
    import createMenuItems        from './createMenuItems.js';
 
@@ -34,7 +35,7 @@
 
    function handleContext(event)
    {
-      TJSMenu.createContext({
+      TJSContextMenu.create({
          duration: 200,
          id: 'tjs-quest-menu',
          x: event.pageX,

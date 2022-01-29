@@ -11,7 +11,7 @@
  *
  * @param {boolean}  [opts.activeTab=false] - Indicates this is the active quest tab.
  *
- * @returns {object[]} An array of menu items for TJSMenu.
+ * @returns {object[]} An array of menu items for TJSContextMenu.
  */
 export default function createMenuItems({ questId, name, eventbus, activeTab = false })
 {

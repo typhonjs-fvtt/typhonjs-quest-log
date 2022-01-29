@@ -1,6 +1,7 @@
 import { scale }                 from 'svelte/transition';
-import { TJSMenu }               from '@typhonjs-fvtt/runtime/svelte/application';
+
 import { HandlebarsApplication } from '@typhonjs-fvtt/runtime/svelte/application/legacy';
+import { TJSContextMenu }        from '@typhonjs-fvtt/svelte-standard/application';
 
 import createMenuItems           from './createMenuItems.js';
 import HandlerLog                from './HandlerLog.js';
@@ -110,7 +111,7 @@ export default class QuestLog extends HandlebarsApplication
 
          if (quest)
          {
-            TJSMenu.createContext({
+            TJSContextMenu.create({
                duration: 200,
                id: 'tjs-quest-menu',
                x: event.pageX,
@@ -127,7 +128,7 @@ export default class QuestLog extends HandlebarsApplication
 
          if (quest)
          {
-            TJSMenu.createContext({
+            TJSContextMenu.create({
                duration: 200,
                id: 'tjs-quest-menu',
                x: event.pageX,

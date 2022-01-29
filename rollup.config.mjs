@@ -28,6 +28,11 @@ const postcssTinyMCE = postcssConfig({
    sourceMap: s_SOURCEMAPS
 });
 
+const s_RESOLVE_CONFIG = {
+   browser: true,
+   dedupe: ['svelte', '@typhonjs-fvtt/runtime', '@typhonjs-fvtt/svelte-standard']
+}
+
 export default () =>
 {
    // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
@@ -66,10 +71,7 @@ export default () =>
                },
             }),
             postcss(postcssMain),
-            resolve({
-               browser: true,
-               dedupe: ['svelte']
-            }),
+            resolve(s_RESOLVE_CONFIG),
             commonjs(),
             // sourcemaps()
             s_TYPHONJS_MODULE_LIB && typhonjsRuntime(),

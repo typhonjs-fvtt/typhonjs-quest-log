@@ -1,4 +1,4 @@
-import { TJSMenu }               from '@typhonjs-fvtt/runtime/svelte/application';
+import { TJSContextMenu }        from '@typhonjs-fvtt/svelte-standard/application';
 import { HandlebarsApplication } from '@typhonjs-fvtt/runtime/svelte/application/legacy';
 import collect                   from '#collect';
 
@@ -185,7 +185,7 @@ export default class QuestTracker extends HandlebarsApplication
 
          if (quest)
          {
-            TJSMenu.createContext({
+            TJSContextMenu.create({
                duration: 200,
                id: 'tjs-quest-menu',
                x: event.pageX,

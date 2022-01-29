@@ -9,7 +9,7 @@
  *
  * @param {Eventbus} opts.eventbus - The Plugin manager eventbus.
  *
- * @returns {object[]} An array of menu items for TJSMenu.
+ * @returns {object[]} An array of menu items for TJSContextMenu.
  */
 export default function createMenuItems({ questId, name, eventbus })
 {

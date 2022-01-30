@@ -1,34 +1,12 @@
+import { TJSSettingsControl } from '@typhonjs-fvtt/runtime/svelte/plugin/system';
+
 import { tqlSettings }  from './tqlSettings.js';
 
 import { constants, questStatus, sessionConstants, settings } from '#constants';
 
-/**
- * Defines if logging setting changes to the console occurs.
- *
- * @type {boolean}
- */
-let loggingEnabled = false;
-
-export default class SettingsControl
+export default class SettingsControl extends TJSSettingsControl
 {
-   static handleDispatch(data)
-   {
-      if (typeof data.setting !== 'string') { return; }
-
-      if (loggingEnabled)
-      {
-         console.log(`SettingsControl - handleDispatch - data:\n${JSON.stringify(data)}`);
-      }
-
-      const dispatchFunction = this[`handle_${data.setting}`];
-
-      if (typeof dispatchFunction === 'function')
-      {
-         dispatchFunction.call(this, data.value);
-      }
-   }
-
-   static handle_allowPlayersAccept(value)
+   allowPlayersAccept(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -43,7 +21,7 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:all', { questPreview: true });
    }
 
-   static handle_allowPlayersCreate(value)
+   allowPlayersCreate(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -59,7 +37,7 @@ export default class SettingsControl
       }
    }
 
-   static handle_allowPlayersDrag(value)
+   allowPlayersDrag(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -74,7 +52,7 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:all', { force: true, questPreview: true });
    }
 
-   static handle_countHidden(value)
+   countHidden(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -89,7 +67,7 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:all');
    }
 
-   static handle_dynamicBookmarkBackground()
+   dynamicBookmarkBackground()
    {
       // Must render the quest log.
       const questLog = this._eventbus.triggerSync('tql:viewmanager:quest:log:get');
@@ -99,7 +77,7 @@ export default class SettingsControl
       }
    }
 
-   static async handle_hideTQLFromPlayers(value)
+   async hideTQLFromPlayers(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -144,7 +122,7 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker', { updateSetting: false });
    }
 
-   static handle_navStyle()
+   navStyle()
    {
       // Must enrich all quests again in QuestDB.
       this._eventbus.trigger('tql:questdb:enrich:all');
@@ -157,7 +135,7 @@ export default class SettingsControl
       }
    }
 
-   static handle_notifyRewardDrop(value)
+   notifyRewardDrop(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -166,7 +144,7 @@ export default class SettingsControl
       }
    }
 
-   static handle_primaryQuest(value)
+   primaryQuest(value)
    {
       // Any current primary quest.
       const currentQuestEntry = this._eventbus.triggerSync('tql:questdb:quest:entry:get',
@@ -220,7 +198,7 @@ export default class SettingsControl
       }
    }
 
-   static handle_questTrackerEnabled(value)
+   questTrackerEnabled(value)
    {
       // Potentially Post notification that the quest tracker is enabled, but not visible as there are no active
       // quests.
@@ -239,21 +217,22 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
    }
 
-   static handle_questTrackerResizable(value)
+   questTrackerResizable(value)
    {
+console.log(`!! SettingsControl`)
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
 
       // Swap macro image based on current state. No need to await.
       this._eventbus.trigger('tql:utils:macro:image:set', settings.questTrackerResizable, value);
    }
 
-   static handle_showFolder()
+   showFolder()
    {
       // Render the journal to show / hide the quest folder.
       game.journal.render();
    }
 
-   static handle_showTasks()
+   showTasks()
    {
       // Must enrich all quests again in QuestDB.
       this._eventbus.trigger('tql:questdb:enrich:all');
@@ -262,7 +241,7 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:all');
    }
 
-   static handle_trustedPlayerEdit(value)
+   trustedPlayerEdit(value)
    {
       // Swap macro image based on current state. No need to await.
       if (game.user.isGM)
@@ -278,16 +257,9 @@ export default class SettingsControl
       this._eventbus.trigger('tql:viewmanager:render:all', { questPreview: true });
    }
 
-   static onPluginLoad(ev)
+   onPluginLoad(ev)
    {
-      this._eventbus = ev.eventbus;
-
-      const opts = { guard: true };
-
-      ev.eventbus.on('tjs:system:game:settings:change:any', this.handleDispatch, this, opts);
-
-      // Enables local logging of setting changes.
-      ev.eventbus.on('tql:game:settings:log:enable', (enabled) => loggingEnabled = enabled, void 0, opts);
+      super.onPluginLoad(ev);
 
       // Load all TQL game settings.
       ev.eventbus.trigger('tjs:system:game:settings:register:all', tqlSettings);

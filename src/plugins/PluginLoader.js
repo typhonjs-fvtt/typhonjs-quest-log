@@ -45,7 +45,7 @@ export default class PluginLoader
          // Add setting control / responder to settings changes.
          {
             name: 'tql-system-settings-control',
-            instance: SystemPlugins.SettingsControl
+            instance: new SystemPlugins.SettingsControl()
          },
          // Handles returning the left-hand note controls
          {

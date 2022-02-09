@@ -1,3 +1,4 @@
+import { TJSDocumentDialog }           from '@typhonjs-fvtt/runtime/svelte/application';
 import { HandlebarsFormApplication }   from '@typhonjs-fvtt/runtime/svelte/application/legacy';
 
 import HandlerAny                      from './HandlerAny.js';
@@ -154,18 +155,6 @@ export default class QuestPreview extends HandlebarsFormApplication // FormAppli
        * @package
        */
       this._openedAppIds = [];
-
-      /**
-       * Tracks any open TQLPermissionControl dialog that can be opened from the management tab, so that it can be
-       * closed if this QuestPreview is closed or the tab is changed.
-       *
-       * @type {TQLPermissionControl}
-       * @package
-       *
-       * @see {@link HandlerManage.configurePermissions}
-       * @see {@link QuestPreview.close}
-       */
-      this._permControl = void 0;
 
       /**
        * Stores a single instance of the ImagePopup for the abstract reward image opened in
@@ -325,12 +314,6 @@ export default class QuestPreview extends HandlebarsFormApplication // FormAppli
     */
    _onChangeTab(event, tabs, active)
    {
-      if (this._permControl)
-      {
-         this._permControl.close();
-         this._permControl = void 0;
-      }
-
       super._onChangeTab(event, tabs, active);
    }
 
@@ -532,9 +515,9 @@ export default class QuestPreview extends HandlebarsFormApplication // FormAppli
          // Management view callbacks -------------------------------------------------------------------------------
 
          html.on(jquery.click, '.add-subquest-btn',
-          async () => await HandlerManage.addSubquest(this._quest, eventbus, this));
+          async () => await HandlerManage.addSubquest(this._quest, eventbus));
 
-         html.on(jquery.click, '.configure-perm-btn', () => HandlerManage.configurePermissions(this._quest, this));
+         html.on(jquery.click, '.configure-perm-btn', () => TJSDocumentDialog.configurePermissions(this._quest.entry));
 
          html.on(jquery.click, '.delete-splash', async () => await HandlerManage.deleteSplashImage(this._quest, this));
 
@@ -551,7 +534,6 @@ export default class QuestPreview extends HandlebarsFormApplication // FormAppli
    /**
     * When closing this Foundry app:
     * - Close any associated dialogs via {@link TQLDialog.closeDialogs}
-    * - Close any associated {@link QuestPreview._permControl}
     * - Close any associated {@link QuestPreview._rewardImagePopup}
     * - Close any associated {@link QuestPreview._splashImagePopup}
     * - If set invoke {@link QuestPreview._activeFocusOutFunction} or {@link QuestPreview.saveQuest} if the current
@@ -572,13 +554,6 @@ export default class QuestPreview extends HandlebarsFormApplication // FormAppli
     */
    async close({ noSave = false, ...options } = {})
    {
-      // If a permission control app / dialog is open close it.
-      if (this._permControl)
-      {
-         this._permControl.close();
-         this._permControl = void 0;
-      }
-
       // Close any opened actor or reward item sheets.
       for (const appId of this._openedAppIds)
       {

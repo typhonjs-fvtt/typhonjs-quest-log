@@ -1,5 +1,3 @@
-import TQLPermissionControl   from '../TQLPermissionControl.js';
-
 /**
  * Provides all {@link JQuery} callbacks for the `management` tab.
  */
@@ -10,50 +8,14 @@ export default class HandlerManage
     *
     * @param {Eventbus}       eventbus - Plugin manager eventbus
     *
-    * @param {QuestPreview}   questPreview - The QuestPreview being manipulated.
-    *
     * @returns {Promise<void>}
     */
-   static async addSubquest(quest, eventbus, questPreview)
+   static async addSubquest(quest, eventbus)
    {
-      // If a permission control app / dialog is open close it.
-      if (questPreview._permControl)
-      {
-         questPreview._permControl.close();
-         questPreview._permControl = void 0;
-      }
-
       if (eventbus.triggerSync('tql:viewmanager:verify:quest:can:add'))
       {
          const subquest = await eventbus.triggerAsync('tql:questdb:quest:create', { parentId: quest.id });
          eventbus.trigger('tql:viewmanager:quest:added', { quest: subquest });
-      }
-   }
-
-   /**
-    * @param {Quest}          quest - The current quest being manipulated.
-    *
-    * @param {QuestPreview}   questPreview - The QuestPreview being manipulated.
-    *
-    * @returns {Promise<void>}
-    */
-   static async configurePermissions(quest, questPreview)
-   {
-      if (quest.entry)
-      {
-         if (!questPreview._permControl)
-         {
-            questPreview._permControl = new TQLPermissionControl(quest.entry, {
-               top: Math.min(questPreview.position.top, globalThis.innerHeight - 350),
-               left: questPreview.position.left + 125
-            });
-         }
-
-         questPreview._permControl.render(true, {
-            top: Math.min(questPreview.position.top, globalThis.innerHeight - 350),
-            left: questPreview.position.left + 125,
-            focus: true
-         });
       }
    }
 

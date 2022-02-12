@@ -58,7 +58,7 @@ export default class FoundryUIManager
       }
 
       // If not pinned adjust the position top based on the hotbar top.
-      if (!tracker.pinned && hotbar.gapY >= 0 && position.top + position.height > hotbar.top)
+      if (!tracker.options.pinned && hotbar.gapY >= 0 && position.top + position.height > hotbar.top)
       {
          if (position.resizeHeight)
          {
@@ -73,7 +73,7 @@ export default class FoundryUIManager
       }
 
       // If pinned always make sure the position top is the sidebar top.
-      if (tracker.pinned) { position.top = sidebarData.top; }
+      if (tracker.options.pinned) { position.top = sidebarData.top; }
 
       return sidebarData.rectDock.contains(position.left + position.width, position.top);
    }
@@ -120,7 +120,7 @@ export default class FoundryUIManager
       };
 
       // If the tracker is pinned set the top / left based on the sidebar.
-      if (tracker.pinned)
+      if (tracker.options.pinned)
       {
          position.top = sidebarData.top;
          position.left = sidebarData.left - tracker.position.width - s_SPACE_X;
@@ -157,11 +157,10 @@ export default class FoundryUIManager
    static updateTrackerPinned()
    {
       const tracker = this._eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
-      const pinned = tracker.pinned;
       const sidebarData = sidebar.open;
 
       let width = navigation.left + sidebarData.width + s_SPACE_NAV_X;
-      width += pinned ? tracker.position.width : 0;
+      width += tracker.options.pinned ? tracker.position.width : 0;
       ui?.nav?.element?.css('width', `calc(100% - ${width}px`);
    }
 

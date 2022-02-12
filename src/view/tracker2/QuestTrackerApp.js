@@ -45,20 +45,12 @@ export default class QuestTrackerApp extends SvelteApplication
    #inPinDropRect = false;
 
    /**
-    * Stores whether the QuestTracker is pinned to the sidebar.
-    *
-    * @type {boolean}
-    * @private
-    */
-   #pinned = game.settings.get(constants.moduleName, settings.questTrackerPinned);
-
-   /**
     * @inheritDoc
     * @see https://foundryvtt.com/api/Application.html
     */
    constructor(options = {})
    {
-      super(options);
+      super({ pinned: game.settings.get(constants.moduleName, settings.questTrackerPinned), ...options });
 
       try
       {
@@ -115,13 +107,6 @@ export default class QuestTrackerApp extends SvelteApplication
    get minWidth() { return this.#appExtents.minWidth || 275; }
 
    /**
-    * Is the QuestTracker pinned to the sidebar.
-    *
-    * @returns {boolean} QuestTracker pinned.
-    */
-   get pinned() { return this.#pinned; }
-
-   /**
     * Override default Application `bringToTop` to stop adjustment of z-index and set height to auto if not resizable.
     *
     * @override
@@ -176,7 +161,7 @@ export default class QuestTrackerApp extends SvelteApplication
       if (dragging)
       {
          this.#dragHeader = true;
-         this.#pinned = false;
+         this.options.pinned = false;
 
          // Only set `setting.questTrackerPinned` to false if it is currently true.
          if (game.settings.get(constants.moduleName, settings.questTrackerPinned))
@@ -190,7 +175,7 @@ export default class QuestTrackerApp extends SvelteApplication
 
          if (this.#inPinDropRect)
          {
-            this.#pinned = true;
+            this.options.pinned = true;
             await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
             this.elementTarget.style.animation = '';
          }
@@ -296,14 +281,14 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    setPosition(position = {})
    {
-      const { override, pinned = this.#pinned } = position;
+      const { override, pinned = this.options.pinned } = position;
 
       // Potentially force override any pinned state. This is done from TQLHooks.openQuestTracker.
       if (typeof override === 'boolean')
       {
          if (pinned)
          {
-            this.#pinned = true;
+            this.options.pinned = true;
             this.#inPinDropRect = true;
             game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
             this._eventbus.trigger('tql:foundryuimanager:update:tracker');
@@ -311,7 +296,7 @@ export default class QuestTrackerApp extends SvelteApplication
          }
          else
          {
-            this.#pinned = false;
+            this.options.pinned = false;
             this.#inPinDropRect = false;
             game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
          }
@@ -350,7 +335,7 @@ export default class QuestTrackerApp extends SvelteApplication
 
       // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
       // has changed.
-      if (!this.#pinned && this.#dragHeader && currentInPinDropRect !== this.#inPinDropRect)
+      if (!this.options.pinned && this.#dragHeader && currentInPinDropRect !== this.#inPinDropRect)
       {
          el.style.animation = this.#inPinDropRect ? 'tql-jiggle 0.3s infinite' : '';
       }

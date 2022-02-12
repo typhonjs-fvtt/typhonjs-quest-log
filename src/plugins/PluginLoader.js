@@ -78,11 +78,6 @@ export default class PluginLoader
             name: 'tql-system-viewmanager',
             instance: SystemPlugins.ViewManager
          },
-         // Start watching sidebar updates.
-         {
-            name: 'tql-system-foundryuimanager',
-            instance: SystemPlugins.FoundryUIManager
-         },
          // Initialize the in-memory QuestDB. Loads all quests that the user can see at this point.
          {
             name: 'tql-system-questdb',

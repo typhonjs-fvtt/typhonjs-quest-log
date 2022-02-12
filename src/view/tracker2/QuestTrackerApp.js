@@ -1,6 +1,7 @@
 import { SvelteApplication }     from '@typhonjs-fvtt/runtime/svelte/application';
 
 import createHeaderButtons       from './createHeaderButtons.js';
+import PositionValidator         from './PositionValidator.js';
 import QuestTrackerShell         from './QuestTrackerShell.svelte';
 
 import { constants, settings }   from '#constants';
@@ -70,8 +71,9 @@ export default class QuestTrackerApp extends SvelteApplication
          this.position = s_DEFAULT_POSITION;
       }
 
-      // Subscribe to dragging state changes.
-      this.reactive.storeUIOptions.dragging.subscribe(this.#handleDraggingState.bind(this));
+      this.position.validators.add(PositionValidator.checkPosition.bind(PositionValidator));
+
+      PositionValidator.init(this);
    }
 
    /**
@@ -151,36 +153,36 @@ export default class QuestTrackerApp extends SvelteApplication
       return [...createHeaderButtons(this._eventbus), ...super._getHeaderButtons()];
    }
 
-   /**
-    * Handles setting {@link TQLSettings.questTrackerPinned} based on current dragging state.
-    *
-    * @param {boolean}   dragging - Current dragging state.
-    */
-   async #handleDraggingState(dragging)
-   {
-      if (dragging)
-      {
-         this.#dragHeader = true;
-         this.options.pinned = false;
-
-         // Only set `setting.questTrackerPinned` to false if it is currently true.
-         if (game.settings.get(constants.moduleName, settings.questTrackerPinned))
-         {
-            await game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
-         }
-      }
-      else
-      {
-         this.#dragHeader = false;
-
-         if (this.#inPinDropRect)
-         {
-            this.options.pinned = true;
-            await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-            this.elementTarget.style.animation = '';
-         }
-      }
-   }
+   // /**
+   //  * Handles setting {@link TQLSettings.questTrackerPinned} based on current dragging state.
+   //  *
+   //  * @param {boolean}   dragging - Current dragging state.
+   //  */
+   // async #handleDraggingState(dragging)
+   // {
+   //    if (dragging)
+   //    {
+   //       this.#dragHeader = true;
+   //       this.options.pinned = false;
+   //
+   //       // Only set `setting.questTrackerPinned` to false if it is currently true.
+   //       if (game.settings.get(constants.moduleName, settings.questTrackerPinned))
+   //       {
+   //          await game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
+   //       }
+   //    }
+   //    else
+   //    {
+   //       this.#dragHeader = false;
+   //
+   //       if (this.#inPinDropRect)
+   //       {
+   //          this.options.pinned = true;
+   //          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
+   //          this.elementTarget.style.animation = '';
+   //       }
+   //    }
+   // }
 
    /**
     * Handles showing / hiding the resize element.
@@ -253,6 +255,8 @@ export default class QuestTrackerApp extends SvelteApplication
       };
 
       this.#handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
+
+      PositionValidator.updateTracker();
    }
 
    /**
@@ -281,31 +285,7 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    setPosition(position = {})
    {
-      const { override, pinned = this.options.pinned } = position;
-
-      // Potentially force override any pinned state. This is done from TQLHooks.openQuestTracker.
-      if (typeof override === 'boolean')
-      {
-         if (pinned)
-         {
-            this.options.pinned = true;
-            this.#inPinDropRect = true;
-            game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-            this._eventbus.trigger('tql:foundryuimanager:update:tracker');
-            return position; // Early out as updateTracker above calls setPosition again.
-         }
-         else
-         {
-            this.options.pinned = false;
-            this.#inPinDropRect = false;
-            game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
-         }
-      }
-
-      const initialTop = this.position.top;
-      const initialLeft = this.position.left;
-      const initialWidth = this.position.width;
-      const initialHeight = this.position.height;
+      const { pinned = this.options.pinned } = position;
 
       if (pinned)
       {
@@ -315,50 +295,7 @@ export default class QuestTrackerApp extends SvelteApplication
       }
 
       // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps.
-      const currentPosition = super.setPosition(position, { apply: false });
-
-      // Pin width / height to min / max styles if defined.
-      if (currentPosition.width < this.#appExtents.minWidth) { currentPosition.width = this.#appExtents.minWidth; }
-      if (currentPosition.width > this.#appExtents.maxWidth) { currentPosition.width = this.#appExtents.maxWidth; }
-      if (currentPosition.height < this.#appExtents.minHeight) { currentPosition.height = this.#appExtents.minHeight; }
-      if (currentPosition.height > this.#appExtents.maxHeight) { currentPosition.height = this.#appExtents.maxHeight; }
-
-      const el = this.elementTarget;
-
-      currentPosition.resizeWidth = initialWidth < currentPosition.width;
-      currentPosition.resizeHeight = initialHeight < currentPosition.height;
-
-      // Mutates `checkPosition` to set maximum left position. Must do this calculation after `super.setPosition`
-      // as in some cases `super.setPosition` will override the changes of `FoundryUIManager.checkPosition`.
-      const currentInPinDropRect = this.#inPinDropRect;
-      this.#inPinDropRect = this._eventbus.triggerSync('tql:foundryuimanager:check:position', currentPosition);
-
-      // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
-      // has changed.
-      if (!this.options.pinned && this.#dragHeader && currentInPinDropRect !== this.#inPinDropRect)
-      {
-         el.style.animation = this.#inPinDropRect ? 'tql-jiggle 0.3s infinite' : '';
-      }
-
-      el.style.top = `${currentPosition.top}px`;
-      el.style.left = `${currentPosition.left}px`;
-      el.style.width = `${currentPosition.width}px`;
-
-      // Only set height if resizable.
-      if (this.reactive.resizable) { el.style.height = `${currentPosition.height}px`; }
-
-      // Note: the root position is saved to `settings.questTrackerPosition` in QuestTrackerShell when any
-      // height position changes are made to handle when `this.options.resizable` is false; height is set to `auto`.
-
-      this.position.set(currentPosition);
-
-      // Any position changes need to be saved here when there are actual changes.
-      if (initialTop !== currentPosition.top || initialLeft !== currentPosition.left || initialWidth !== currentPosition.width || initialHeight !== currentPosition.height)
-      {
-         s_SAVE_POSITION(currentPosition);
-      }
-
-      return currentPosition;
+      return super.setPosition(position);
    }
 
    onPluginLoad(ev)
@@ -369,13 +306,3 @@ export default class QuestTrackerApp extends SvelteApplication
        this.#handleSettingWindowResize, this);
    }
 }
-
-/**
- * Provides a debounced function to save position to {@link TQLSettings.questTrackerPosition}.
- *
- * @type {(function(object): void)}
- */
-const s_SAVE_POSITION = foundry.utils.debounce((currentPosition) =>
-{
-   game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify(currentPosition));
-}, 1000);

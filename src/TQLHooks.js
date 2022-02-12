@@ -7,6 +7,7 @@ import PluginLoader     from './plugins/PluginLoader.js';
 import { eventbus }     from './plugins/PluginManager.js';
 
 import { constants, sessionConstants, settings } from '#constants';
+import PositionValidator from "./view/tracker2/PositionValidator.js";
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -413,17 +414,39 @@ export default class TQLHooks
          // Select only constraint related parameters.
          const constraints = (({ left, top, width, height, pinned }) => ({ left, top, width, height, pinned }))(opts);
 
+         const tracker = eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
+
          if (Object.keys(constraints).length > 0)
          {
             // Set to indicate an override of any pinned state.
             constraints.override = true;
 
-            const tracker = eventbus.triggerSync('tql:viewmanager:quest:tracker:get');
-
             // Defer to make sure quest tracker is rendered before setting position.
             setTimeout(() =>
             {
                if (tracker.rendered) { tracker.setPosition(constraints); }
+            }, 0);
+         }
+
+         if (typeof opts.pinned === 'boolean')
+         {
+            const pinned = opts.pinned;
+
+            setTimeout(() =>
+            {
+               if (pinned)
+               {
+                  tracker.options.pinned = true;
+                  // this.#inPinDropRect = true;
+                  game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
+                  PositionValidator.updateTracker();
+               }
+               else
+               {
+                  tracker.options.pinned = false;
+                  // this.#inPinDropRect = false;
+                  game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
+               }
             }, 0);
          }
 

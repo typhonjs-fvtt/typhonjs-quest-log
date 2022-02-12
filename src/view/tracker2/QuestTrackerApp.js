@@ -77,6 +77,9 @@ export default class QuestTrackerApp extends SvelteApplication
       {
          this.position = s_DEFAULT_POSITION;
       }
+
+      // Subscribe to dragging state changes.
+      this.reactive.storeUIOptions.dragging.subscribe(this.#handleDraggingState.bind(this));
    }
 
    /**
@@ -164,16 +167,13 @@ export default class QuestTrackerApp extends SvelteApplication
    }
 
    /**
-    * Handles the pointer down event from the header to reset the pinned state.
+    * Handles setting {@link TQLSettings.questTrackerPinned} based on current dragging state.
     *
-    * @param {PointerEvent}   event - PointerEvent
-    *
-    * @param {HTMLElement}    header - The app header element.
+    * @param {boolean}   dragging - Current dragging state.
     */
-   async #handleHeaderPointerDown(event, header)
+   async #handleDraggingState(dragging)
    {
-      if (event.target.classList.contains('window-title') ||
-       event.target.classList.contains('window-header'))
+      if (dragging)
       {
          this.#dragHeader = true;
          this.#pinned = false;
@@ -183,28 +183,17 @@ export default class QuestTrackerApp extends SvelteApplication
          {
             await game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
          }
-
-         header.setPointerCapture(event.pointerId);
       }
-   }
-
-   /**
-    * Handles the pointer up event from the header to check for and set the pinned state.
-    *
-    * @param {PointerEvent}   event - PointerEvent
-    *
-    * @param {HTMLElement}    header - The app header element.
-    */
-   async #handleHeaderPointerUp(event, header)
-   {
-      header.releasePointerCapture(event.pointerId);
-      this.#dragHeader = false;
-
-      if (this.#inPinDropRect)
+      else
       {
-         this.#pinned = true;
-         await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-         this.elementTarget.style.animation = '';
+         this.#dragHeader = false;
+
+         if (this.#inPinDropRect)
+         {
+            this.#pinned = true;
+            await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
+            this.elementTarget.style.animation = '';
+         }
       }
    }
 
@@ -262,13 +251,6 @@ export default class QuestTrackerApp extends SvelteApplication
     */
    onSvelteMount({ elementTarget })
    {
-      // Make the window draggable
-      const header = elementTarget.querySelector('header');
-
-      // Use pointer events to make sure accurate drag & drop is detected especially when mouse outside window bounds.
-      header.addEventListener('pointerdown', async (event) => this.#handleHeaderPointerDown(event, header));
-      header.addEventListener('pointerup', async (event) => this.#handleHeaderPointerUp(event, header));
-
       const styles = globalThis.getComputedStyle(elementTarget);
 
       /**
@@ -293,31 +275,29 @@ export default class QuestTrackerApp extends SvelteApplication
     * need to set these for '.window-content' to 'visible' which will cause an issue for very long tables. Thus we must
     * manually set the table max-heights based on the position / height of the {@link Application}.
     *
-    * @param {object}               [opts] - Optional parameters.
+    * @param {object}               [position] - Optional parameters.
     *
-    * @param {number|null}          [opts.left] - The left offset position in pixels.
+    * @param {number|null}          [position.left] - The left offset position in pixels.
     *
-    * @param {number|null}          [opts.top] - The top offset position in pixels.
+    * @param {number|null}          [position.top] - The top offset position in pixels.
     *
-    * @param {number|null}          [opts.width] - The application width in pixels.
+    * @param {number|null}          [position.width] - The application width in pixels.
     *
-    * @param {number|string|null}   [opts.height] - The application height in pixels.
+    * @param {number|string|null}   [position.height] - The application height in pixels.
     *
-    * @param {number|null}          [opts.scale] - The application scale as a numeric factor where 1.0 is default.
+    * @param {number|null}          [position.scale] - The application scale as a numeric factor where 1.0 is default.
     *
-    * @param {boolean}              [opts.noHeight] - When true no element height is modified.
+    * @param {boolean}              [position.override] - Forces any manual pinned setting to take effect.
     *
-    * @param {boolean}              [opts.noWidth] - When true no element Width is modified.
-    *
-    * @param {boolean}              [opts.override] - Forces any manual pinned setting to take effect.
-    *
-    * @param {boolean}              [opts.pinned] - Sets the pinned state.
+    * @param {boolean}              [position.pinned] - Sets the pinned state.
     *
     * @returns {{left: number, top: number, width: number, height: number, scale:number}}
     * The updated position object for the application containing the new values.
     */
-   setPosition({ override, pinned = this.#pinned, ...opts } = {})
+   setPosition(position = {})
    {
+      const { override, pinned = this.#pinned } = position;
+
       // Potentially force override any pinned state. This is done from TQLHooks.openQuestTracker.
       if (typeof override === 'boolean')
       {
@@ -327,7 +307,7 @@ export default class QuestTrackerApp extends SvelteApplication
             this.#inPinDropRect = true;
             game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
             this._eventbus.trigger('tql:foundryuimanager:update:tracker');
-            return opts; // Early out as updateTracker above calls setPosition again.
+            return position; // Early out as updateTracker above calls setPosition again.
          }
          else
          {
@@ -344,15 +324,13 @@ export default class QuestTrackerApp extends SvelteApplication
 
       if (pinned)
       {
-         if (typeof opts.left === 'number') { opts.left = this.position.left; }
-         if (typeof opts.top === 'number') { opts.top = this.position.top; }
-         if (typeof opts.width === 'number') { opts.width = this.position.width; }
+         if (typeof position.left === 'number') { position.left = this.position.left; }
+         if (typeof position.top === 'number') { position.top = this.position.top; }
+         if (typeof position.width === 'number') { position.width = this.position.width; }
       }
 
-      // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps and
-      // takes a `noHeight` / `noWidth` parameters to alter setting height / width.
-      // opts.noHeight = !this.reactive.resizable;
-      const currentPosition = super.setPosition(opts);
+      // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps.
+      const currentPosition = super.setPosition(position, { apply: false });
 
       // Pin width / height to min / max styles if defined.
       if (currentPosition.width < this.#appExtents.minWidth) { currentPosition.width = this.#appExtents.minWidth; }
@@ -387,6 +365,8 @@ export default class QuestTrackerApp extends SvelteApplication
       // Note: the root position is saved to `settings.questTrackerPosition` in QuestTrackerShell when any
       // height position changes are made to handle when `this.options.resizable` is false; height is set to `auto`.
 
+      this.position.set(currentPosition);
+
       // Any position changes need to be saved here when there are actual changes.
       if (initialTop !== currentPosition.top || initialLeft !== currentPosition.left || initialWidth !== currentPosition.width || initialHeight !== currentPosition.height)
       {
@@ -413,5 +393,4 @@ export default class QuestTrackerApp extends SvelteApplication
 const s_SAVE_POSITION = foundry.utils.debounce((currentPosition) =>
 {
    game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify(currentPosition));
-   console.log(currentPosition);
 }, 1000);

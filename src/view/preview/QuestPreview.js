@@ -1,4 +1,4 @@
-import { TJSDocumentDialog }           from '@typhonjs-fvtt/runtime/svelte/application';
+import { TJSPermissionControl }        from '@typhonjs-fvtt/runtime/svelte/application/dialog';
 import { HandlebarsFormApplication }   from '@typhonjs-fvtt/runtime/svelte/application/legacy';
 
 import HandlerAny                      from './HandlerAny.js';
@@ -517,7 +517,7 @@ export default class QuestPreview extends HandlebarsFormApplication // FormAppli
          html.on(jquery.click, '.add-subquest-btn',
           async () => await HandlerManage.addSubquest(this._quest, eventbus));
 
-         html.on(jquery.click, '.configure-perm-btn', () => TJSDocumentDialog.configurePermissions(this._quest.entry));
+         html.on(jquery.click, '.configure-perm-btn', () => TJSPermissionControl.show(this._quest.entry));
 
          html.on(jquery.click, '.delete-splash', async () => await HandlerManage.deleteSplashImage(this._quest, this));
 

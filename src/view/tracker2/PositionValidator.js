@@ -27,7 +27,7 @@ export default class PositionValidator
       this.tracker = tracker;
 
       // Subscribe to dragging state changes.
-      this.tracker.reactive.storeUIOptions.dragging.subscribe(this.handleDraggingState.bind(this));
+      this.tracker.reactive.storeUIState.dragging.subscribe(this.handleDraggingState.bind(this));
 
       globalThis.addEventListener('resize', s_WINDOW_RESIZE);
       Hooks.on('collapseSidebar', PositionValidator.collapseSidebar);

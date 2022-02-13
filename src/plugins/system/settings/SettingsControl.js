@@ -219,7 +219,6 @@ export default class SettingsControl extends TJSSettingsControl
 
    questTrackerResizable(value)
    {
-console.log(`!! SettingsControl`)
       this._eventbus.trigger('tql:viewmanager:render:or:close:quest:tracker');
 
       // Swap macro image based on current state. No need to await.

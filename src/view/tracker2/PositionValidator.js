@@ -53,6 +53,15 @@ export default class PositionValidator
    {
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
 
+      const { pinned = this.tracker.options.pinned } = position;
+
+      if (pinned)
+      {
+         if (typeof position.left === 'number') { position.left = this.tracker.position.left; }
+         if (typeof position.top === 'number') { position.top = this.tracker.position.top; }
+         if (typeof position.width === 'number') { position.width = this.tracker.position.width; }
+      }
+
       const resizeWidth = this.tracker.position.width < position.width;
       const resizeHeight = this.tracker.position.height < position.height;
 

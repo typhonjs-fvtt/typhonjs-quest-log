@@ -30,22 +30,6 @@ export default class QuestTrackerApp extends SvelteApplication
    #appExtents;
 
    /**
-    * Stores whether the header is being dragged.
-    *
-    * @type {boolean}
-    * @private
-    */
-   #dragHeader = false;
-
-   /**
-    * Stores whether the current position is in the sidebar pin drop rectangle.
-    *
-    * @type {boolean}
-    * @private
-    */
-   #inPinDropRect = false;
-
-   /**
     * @inheritDoc
     * @see https://foundryvtt.com/api/Application.html
     */
@@ -153,37 +137,6 @@ export default class QuestTrackerApp extends SvelteApplication
       return [...createHeaderButtons(this._eventbus), ...super._getHeaderButtons()];
    }
 
-   // /**
-   //  * Handles setting {@link TQLSettings.questTrackerPinned} based on current dragging state.
-   //  *
-   //  * @param {boolean}   dragging - Current dragging state.
-   //  */
-   // async #handleDraggingState(dragging)
-   // {
-   //    if (dragging)
-   //    {
-   //       this.#dragHeader = true;
-   //       this.options.pinned = false;
-   //
-   //       // Only set `setting.questTrackerPinned` to false if it is currently true.
-   //       if (game.settings.get(constants.moduleName, settings.questTrackerPinned))
-   //       {
-   //          await game.settings.set(constants.moduleName, settings.questTrackerPinned, false);
-   //       }
-   //    }
-   //    else
-   //    {
-   //       this.#dragHeader = false;
-   //
-   //       if (this.#inPinDropRect)
-   //       {
-   //          this.options.pinned = true;
-   //          await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
-   //          this.elementTarget.style.animation = '';
-   //       }
-   //    }
-   // }
-
    /**
     * Handles showing / hiding the resize element.
     *
@@ -257,45 +210,6 @@ export default class QuestTrackerApp extends SvelteApplication
       this.#handleSettingWindowResize(game.settings.get(constants.moduleName, settings.questTrackerResizable));
 
       PositionValidator.updateTracker();
-   }
-
-   /**
-    * Some game systems and custom UI theming modules provide hard overrides on overflow-x / overflow-y styles. Alas we
-    * need to set these for '.window-content' to 'visible' which will cause an issue for very long tables. Thus we must
-    * manually set the table max-heights based on the position / height of the {@link Application}.
-    *
-    * @param {object}               [position] - Optional parameters.
-    *
-    * @param {number|null}          [position.left] - The left offset position in pixels.
-    *
-    * @param {number|null}          [position.top] - The top offset position in pixels.
-    *
-    * @param {number|null}          [position.width] - The application width in pixels.
-    *
-    * @param {number|string|null}   [position.height] - The application height in pixels.
-    *
-    * @param {number|null}          [position.scale] - The application scale as a numeric factor where 1.0 is default.
-    *
-    * @param {boolean}              [position.override] - Forces any manual pinned setting to take effect.
-    *
-    * @param {boolean}              [position.pinned] - Sets the pinned state.
-    *
-    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
-    * The updated position object for the application containing the new values.
-    */
-   setPosition(position = {})
-   {
-      const { pinned = this.options.pinned } = position;
-
-      if (pinned)
-      {
-         if (typeof position.left === 'number') { position.left = this.position.left; }
-         if (typeof position.top === 'number') { position.top = this.position.top; }
-         if (typeof position.width === 'number') { position.width = this.position.width; }
-      }
-
-      // SvelteApplication provides a customized setPosition which works with popOut / non-popOut apps.
-      return super.setPosition(position);
    }
 
    onPluginLoad(ev)

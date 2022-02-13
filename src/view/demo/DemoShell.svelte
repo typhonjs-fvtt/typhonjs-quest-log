@@ -14,7 +14,7 @@
 
    onMount(() =>
    {
-      console.log(`DemoShell.svelte - onMount - title: ${foundryApp ? foundryApp.title : 'NO TITLE / APP'}`);
+      console.log(`DemoShell.svelte - onMount - title: ${application ? application.title : 'NO TITLE / APP'}`);
       console.log(`DemoShell.svelte - onMount - external context TEST: ${TEST}`);
    });
 
@@ -23,7 +23,7 @@
       console.log(`DemoShell.svelte - onDestroy`);
    });
 
-   const foundryApp = getContext('external').foundryApp;
+   const application = getContext('external').application;
    const TEST = getContext('external').TEST;
 
    let desc = false;

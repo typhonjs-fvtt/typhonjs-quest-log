@@ -100,7 +100,6 @@ export default class PositionValidator
 
       s_SAVE_POSITION(position);
 
-      // TODO: RECT PIN RELATED
       const currentInPinDropRect = sidebarData.rectDock.contains(
        this.tracker.position.left + this.tracker.position.width, this.tracker.position.top);
 
@@ -108,8 +107,8 @@ export default class PositionValidator
 
       // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
       // has changed.
-      // if (!this.tracker.options.pinned && this.#dragHeader && currentInPinDropRect !== this.#inPinDropRect)
-      if (this.tracker?.elementTarget && this.dragHeader && !this.tracker.options.pinned && currentInPinDropRect !== this.inPinDropRect)
+      if (this.tracker?.elementTarget && this.dragHeader && !this.tracker.options.pinned && currentInPinDropRect !==
+       this.inPinDropRect)
       {
          this.tracker.elementTarget.style.animation = this.inPinDropRect ? 'tql-jiggle 0.3s infinite' : '';
       }

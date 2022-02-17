@@ -1,5 +1,3 @@
-import { scale }                 from 'svelte/transition';
-
 import { HandlebarsApplication } from '@typhonjs-fvtt/runtime/svelte/application/legacy';
 import { TJSContextMenu }        from '@typhonjs-fvtt/svelte-standard/application';
 
@@ -48,13 +46,7 @@ export default class QuestLog extends HandlebarsApplication
          minimizable: true,
          resizable: true,
          title: game.i18n.localize('TyphonJSQuestLog.QuestLog.Title'),
-         tabs: [{ navSelector: '.log-tabs', contentSelector: '.log-body', initial: 'active' }],
-         svelte: {
-            props: {
-               transition: scale,
-               transitionOptions: { duration: 2000 }
-            }
-         }
+         tabs: [{ navSelector: '.log-tabs', contentSelector: '.log-body', initial: 'active' }]
       });
    }
 

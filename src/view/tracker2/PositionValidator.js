@@ -12,6 +12,13 @@ export default class PositionValidator
    static inPinDropRect = false;
 
    /**
+    * Stores the jiggle animation when quest tracker is in the pin drop rect next to the sidebar.
+    *
+    * @type {Animation}
+    */
+   static animationJiggle;
+
+   /**
     * @type {QuestTrackerApp}
     */
    static tracker;
@@ -105,12 +112,27 @@ export default class PositionValidator
 
       this.inPinDropRect = sidebarData.rectDock.contains(position.left + position.width, position.top);
 
+      // Create animation if it doesn't exist.
+      if (!this.animationJiggle)
+      {
+         this.animationJiggle = this.tracker.elementTarget.animate([
+            { transform: 'rotate(-0.25deg)' },
+            { transform: 'rotate(0.5deg)', offset: 0.5 }
+         ], {
+            duration: 300,
+            easing: 'ease-in-out',
+            iterations: Infinity
+         });
+
+         this.animationJiggle.pause();
+      }
+
       // Set the jiggle animation if the position movement is coming from dragging the header and the pin drop state
       // has changed.
       if (this.tracker?.elementTarget && this.dragHeader && !this.tracker.options.pinned && currentInPinDropRect !==
        this.inPinDropRect)
       {
-         this.tracker.elementTarget.style.animation = this.inPinDropRect ? 'tql-jiggle 0.3s infinite' : '';
+         this.animationJiggle[this.inPinDropRect ? 'play' : 'cancel']();
       }
 
       return position;
@@ -157,10 +179,7 @@ export default class PositionValidator
             this.tracker.options.pinned = true;
             await game.settings.set(constants.moduleName, settings.questTrackerPinned, true);
 
-            if (this.tracker?.elementTarget)
-            {
-               this.tracker.elementTarget.style.animation = '';
-            }
+            this.animationJiggle.cancel();
          }
       }
 

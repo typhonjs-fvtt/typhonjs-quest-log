@@ -73,7 +73,7 @@ export default class PositionValidator
       const resizeHeight = this.tracker.position.height < position.height;
 
       // Detect if the new position overlaps with the sidebar.
-      if (sidebarData.gapX >= 0 && position.left + this.tracker.position.width > sidebarData.left - s_SPACE_X)
+      if (sidebarData.gapX >= 0 && position.left + position.width > sidebarData.left - s_SPACE_X)
       {
          // This is a resize width change, so limit the new position width to the sidebar left side.
          if (resizeWidth)
@@ -82,7 +82,7 @@ export default class PositionValidator
          }
          else // Otherwise move the new position to the left pinning the position to the sidebar left.
          {
-            position.left = sidebarData.left - s_SPACE_X - this.tracker.position.width;
+            position.left = sidebarData.left - s_SPACE_X - position.width;
             if (position.left < 0) { position.left = 0; }
          }
       }
@@ -204,33 +204,27 @@ export default class PositionValidator
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
 
       // Store the current position before any modification.
-      const position = {
-         pinned: false,
-         top: this.tracker.position.top,
-         left: this.tracker.position.left,
-         width: this.tracker.position.width,
-         height: this.tracker.position.height
-      };
+      const position = this.tracker.position.get({ pinned: false });
 
       // If the tracker is pinned set the top / left based on the sidebar.
       if (this.tracker.options.pinned)
       {
          position.top = sidebarData.top;
-         position.left = sidebarData.left - this.tracker.position.width - s_SPACE_X;
+         position.left = sidebarData.left - position.width - s_SPACE_X;
       }
       else // Make sure the tracker isn't overlapping the sidebar or hotbar.
       {
-         const trackerRight = this.tracker.position.left + this.tracker.position.width;
+         const trackerRight = position.left + position.width;
          if (trackerRight > sidebarData.left - s_SPACE_X)
          {
-            position.left = sidebarData.left - this.tracker.position.width - s_SPACE_X;
+            position.left = sidebarData.left - position.width - s_SPACE_X;
             if (position.left < 0) { position.left = 0; }
          }
 
-         const trackerBottom = this.tracker.position.top + this.tracker.position.height;
+         const trackerBottom = position.top + position.height;
          if (trackerBottom > hotbar.top - s_SPACE_Y)
          {
-            position.top = hotbar.top - this.tracker.position.height - s_SPACE_Y;
+            position.top = hotbar.top - position.height - s_SPACE_Y;
             if (position.top < 0) { position.top = 0; }
          }
       }
@@ -239,7 +233,7 @@ export default class PositionValidator
       if (position.top !== this.tracker.position.top || position.left !== this.tracker.position.left ||
        position.width !== this.tracker.position.width || position.height !== this.tracker.position.height)
       {
-         this.tracker.setPosition(position);
+         this.tracker.position = position;
       }
    }
 

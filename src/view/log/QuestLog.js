@@ -3,8 +3,9 @@ import { TJSContextMenu }        from '@typhonjs-fvtt/svelte-standard/applicatio
 
 import createMenuItems           from './createMenuItems.js';
 import HandlerLog                from './HandlerLog.js';
+import PositionValidator         from './PositionValidator.js';
 
-import { constants, jquery, questStatusI18n, questTabIndex, settings } from '#constants';
+import { constants, jquery, questStatusI18n, settings } from '#constants';
 
 /**
  * Provides the main quest log app which shows the quests separated by status either with bookmark or classic tabs.
@@ -27,6 +28,8 @@ export default class QuestLog extends HandlebarsApplication
    constructor(options = {})
    {
       super(options);
+
+      this.position.validators.add(PositionValidator.checkPosition.bind(PositionValidator));
    }
 
    /**
@@ -165,49 +168,6 @@ export default class QuestLog extends HandlebarsApplication
          questStatusI18n,
          quests: this._eventbus.triggerSync('tql:questdb:collect:sort')
       });
-   }
-
-   /**
-    * Some game systems and custom UI theming modules provide hard overrides on overflow-x / overflow-y styles. Alas we
-    * need to set these for '.window-content' to 'visible' which will cause an issue for very long tables. Thus we must
-    * manually set the table max-heights based on the position / height of the {@link Application}.
-    *
-    * @param {object}               opts - Optional parameters.
-    *
-    * @param {number|null}          opts.left - The left offset position in pixels.
-    *
-    * @param {number|null}          opts.top - The top offset position in pixels.
-    *
-    * @param {number|null}          opts.width - The application width in pixels.
-    *
-    * @param {number|string|null}   opts.height - The application height in pixels.
-    *
-    * @param {number|null}          opts.scale - The application scale as a numeric factor where 1.0 is default.
-    *
-    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
-    * The updated position object for the application containing the new values.
-    */
-   setPosition(opts)
-   {
-      const currentPosition = super.setPosition(opts);
-
-      // Retrieve all the table elements.
-      const tableElements = $('#typhonjs-quest-log .table');
-
-      // Retrieve the active table.
-      const tabIndex = questTabIndex[this?._tabs[0]?.active];
-      const table = tableElements[tabIndex];
-
-      if (table)
-      {
-         const tqlPosition = $('#typhonjs-quest-log')[0].getBoundingClientRect();
-         const tablePosition = table.getBoundingClientRect();
-
-         // Manually calculate the max height for the table based on the position of the main window div and table.
-         tableElements.css('max-height', `${currentPosition.height - (tablePosition.top - tqlPosition.top + 16)}px`);
-      }
-
-      return currentPosition;
    }
 
    onPluginLoad(ev)

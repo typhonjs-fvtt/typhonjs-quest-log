@@ -1,13 +1,12 @@
-import Quest            from './plugins/system/database/Quest.js';
-import QuestCollection  from './plugins/data/QuestCollection.js';
+import Quest               from './plugins/system/database/Quest.js';
 
-import QuestPreview     from './view/preview/QuestPreview.js';
+import QuestPreview        from './view/preview/QuestPreview.js';
+import PositionValidator   from './view/tracker2/PositionValidator.js';
 
-import PluginLoader     from './plugins/PluginLoader.js';
-import { eventbus }     from './plugins/PluginManager.js';
+import PluginLoader        from './plugins/PluginLoader.js';
+import { eventbus }        from './plugins/PluginManager.js';
 
 import { constants, sessionConstants, settings } from '#constants';
-import PositionValidator from "./view/tracker2/PositionValidator.js";
 
 /**
  * Provides implementations for all Foundry hooks that TQL responds to and registers under. Please view the
@@ -18,7 +17,7 @@ import PositionValidator from "./view/tracker2/PositionValidator.js";
  * - `ready` - {@link TQLHooks.foundryReady} - A hook `TyphonJSQuestLog.Lifecycle.ready` is fired after TQL is ready.
  *
  * Foundry game hooks:
- * - `collapseSidebar` - {@link FoundryUIManager.collapseSidebar} - Handle tracking state of the sidebar.
+ * - `collapseSidebar` - {@link PositionValidator.collapseSidebar} - Handle tracking state of the sidebar.
  * - `dropActorSheetData` - {@link TQLHooks.dropActorSheetData} - Handle drop data for reward items in actor sheet.
  * - `dropCanvasData` - {@link TQLHooks.dropCanvasData} - Handle drop data for {@link Quest} on Foundry canvas.
  * - `getSceneControlButtons` - {@link TQLHooks.getSceneControlButtons} - Add TQL scene controls to 'note'.
@@ -424,7 +423,7 @@ export default class TQLHooks
             // Defer to make sure quest tracker is rendered before setting position.
             setTimeout(() =>
             {
-               if (tracker.rendered) { tracker.setPosition(constraints); }
+               if (tracker.rendered) { tracker.position.set(constraints); }
             }, 0);
          }
 

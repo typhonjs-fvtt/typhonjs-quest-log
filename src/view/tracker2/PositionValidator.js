@@ -188,7 +188,7 @@ export default class PositionValidator
    }
 
    /**
-    * Updates the tracker bounds based on pinned state and invokes {@link QuestTracker.setPosition} if changes occur.
+    * Updates the tracker bounds based on pinned state and sets the quest tracker position if changes occur.
     */
    static updateTracker()
    {

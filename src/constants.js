@@ -70,8 +70,8 @@ const questStatusI18n = {
 };
 
 /**
- * Stores the QuestLog tab indexes. This is used by QuestLog.setPosition to select the current table based on status
- * name.
+ * Stores the QuestLog tab indexes. This is used by QuestLog position validator to select the current table based on
+ * status name.
  *
  * @type {{inactive: number, available: number, active: number, completed: number, failed: number}}
  */

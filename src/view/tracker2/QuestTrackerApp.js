@@ -39,9 +39,6 @@ export default class QuestTrackerApp extends SvelteApplication
           * {@link Application.position}
           */
          this.position = JSON.parse(game.settings.get(constants.moduleName, settings.questTrackerPosition));
-
-         // When upgrading to `v0.7.7` it is necessary to set the default width.
-         if (!this.position?.width) { this.position.width = s_DEFAULT_WIDTH; }
       }
       catch (err)
       {

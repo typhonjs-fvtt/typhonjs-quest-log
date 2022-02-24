@@ -9,13 +9,13 @@ export default class PositionValidator
     * need to set these for '.window-content' to 'visible' which will cause an issue for very long tables. Thus we must
     * manually set the table max-heights based on the position / height of the {@link Application}.
     *
-    * @param {QuestLog} app - The quest log.
-    *
     * @param {PositionData}   position - The complete position with top, left, width, height keys.
+    *
+    * @param {QuestLog}       app - The quest log.
     *
     * @returns {PositionData} Adjusted position data.
     */
-   static checkPosition(app, position)
+   static checkPosition(position, app)
    {
       // Retrieve all the table elements.
       const tableElements = $('#typhonjs-quest-log .table');

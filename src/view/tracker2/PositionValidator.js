@@ -50,13 +50,11 @@ export default class PositionValidator
    /**
     * Check the position against the sidebar and hotbar.
     *
-    * @param {QuestTrackerApp} app - The quest tracker.
-    *
     * @param {PositionData}   position - The complete position with top, left, width, height keys.
     *
     * @returns {PositionData} Adjusted position data.
     */
-   static checkPosition(app, position)
+   static checkPosition(position)
    {
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
 

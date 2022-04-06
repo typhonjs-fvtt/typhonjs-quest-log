@@ -11,17 +11,17 @@ export default class PositionValidator
     *
     * @param {PositionData}   position - The complete position with top, left, width, height keys.
     *
-    * @param {QuestLog}       app - The quest log.
+    * @param {QuestLog}       parent - The quest log.
     *
     * @returns {PositionData} Adjusted position data.
     */
-   static checkPosition(position, app)
+   static checkPosition({ position, parent })
    {
       // Retrieve all the table elements.
       const tableElements = $('#typhonjs-quest-log .table');
 
       // Retrieve the active table.
-      const tabIndex = questTabIndex[app?._tabs[0]?.active];
+      const tabIndex = questTabIndex[parent?._tabs[0]?.active];
       const table = tableElements[tabIndex];
 
       if (table)

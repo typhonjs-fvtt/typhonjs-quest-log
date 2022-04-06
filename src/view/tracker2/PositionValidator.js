@@ -54,7 +54,7 @@ export default class PositionValidator
     *
     * @returns {PositionData} Adjusted position data.
     */
-   static checkPosition(position)
+   static checkPosition({ position })
    {
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
 

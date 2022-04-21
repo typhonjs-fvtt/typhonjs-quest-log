@@ -50,15 +50,19 @@ export default class PositionValidator
    /**
     * Check the position against the sidebar and hotbar.
     *
-    * @param {PositionData}   position - The complete position with top, left, width, height keys.
+    * @param {object}         opts - Options.
+    *
+    * @param {PositionData}   opts.position - The complete position with top, left, width, height keys.
+
+    * @param {object}         opts.rest - Any additional data passed to {@link Position.set}.
     *
     * @returns {PositionData} Adjusted position data.
     */
-   static checkPosition({ position })
+   static checkPosition({ position, rest })
    {
       const sidebarData = sidebar.currentCollapsed ? sidebar.collapsed : sidebar.open;
 
-      const { pinned = this.tracker.options.pinned } = position;
+      const { pinned = this.tracker.options.pinned } = rest;
 
       if (pinned)
       {

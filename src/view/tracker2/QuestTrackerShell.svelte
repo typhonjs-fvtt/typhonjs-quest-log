@@ -11,16 +11,15 @@
    // Application shell contract (only elementRoot is required).
    export let elementContent, elementRoot;
 
-   // Stores height changes between root / content elements and is used as a latch to calculate scroll bar activation
-   // and saving the current root position into module settings for `questTrackerPosition`. If passing true to
-   // TJSApplicationShell `heightChanged` is bound to `clientHeight` of the root & content elements.
-   let heightChanged = true;
-
    // Tracks the scroll bar active state.
    let scrollActivated = false;
 
+   const context = getContext('external');
+
+   const application = context.application;
+
    // SessionStorage store for `trackerShowBackground`.
-   const storeTrackerShowBackground = getContext('external').eventbus.triggerSync('tql:storage:session:store:get',
+   const storeTrackerShowBackground = context.eventbus.triggerSync('tql:storage:session:store:get',
     sessionConstants.trackerShowBackground, true);
 
    // A customized ApplicationShell is used to monitor the root & content clientHeight. Provides a check to compare
@@ -41,12 +40,12 @@
 
       if (elementRoot)
       {
-         // Save position of the root on any root or client change when quest tracker isn't resizable / auto-mode.
+         // Save position of the root on any root or client change when quest tracker isn't resizable / IE in auto-mode.
          if (!game.settings.get(constants.moduleName, settings.questTrackerResizable))
          {
             game.settings.set(constants.moduleName, settings.questTrackerPosition, JSON.stringify({
-               top: parseInt(elementRoot.style.top, 10),
-               left: parseInt(elementRoot.style.left, 10),
+               top: application.position.top,
+               left: application.position.left,
                width: elementRoot.clientWidth,
                height: elementRoot.clientHeight
             }));
@@ -54,8 +53,7 @@
       }
    }, 400);
 
-   // `heightChanged` is bound to the root & content clientHeight; execute throttle function on any changes.
-   $: throttle(heightChanged);
+   // $: throttle(heightChanged);
 
    // Set the `pointer-events` CSS attribute when scrollActivated changes. This allows the QuestTracker to pass through
    // mouse / pointer events to the game canvas below when scroll bars are not activated. Pointer events need to be
@@ -72,10 +70,19 @@
    {
       elementRoot.classList[$storeTrackerShowBackground ? 'remove' : 'add']('no-background');
    }
+
+   // Stores height changes between root and container elements and is used as a latch to calculate scroll bar
+   // activation and saving the current root position into module settings for `questTrackerPosition`. If passing true
+   // to TJSApplicationShell `appOffsetHeight` enables a `resizeObserver` action on the element root.
+   let containerOffsetHeight = true;
+   let appOffsetHeight = true;
+
+   // If either `containerOffsetHeight` or `appOffsetHeight` changes then invoke `throttle`.
+   $: throttle(Number.isFinite(containerOffsetHeight) || Number.isFinite(appOffsetHeight));
 </script>
 
 <svelte:options accessors={true}/>
 
-<TJSApplicationShell bind:elementContent bind:elementRoot bind:heightChanged transition={scale}>
-   <MainContainer />
+<TJSApplicationShell bind:elementContent bind:elementRoot bind:appOffsetHeight transition={scale}>
+   <MainContainer bind:containerOffsetHeight/>
 </TJSApplicationShell>

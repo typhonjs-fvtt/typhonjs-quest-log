@@ -16,7 +16,7 @@ quest runtime for Foundry VTT.
 When officially launched there will be a migration path for users of Forien's Quest Log to update to the TyphonJS Quest
 Log.
 
-**[Compatibility]**: _FoundryVTT_ 0.8.x
+**[Compatibility]**: _FoundryVTT_ v10+
 
 **[Systems]**: _any_
 

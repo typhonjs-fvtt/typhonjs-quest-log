@@ -26,7 +26,8 @@ This module provides comprehensive Quest Log system for players and Game Masters
 
 ## Installation
 
-Presently TQL is in development and is not officially released. The initial release should be available in Q1 '22. 
+Presently TQL is in development and is not officially released. The initial release should be available in the summer / 
+Q3 '22. 
 
 ## Usage
 

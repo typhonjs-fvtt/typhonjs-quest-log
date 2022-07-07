@@ -1,6 +1,6 @@
 import { constants, settings } from '#constants';
 
-const moduleId = constants.moduleName;
+const namespace = constants.moduleName;
 
 /**
  * The default location for the QuestTracker
@@ -21,7 +21,7 @@ const scope = {
 
 export const tqlSettings = [
    {
-      moduleId,
+      namespace,
       key: settings.allowPlayersDrag,
       options: {
          name: 'TyphonJSQuestLog.Settings.allowPlayersDrag.Enable',
@@ -34,7 +34,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.allowPlayersCreate,
       options: {
          name: 'TyphonJSQuestLog.Settings.allowPlayersCreate.Enable',
@@ -47,7 +47,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.allowPlayersAccept,
       options: {
          name: 'TyphonJSQuestLog.Settings.allowPlayersAccept.Enable',
@@ -60,7 +60,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.trustedPlayerEdit,
       options: {
          name: 'TyphonJSQuestLog.Settings.trustedPlayerEdit.Enable',
@@ -73,7 +73,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.countHidden,
       options: {
          name: 'TyphonJSQuestLog.Settings.countHidden.Enable',
@@ -86,7 +86,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.dynamicBookmarkBackground,
       options: {
          name: 'TyphonJSQuestLog.Settings.dynamicBookmarkBackground.Enable',
@@ -99,7 +99,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.navStyle,
       options: {
          name: 'TyphonJSQuestLog.Settings.navStyle.Enable',
@@ -116,7 +116,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.showTasks,
       options: {
          name: 'TyphonJSQuestLog.Settings.showTasks.Enable',
@@ -134,7 +134,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.defaultPermission,
       options: {
          name: 'TyphonJSQuestLog.Settings.defaultPermissionLevel.Enable',
@@ -152,7 +152,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.hideTQLFromPlayers,
       options: {
          name: 'TyphonJSQuestLog.Settings.hideTQLFromPlayers.Enable',
@@ -165,7 +165,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.notifyRewardDrop,
       options: {
          name: 'TyphonJSQuestLog.Settings.notifyRewardDrop.Enable',
@@ -178,7 +178,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.showFolder,
       options: {
          name: 'TyphonJSQuestLog.Settings.showFolder.Enable',
@@ -195,7 +195,7 @@ export const tqlSettings = [
    // Currently provides a hidden setting to set the default abstract reward image.
    // It may never be displayed in the module settings menu, but if it is in the future this is where it would go.
    {
-      moduleId,
+      namespace,
       key: settings.defaultAbstractRewardImage,
       options: {
          scope: scope.world,
@@ -216,7 +216,7 @@ export const tqlSettings = [
     * `value` may be a quest ID or an empty string.
     */
    {
-      moduleId,
+      namespace,
       key: settings.primaryQuest,
       options: {
          scope: scope.world,
@@ -227,7 +227,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.questTrackerEnabled,
       options: {
          scope: scope.client,
@@ -238,7 +238,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.questTrackerPinned,
       options: {
          scope: scope.client,
@@ -249,7 +249,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.questTrackerPosition,
       options: {
          scope: scope.client,
@@ -259,7 +259,7 @@ export const tqlSettings = [
    },
 
    {
-      moduleId,
+      namespace,
       key: settings.questTrackerResizable,
       options: {
          name: 'TyphonJSQuestLog.Settings.questTrackerResizable.Enable',

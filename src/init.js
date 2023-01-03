@@ -1,8 +1,7 @@
-import TQLHooks               from './TQLHooks.js';
+import TQLHooks   from './TQLHooks.js';
 
 // Initializes the TyphonJS TinyMCE plugin for Oembed media.
-import { initializePlugins }  from '@typhonjs-fvtt/runtime/tinymce';
-initializePlugins();
+import '@typhonjs-fvtt/runtime/tinymce';
 
 import '../styles/init.scss';             // Include the module styles to be picked up by PostCSS.
 

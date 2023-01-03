@@ -1,10 +1,10 @@
-import { TJSSettingsControl } from '@typhonjs-fvtt/runtime/svelte/plugin/system';
+import { TJSGameSettingsControl } from '@typhonjs-fvtt/svelte-standard/plugin/system';
 
 import { tqlSettings }  from './tqlSettings.js';
 
 import { constants, questStatus, sessionConstants, settings } from '#constants';
 
-export default class SettingsControl extends TJSSettingsControl
+export default class GameSettingsControl extends TJSGameSettingsControl
 {
    allowPlayersAccept(value)
    {

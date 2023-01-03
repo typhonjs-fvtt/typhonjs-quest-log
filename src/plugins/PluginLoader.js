@@ -1,14 +1,13 @@
-import { DOMPurify }       from '@typhonjs-fvtt/runtime/dompurify/plugin/system';
-import {
-   SessionStorage,
-   TJSGameSettings }       from '@typhonjs-fvtt/runtime/svelte/plugin/system';
+import { DOMPurify }          from '@typhonjs-fvtt/runtime/dompurify/plugin/system';
+import { TJSSessionStorage }  from '@typhonjs-fvtt/runtime/svelte/plugin/system';
+import { TJSGameSettings }    from '@typhonjs-fvtt/svelte-standard/plugin/system';
 
-import * as DataPlugins    from './data/index.js';
-import * as SystemPlugins  from './system/index.js';
+import * as DataPlugins       from './data/index.js';
+import * as SystemPlugins     from './system/index.js';
 
-import pluginManager       from './PluginManager.js';
+import pluginManager          from './PluginManager.js';
 
-import { constants }       from '#constants';
+import { constants }          from '#constants';
 
 export default class PluginLoader
 {
@@ -18,7 +17,7 @@ export default class PluginLoader
          // Manages session storage w/ Svelte stores for each session item.
          {
             name: 'tjs-system-session-storage',
-            instance: new SessionStorage(),
+            instance: new TJSSessionStorage(),
             options: { eventPrepend: 'tql' }
          },
          // Provides utilities, but also preloads Handlebars templates and registers helpers.
@@ -40,12 +39,12 @@ export default class PluginLoader
          // Add setting dispatch / triggers events w/ data for all settings changes; also provides Svelte stores.
          {
             name: 'tjs-system-game-settings',
-            instance: new TJSGameSettings()
+            instance: new TJSGameSettings(constants.moduleName)
          },
          // Add setting control / responder to settings changes.
          {
             name: 'tql-system-settings-control',
-            instance: new SystemPlugins.SettingsControl()
+            instance: new SystemPlugins.GameSettingsControl()
          },
          // Handles returning the left-hand note controls
          {

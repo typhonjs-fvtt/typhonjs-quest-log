@@ -1,10 +1,9 @@
 import alias               from '@rollup/plugin-alias';
-import { babel }           from '@rollup/plugin-babel';
 import commonjs            from '@rollup/plugin-commonjs';
 import postcss             from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
 import resolve             from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 import svelte              from 'rollup-plugin-svelte';
-// import preprocess          from 'svelte-preprocess';
+import preprocess          from 'svelte-preprocess';
 import { terser }          from 'rollup-plugin-terser';        // Terser is used for minification / mangling
 import {
    postcssConfig,
@@ -60,27 +59,13 @@ export default () =>
                ]
             }),
             svelte({
-               // preprocess: preprocess(),
-               onwarn: (warning, handler) =>
-               {
-                  // Suppress `a11y-missing-attribute` for missing href in <a> links.
-                  if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
-
-                  // Let Rollup handle all other warnings normally.
-                  handler(warning);
-               },
+               preprocess: preprocess()
             }),
             postcss(postcssMain),
             resolve(s_RESOLVE_CONFIG),
             commonjs(),
             // sourcemaps()
-            s_TYPHONJS_MODULE_LIB && typhonjsRuntime(),
-            babel({
-               babelHelpers: 'bundled',
-               presets: [
-                  ['@babel/preset-env', { bugfixes: true, shippedProposals: true, targets: { esmodules: true } }]
-               ]
-            })
+            s_TYPHONJS_MODULE_LIB && typhonjsRuntime()
          ]
       },
       {  // A 2nd virtual bundle to process TinyMCE CSS separately.
